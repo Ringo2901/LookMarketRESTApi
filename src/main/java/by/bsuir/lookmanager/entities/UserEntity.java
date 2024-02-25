@@ -16,28 +16,26 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    String login;
+    private String login;
 
-    String password;
+    private String password;
 
-    String firstname;
+    private String firstname;
 
-    String lastname;
+    private String lastname;
 
-    boolean sex;
-
-    String email;
+    private String email;
 
     @Column(name = "city_id")
-    Long cityId;
+    private Long cityId;
 
     @Column(name = "country_id")
-    Long countryId;
+    private Long countryId;
 
     @Column(name = "date_of_birth")
-    Timestamp dateOfBirth;
+    private Timestamp dateOfBirth;
 
     @Column(name = "authorisation_status")
     boolean authorisationStatus;
