@@ -4,7 +4,7 @@ import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
-import by.bsuir.lookmanager.entities.UserEntity;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
 import by.bsuir.lookmanager.dto.user.mapper.UserLoginMapper;
@@ -24,8 +24,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserProfileMapper userProfileMapper;
 
-
-    //todo refactor and exceptions!!!
     @Override
     public ApplicationResponseDto<Object> userRegister(UserRegisterRequestDto userRegisterRequestDto) {
         UserEntity user = userRegisterMapper.userRegisterRequestToUserEntity(userRegisterRequestDto);

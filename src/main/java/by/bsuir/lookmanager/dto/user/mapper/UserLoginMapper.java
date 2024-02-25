@@ -1,6 +1,6 @@
 package by.bsuir.lookmanager.dto.user.mapper;
 
-import by.bsuir.lookmanager.entities.UserEntity;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import org.mapstruct.Mapper;
 
