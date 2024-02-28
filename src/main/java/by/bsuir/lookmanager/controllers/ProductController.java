@@ -27,4 +27,13 @@ public class ProductController {
                                                                                @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
         return productService.getProducts(pageNumber, pageSize, sortBy, sortOrder);
     }
+
+    @GetMapping("/by-category/{id}")
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(@PathVariable Long id,
+                                                                                        @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                                                        @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                                                                        @RequestParam(required = false, defaultValue = "id") String sortBy,
+                                                                                        @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
+        return productService.getProductsByCategory(id, pageNumber, pageSize, sortBy, sortOrder);
+    }
 }
