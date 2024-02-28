@@ -9,6 +9,9 @@ import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,9 +43,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts() {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-        responseDto.setPayload(productListMapper.toGeneralProductResponseDtoList((List<ProductEntity>) productRepository.findAll()));
+        Pageable pageable;
+        if (sortOrder!=null && sortOrder.equals("asc")){
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        } else{
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        }
+        List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+        if (!responseEntityList.isEmpty()){
+            responseDto.setCode(200);
+            responseDto.setMessage("Products found!");
+            responseDto.setStatus("OK");
+            responseDto.setPayload(productListMapper.toGeneralProductResponseDtoList(productRepository.findAll(pageable).toList()));
+        }
+        else{
+            responseDto.setCode(400);
+            responseDto.setMessage("Products not found!");
+            responseDto.setStatus("ERROR");
+        }
         return responseDto;
     }
 }

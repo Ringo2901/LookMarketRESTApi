@@ -1,14 +1,11 @@
 package by.bsuir.lookmanager.controllers;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
-import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
+import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +21,10 @@ public class ProductController {
     }
 
     @GetMapping()
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getUserById() {
-        return productService.getProducts();
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                                               @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                                                               @RequestParam(required = false, defaultValue = "id") String sortBy,
+                                                                               @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
+        return productService.getProducts(pageNumber, pageSize, sortBy, sortOrder);
     }
 }

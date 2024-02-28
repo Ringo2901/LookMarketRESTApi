@@ -1,6 +1,5 @@
 package by.bsuir.lookmanager.dto.product.details;
 
-import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.product.promotion.Promotion;
 import by.bsuir.lookmanager.enums.*;
 import lombok.AllArgsConstructor;
