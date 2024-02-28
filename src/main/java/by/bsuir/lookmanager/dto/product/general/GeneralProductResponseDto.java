@@ -1,7 +1,5 @@
-package by.bsuir.lookmanager.dto.product;
+package by.bsuir.lookmanager.dto.product.general;
 
-import by.bsuir.lookmanager.entities.product.information.ProductInformation;
-import by.bsuir.lookmanager.entities.product.information.SubCategory;
 import by.bsuir.lookmanager.entities.product.promotion.Promotion;
 import by.bsuir.lookmanager.enums.ProductStatus;
 import lombok.AllArgsConstructor;
@@ -13,13 +11,13 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponseDto {
+public class GeneralProductResponseDto {
     private String title;
     private Timestamp createdTime;
     private Timestamp updateTime;
     private Double price;
     private ProductStatus status;
-    private ProductInformation productInformation;
     private Promotion promotion;
-    private SubCategory subCategory;
+    private String subCategoryName;
+    private String categoryName;
 }

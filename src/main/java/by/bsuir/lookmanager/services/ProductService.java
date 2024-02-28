@@ -1,8 +1,12 @@
 package by.bsuir.lookmanager.services;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
-import by.bsuir.lookmanager.dto.product.ProductResponseDto;
+import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
+import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
+
+import java.util.List;
 
 public interface ProductService {
-    ApplicationResponseDto<ProductResponseDto> getProductInformationById(Long id);
+    ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id);
+    ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts();
 }
