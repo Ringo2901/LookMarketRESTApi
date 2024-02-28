@@ -1,5 +1,7 @@
 package by.bsuir.lookmanager.entities.user;
 
+import by.bsuir.lookmanager.entities.product.ProductEntity;
+import by.bsuir.lookmanager.entities.user.information.Assessments;
 import by.bsuir.lookmanager.entities.user.information.UserProfile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -34,4 +37,11 @@ public class UserEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private UserProfile userProfile;
+    @ManyToMany
+    @JoinTable (name="favourites",
+            joinColumns=@JoinColumn (name="user_id"),
+            inverseJoinColumns=@JoinColumn(name="product_id"))
+    private List<ProductEntity> favouriteProducts;
+    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
+    private List<Assessments> assessments;
 }

@@ -1,6 +1,8 @@
 package by.bsuir.lookmanager.entities.product;
 
 import by.bsuir.lookmanager.entities.product.information.ProductInformation;
+import by.bsuir.lookmanager.entities.product.information.SubCategory;
+import by.bsuir.lookmanager.entities.product.promotion.Promotion;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.enums.ProductStatus;
 import jakarta.persistence.*;
@@ -30,14 +32,16 @@ public class ProductEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ProductStatus status;
-    @Column(name = "promotion")
-    private boolean hasPromotion;
-    @Column(name = "promotion_duration_to")
-    private Timestamp promotionDurationTo;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_information_id")
     private ProductInformation productInformation;
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "catalog_id")
     private Catalog catalog;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "sub_category_id")
+    private SubCategory subCategory;
+    @OneToOne (cascade=CascadeType.ALL)
+    @JoinColumn(name="promotion_id")
+    private Promotion promotion;
 }

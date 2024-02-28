@@ -38,9 +38,6 @@ public class ProductInformation {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "brand_id")
     private ProductBrand productBrand;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sub_category_id")
-    private SubCategory subCategory;
     @ManyToMany (fetch = FetchType.EAGER)
     @JoinTable(name = "product_size",
     joinColumns = @JoinColumn(name = "product_id"),
