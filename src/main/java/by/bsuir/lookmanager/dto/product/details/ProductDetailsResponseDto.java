@@ -37,5 +37,5 @@ public class ProductDetailsResponseDto {
     private List<Long> mediaId;
 
     private String login;
-    private Long userMediaId;
+    private Long userId;
 }

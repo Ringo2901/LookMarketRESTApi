@@ -23,7 +23,7 @@ public class GeneralProductResponseDto {
     private String categoryName;
 
     private String login;
-    private Long userMediaId;
+    private Long userId;
 
     private Long productMediaId;
 }

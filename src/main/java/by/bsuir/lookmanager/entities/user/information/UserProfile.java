@@ -38,4 +38,6 @@ public class UserProfile {
     @ManyToOne (cascade=CascadeType.ALL)
     @JoinColumn (name="country_id")
     private Country country;
+    @Column(name = "profile_image", columnDefinition = "bytea")
+    private byte[] imageData;
 }

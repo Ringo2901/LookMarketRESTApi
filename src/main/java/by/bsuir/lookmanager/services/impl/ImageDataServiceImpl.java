@@ -25,11 +25,11 @@ public class ImageDataServiceImpl implements ImageDataService {
         if (imageData == null) {
             responseDto.setCode(400);
             responseDto.setStatus("ERROR");
-            responseDto.setMessage("Product not found!");
+            responseDto.setMessage("Images not found!");
         } else {
             responseDto.setCode(200);
             responseDto.setStatus("OK");
-            responseDto.setMessage("Product found!");
+            responseDto.setMessage("Images found!");
             responseDto.setPayload(imageDataToDtoMapper.toImageDataDtoList(imageData));
         }
         return responseDto;

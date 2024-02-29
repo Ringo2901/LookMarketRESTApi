@@ -2,8 +2,10 @@ package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
+import by.bsuir.lookmanager.dto.user.mapper.UserToImageDataDtoMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
@@ -23,6 +25,8 @@ public class UserServiceImpl implements UserService {
     UserRegisterMapper userRegisterMapper;
     @Autowired
     UserProfileMapper userProfileMapper;
+    @Autowired
+    UserToImageDataDtoMapper userToImageDataDtoMapper;
 
     @Override
     public ApplicationResponseDto<Object> userRegister(UserRegisterRequestDto userRegisterRequestDto) {
@@ -76,6 +80,23 @@ public class UserServiceImpl implements UserService {
             responseDto.setStatus("OK");
             responseDto.setMessage("User found!");
             responseDto.setPayload(userProfileMapper.userEntityToUserProfileResponseDto(user));
+        }
+        return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<ImageDataDto> findProfileImageByUserId(Long id) {
+        ApplicationResponseDto<ImageDataDto> responseDto = new ApplicationResponseDto<>();
+        UserEntity user = userRepository.findById(id).orElse(null);
+        if (user == null){
+            responseDto.setCode(400);
+            responseDto.setStatus("ERROR");
+            responseDto.setMessage("User image not found!");
+        } else {
+            responseDto.setCode(200);
+            responseDto.setStatus("OK");
+            responseDto.setMessage("User image found!");
+            responseDto.setPayload(userToImageDataDtoMapper.userToImageDataDto(user));
         }
         return responseDto;
     }
