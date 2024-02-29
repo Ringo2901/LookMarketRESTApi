@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GeneralProductResponseDto {
+    private Long id;
     private String title;
     private Timestamp createdTime;
     private Timestamp updateTime;
@@ -20,4 +21,9 @@ public class GeneralProductResponseDto {
     private Promotion promotion;
     private String subCategoryName;
     private String categoryName;
+
+    private String login;
+    private Long userMediaId;
+
+    private Long productMediaId;
 }

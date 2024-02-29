@@ -25,6 +25,7 @@ public interface ProductDetailsMapper {
     @Mapping(source = "productInformation.colors", target = "colors")
     @Mapping(source = "productInformation.materials", target = "materials")
     @Mapping(source = "productInformation.tags", target = "tags")
+    @Mapping(source = "catalog.user.login", target = "login")
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);
 
     default List<Integer> mapProductSizes(List<ProductSize> productSizes) {

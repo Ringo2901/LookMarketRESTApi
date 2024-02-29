@@ -9,5 +9,6 @@ import org.mapstruct.Mapping;
 public interface GeneralProductResponseMapper {
     @Mapping(source = "subCategory.name", target = "subCategoryName")
     @Mapping(source = "subCategory.category.name", target = "categoryName")
+    @Mapping(source = "catalog.user.login", target = "login")
     GeneralProductResponseDto productEntityToResponseDto(ProductEntity product);
 }

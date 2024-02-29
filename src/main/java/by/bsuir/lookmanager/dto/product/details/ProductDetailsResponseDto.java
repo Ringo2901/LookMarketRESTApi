@@ -33,4 +33,9 @@ public class ProductDetailsResponseDto {
     private Promotion promotion;
     private String subCategoryName;
     private String categoryName;
+
+    private List<Long> mediaId;
+
+    private String login;
+    private Long userMediaId;
 }

@@ -5,16 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "media")
-public class Media {
+public class ImageData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "product_id")
-    private Long productId;
+    @Column(name = "media_file", columnDefinition = "bytea")
+    private byte[] imageData;
 }
+
