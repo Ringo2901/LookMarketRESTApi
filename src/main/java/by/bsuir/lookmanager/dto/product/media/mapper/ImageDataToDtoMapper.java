@@ -2,7 +2,6 @@ package by.bsuir.lookmanager.dto.product.media.mapper;
 
 import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
 import by.bsuir.lookmanager.entities.product.information.ImageData;
-import by.bsuir.lookmanager.entities.product.information.Media;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

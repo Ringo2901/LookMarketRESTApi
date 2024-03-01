@@ -6,5 +6,6 @@ import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
 import java.util.List;
 
 public interface ImageDataService {
-    ApplicationResponseDto<List<ImageDataDto>> getImageDataById(List<Long> ids);
+    ApplicationResponseDto<List<ImageDataDto>> getImageDataByProductId(Long id);
+    ApplicationResponseDto<ImageDataDto> getFirstImageDataByProductId(Long id);
 }

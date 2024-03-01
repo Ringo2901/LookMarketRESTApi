@@ -16,12 +16,16 @@ public class ImageController {
     ImageDataService imageDataService;
     @Autowired
     UserServiceImpl userService;
-    @GetMapping()
-    public ApplicationResponseDto<List<ImageDataDto>> getImageDataById(@RequestParam List<Long> ids) {
-        return imageDataService.getImageDataById(ids);
+    @GetMapping("/{id}")
+    public ApplicationResponseDto<List<ImageDataDto>> getImageDataByProductId(@PathVariable Long id) {
+        return imageDataService.getImageDataByProductId(id);
+    }
+    @GetMapping("productList/{id}")
+    public ApplicationResponseDto<ImageDataDto> getFirstImageDataByProductId(@PathVariable Long id) {
+        return imageDataService.getFirstImageDataByProductId(id);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/user/{id}")
     public ApplicationResponseDto<ImageDataDto> getUserImageDataByUserId(@PathVariable Long id) {
         return userService.findProfileImageByUserId(id);
     }

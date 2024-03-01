@@ -1,10 +1,8 @@
 package by.bsuir.lookmanager.entities.product;
 
-import by.bsuir.lookmanager.entities.product.information.Media;
 import by.bsuir.lookmanager.entities.product.information.ProductInformation;
 import by.bsuir.lookmanager.entities.product.information.SubCategory;
 import by.bsuir.lookmanager.entities.product.promotion.Promotion;
-import by.bsuir.lookmanager.entities.user.information.Assessments;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.enums.ProductStatus;
 import jakarta.persistence.*;
@@ -13,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @Data
 @NoArgsConstructor

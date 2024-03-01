@@ -24,6 +24,4 @@ public class GeneralProductResponseDto {
 
     private String login;
     private Long userId;
-
-    private Long productMediaId;
 }
