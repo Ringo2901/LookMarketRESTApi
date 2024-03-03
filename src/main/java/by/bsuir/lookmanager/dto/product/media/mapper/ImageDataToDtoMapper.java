@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.dto.product.media.mapper;
 
-import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataRequestDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.entities.product.information.ImageData;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -15,12 +16,22 @@ public interface ImageDataToDtoMapper {
     ImageDataToDtoMapper INSTANCE = Mappers.getMapper(ImageDataToDtoMapper.class);
 
     @Mapping(target = "imageData", ignore = true)
-    ImageDataDto mediaToDto(ImageData media);
+    ImageDataResponseDto mediaToDto(ImageData media);
 
     @AfterMapping
-    default void mapImageData(ImageData media, @MappingTarget ImageDataDto imageDataDto) {
+    default void mapImageData(ImageData media, @MappingTarget ImageDataResponseDto imageDataResponseDto) {
         if (media != null && media.getImageData() != null) {
-            imageDataDto.setImageData(Base64.getEncoder().encodeToString(media.getImageData()));
+            imageDataResponseDto.setImageData(Base64.getEncoder().encodeToString(media.getImageData()));
+        }
+    }
+
+    @Mapping(target = "imageData", ignore = true)
+    ImageData dtoToMedia (ImageDataRequestDto requestDto);
+
+    @AfterMapping
+    default void mapImageData(ImageDataRequestDto requestDto, @MappingTarget ImageData imageData) {
+        if (requestDto != null && requestDto.getImageData() != null) {
+            imageData.setImageData(Base64.getDecoder().decode(requestDto.getImageData()));
         }
     }
 }

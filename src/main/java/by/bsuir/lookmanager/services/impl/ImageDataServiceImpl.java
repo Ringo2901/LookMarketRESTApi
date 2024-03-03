@@ -2,7 +2,8 @@ package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.ImageDataRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
-import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataRequestDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataListToDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.information.ImageData;
@@ -22,8 +23,8 @@ public class ImageDataServiceImpl implements ImageDataService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
-    public ApplicationResponseDto<List<ImageDataDto>> getImageDataByProductId(Long id) {
-        ApplicationResponseDto<List<ImageDataDto>> responseDto = new ApplicationResponseDto<>();
+    public ApplicationResponseDto<List<ImageDataResponseDto>> getImageDataByProductId(Long id) {
+        ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = new ApplicationResponseDto<>();
         List<ImageData> imageData = imageDataRepository.findByProductId(id);
         if (imageData == null) {
             responseDto.setCode(400);
@@ -39,8 +40,8 @@ public class ImageDataServiceImpl implements ImageDataService {
     }
 
     @Override
-    public ApplicationResponseDto<ImageDataDto> getFirstImageDataByProductId(Long id) {
-        ApplicationResponseDto<ImageDataDto> responseDto = new ApplicationResponseDto<>();
+    public ApplicationResponseDto<ImageDataResponseDto> getFirstImageDataByProductId(Long id) {
+        ApplicationResponseDto<ImageDataResponseDto> responseDto = new ApplicationResponseDto<>();
         ImageData imageData = imageDataRepository.findFirstByProductId(id);
         if (imageData == null) {
             responseDto.setCode(400);
@@ -52,6 +53,24 @@ public class ImageDataServiceImpl implements ImageDataService {
             responseDto.setMessage("Images found!");
             responseDto.setPayload(imageDataToDtoMapper.mediaToDto(imageData));
         }
+        return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<List<ImageDataResponseDto>> addImageDataByProductId(Long id, ImageDataRequestDto requestDto) {
+        ImageData imageData = imageDataToDtoMapper.dtoToMedia(requestDto);
+        imageData.setProductId(id);
+        imageDataRepository.save(imageData);
+        return getImageDataByProductId(id);
+    }
+
+    @Override
+    public ApplicationResponseDto<Object> deleteImageDataById(Long id) {
+        ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
+        imageDataRepository.deleteById(id);
+        responseDto.setCode(200);
+        responseDto.setStatus("OK");
+        responseDto.setMessage("Images delete!");
         return responseDto;
     }
 }

@@ -1,6 +1,6 @@
 package by.bsuir.lookmanager.dto.user.mapper;
 
-import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import org.mapstruct.AfterMapping;
@@ -16,12 +16,12 @@ public interface UserToImageDataDtoMapper {
     ImageDataToDtoMapper INSTANCE = Mappers.getMapper(ImageDataToDtoMapper.class);
 
     @Mapping(target = "imageData", ignore = true)
-    ImageDataDto userToImageDataDto (UserEntity user);
+    ImageDataResponseDto userToImageDataDto (UserEntity user);
 
     @AfterMapping
-    default void mapImageData(UserEntity user, @MappingTarget ImageDataDto imageDataDto) {
+    default void mapImageData(UserEntity user, @MappingTarget ImageDataResponseDto imageDataResponseDto) {
         if (user != null && user.getUserProfile().getImageData() != null) {
-            imageDataDto.setImageData(Base64.getEncoder().encodeToString(user.getUserProfile().getImageData()));
+            imageDataResponseDto.setImageData(Base64.getEncoder().encodeToString(user.getUserProfile().getImageData()));
         }
     }
 }

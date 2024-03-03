@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface ProductDetailsMapper {
+public interface ProductDetailsResponseMapper {
     @Mapping(source = "subCategory.name", target = "subCategoryName")
     @Mapping(source = "subCategory.category.name", target = "categoryName")
+    @Mapping(source = "productInformation.description", target = "description")
     @Mapping(source = "productInformation.gender", target = "gender")
     @Mapping(source = "productInformation.season", target = "season")
     @Mapping(source = "productInformation.condition", target = "condition")
@@ -25,6 +26,7 @@ public interface ProductDetailsMapper {
     @Mapping(source = "productInformation.colors", target = "colors")
     @Mapping(source = "productInformation.materials", target = "materials")
     @Mapping(source = "productInformation.tags", target = "tags")
+    @Mapping(source = "productInformation.price", target = "price")
     @Mapping(source = "catalog.user.login", target = "login")
     @Mapping(source = "catalog.user.id", target = "userId")
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);

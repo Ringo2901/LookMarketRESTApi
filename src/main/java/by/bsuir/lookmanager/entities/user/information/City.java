@@ -16,7 +16,4 @@ public class City {
     private Long id;
     @Column (name = "name")
     private String name;
-    @ManyToOne (optional=false, cascade=CascadeType.ALL)
-    @JoinColumn (name="country_id")
-    private Country country;
 }

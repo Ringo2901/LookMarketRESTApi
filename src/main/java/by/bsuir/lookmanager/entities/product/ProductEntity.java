@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.sql.Timestamp;
 
@@ -23,22 +25,21 @@ public class ProductEntity {
     private Long id;
     @Column(name = "title")
     private String title;
-    @Column(name = "created_time")
+    @Column(name = "created_time", insertable = false)
     private Timestamp createdTime;
     @Column(name = "update_time")
     private Timestamp updateTime;
-    @Column(name = "price")
-    private Double price;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private ProductStatus status;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_information_id")
     private ProductInformation productInformation;
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false, cascade = CascadeType.DETACH)
     @JoinColumn(name = "catalog_id")
     private Catalog catalog;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "sub_category_id")
     private SubCategory subCategory;
     @OneToOne (cascade=CascadeType.ALL)

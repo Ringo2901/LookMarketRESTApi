@@ -2,6 +2,7 @@ package by.bsuir.lookmanager.entities.user;
 
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.user.information.Assessments;
+import by.bsuir.lookmanager.entities.user.information.SubscriptionEntity;
 import by.bsuir.lookmanager.entities.user.information.UserProfile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,10 @@ public class UserEntity {
             joinColumns=@JoinColumn (name="user_id"),
             inverseJoinColumns=@JoinColumn(name="product_id"))
     private List<ProductEntity> favouriteProducts;
+
+    @OneToMany(mappedBy = "subscriber", fetch = FetchType.LAZY)
+    private List<SubscriptionEntity> subscribers;
+
     @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
-    private List<Assessments> assessments;
+    private List<SubscriptionEntity> subscriptions;
 }

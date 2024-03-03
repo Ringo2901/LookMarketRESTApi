@@ -19,6 +19,7 @@ public class ProductDetailsResponseDto {
     private Double price;
     private ProductStatus status;
 
+    private String description;
     private ProductGender gender;
     private Season season;
     private Condition condition;

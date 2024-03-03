@@ -2,7 +2,7 @@ package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
-import by.bsuir.lookmanager.dto.product.media.ImageDataDto;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
 import by.bsuir.lookmanager.dto.user.mapper.UserToImageDataDtoMapper;
@@ -85,8 +85,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationResponseDto<ImageDataDto> findProfileImageByUserId(Long id) {
-        ApplicationResponseDto<ImageDataDto> responseDto = new ApplicationResponseDto<>();
+    public ApplicationResponseDto<ImageDataResponseDto> findProfileImageByUserId(Long id) {
+        ApplicationResponseDto<ImageDataResponseDto> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user == null){
             responseDto.setCode(400);

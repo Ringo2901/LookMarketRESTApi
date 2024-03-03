@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImageDataDto {
-    private Long id;
+public class ImageDataRequestDto {
     private String imageData;
 }

@@ -5,6 +5,7 @@ import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
 import by.bsuir.lookmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +18,14 @@ public class UserAuthController {
     UserService userService;
 
     @PostMapping("/signIn")
-    public ApplicationResponseDto<Object> userLogin(@RequestBody UserLoginRequestDto requestDto) {
-        return userService.userLogin(requestDto);
+    public ResponseEntity<ApplicationResponseDto<Object>> userLogin(@RequestBody UserLoginRequestDto requestDto) {
+        ApplicationResponseDto<Object> responseDto = userService.userLogin(requestDto);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @PostMapping("/signUp")
-    public ApplicationResponseDto<Object> userRegister(@RequestBody UserRegisterRequestDto requestDto) {
-        return userService.userRegister(requestDto);
+    public ResponseEntity<ApplicationResponseDto<Object>> userRegister(@RequestBody UserRegisterRequestDto requestDto) {
+        ApplicationResponseDto<Object> responseDto = userService.userRegister(requestDto);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 }
