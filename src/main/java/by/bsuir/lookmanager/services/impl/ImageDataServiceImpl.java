@@ -40,23 +40,6 @@ public class ImageDataServiceImpl implements ImageDataService {
     }
 
     @Override
-    public ApplicationResponseDto<ImageDataResponseDto> getFirstImageDataByProductId(Long id) {
-        ApplicationResponseDto<ImageDataResponseDto> responseDto = new ApplicationResponseDto<>();
-        ImageData imageData = imageDataRepository.findFirstByProductId(id);
-        if (imageData == null) {
-            responseDto.setCode(400);
-            responseDto.setStatus("ERROR");
-            responseDto.setMessage("Images not found!");
-        } else {
-            responseDto.setCode(200);
-            responseDto.setStatus("OK");
-            responseDto.setMessage("Images found!");
-            responseDto.setPayload(imageDataToDtoMapper.mediaToDto(imageData));
-        }
-        return responseDto;
-    }
-
-    @Override
     public ApplicationResponseDto<List<ImageDataResponseDto>> addImageDataByProductId(Long id, ImageDataRequestDto requestDto) {
         ImageData imageData = imageDataToDtoMapper.dtoToMedia(requestDto);
         imageData.setProductId(id);

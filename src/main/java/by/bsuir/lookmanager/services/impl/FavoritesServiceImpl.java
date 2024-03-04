@@ -1,9 +1,11 @@
 package by.bsuir.lookmanager.services.impl;
 
+import by.bsuir.lookmanager.dao.ImageDataRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
+import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.services.FavoritesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,13 @@ import java.util.List;
 @Component
 public class FavoritesServiceImpl implements FavoritesService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ProductListMapper productListMapper;
+    private ProductListMapper productListMapper;
+    @Autowired
+    private ImageDataRepository imageDataRepository;
+    @Autowired
+    private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavouritesByUserId(Long id) {
@@ -30,7 +36,11 @@ public class FavoritesServiceImpl implements FavoritesService {
             responseDto.setMessage("User found!");
             responseDto.setStatus("OK");
             responseDto.setCode(200);
-            responseDto.setPayload(productListMapper.toGeneralProductResponseDtoList(user.getFavouriteProducts()));
+            List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(user.getFavouriteProducts());
+            for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
+                generalProductResponseDto.setImageData(imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId())).getImageData());
+            }
+            responseDto.setPayload(generalProductResponseDtos);
         }
         return responseDto;
     }

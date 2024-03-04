@@ -2,15 +2,13 @@ package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
-import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
-import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
-import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
-import by.bsuir.lookmanager.dto.user.mapper.UserToImageDataDtoMapper;
-import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
+import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
 import by.bsuir.lookmanager.dto.user.mapper.UserLoginMapper;
+import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
 import by.bsuir.lookmanager.dto.user.mapper.UserRegisterMapper;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +16,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserLoginMapper userLoginMapper;
+    private UserLoginMapper userLoginMapper;
     @Autowired
-    UserRegisterMapper userRegisterMapper;
+    private UserRegisterMapper userRegisterMapper;
     @Autowired
-    UserProfileMapper userProfileMapper;
-    @Autowired
-    UserToImageDataDtoMapper userToImageDataDtoMapper;
+    private UserProfileMapper userProfileMapper;
 
     @Override
     public ApplicationResponseDto<Object> userRegister(UserRegisterRequestDto userRegisterRequestDto) {
@@ -71,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long id) {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(id).orElse(null);
-        if (user == null){
+        if (user == null) {
             responseDto.setCode(400);
             responseDto.setStatus("ERROR");
             responseDto.setMessage("User not found!");
@@ -80,23 +76,6 @@ public class UserServiceImpl implements UserService {
             responseDto.setStatus("OK");
             responseDto.setMessage("User found!");
             responseDto.setPayload(userProfileMapper.userEntityToUserProfileResponseDto(user));
-        }
-        return responseDto;
-    }
-
-    @Override
-    public ApplicationResponseDto<ImageDataResponseDto> findProfileImageByUserId(Long id) {
-        ApplicationResponseDto<ImageDataResponseDto> responseDto = new ApplicationResponseDto<>();
-        UserEntity user = userRepository.findById(id).orElse(null);
-        if (user == null){
-            responseDto.setCode(400);
-            responseDto.setStatus("ERROR");
-            responseDto.setMessage("User image not found!");
-        } else {
-            responseDto.setCode(200);
-            responseDto.setStatus("OK");
-            responseDto.setMessage("User image found!");
-            responseDto.setPayload(userToImageDataDtoMapper.userToImageDataDto(user));
         }
         return responseDto;
     }

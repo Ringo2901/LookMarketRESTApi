@@ -29,11 +29,11 @@ import java.util.List;
 @Component
 public class RecommendedServiceImpl implements RecommendedService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
     @Autowired
-    ProductListMapper productResponseMapper;
+    private ProductListMapper productResponseMapper;
 
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Long numberOfRecommendedItems) {

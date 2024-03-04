@@ -8,5 +8,4 @@ public interface UserService {
     ApplicationResponseDto<Object> userRegister(UserRegisterRequestDto userRegisterRequestDto);
     ApplicationResponseDto<Object> userLogin(UserLoginRequestDto userLoginRequestDto);
     ApplicationResponseDto<UserProfileResponseDto> findUserById(Long id);
-    ApplicationResponseDto<ImageDataResponseDto> findProfileImageByUserId(Long id);
 }

@@ -32,4 +32,6 @@ public class UserProfileResponseDto {
     private String postalCode;
     private String cityName;
     private String countryName;
+
+    private String imageData;
 }

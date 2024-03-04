@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class UserAuthController {
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @PostMapping("/signIn")
     public ResponseEntity<ApplicationResponseDto<Object>> userLogin(@RequestBody UserLoginRequestDto requestDto) {

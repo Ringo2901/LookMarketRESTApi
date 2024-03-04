@@ -10,6 +10,8 @@ import by.bsuir.lookmanager.dto.product.details.mapper.ProductDetailsRequestMapp
 import by.bsuir.lookmanager.dto.product.details.mapper.ProductDetailsResponseMapper;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
+import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataListToDto;
+import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
@@ -50,6 +52,10 @@ public class ProductServiceImpl implements ProductService {
     private SubCategoryRepository subCategoryRepository;
     @Autowired
     private CatalogRepository catalogRepository;
+    @Autowired
+    private ImageDataRepository imageDataRepository;
+    @Autowired
+    private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
     public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id) {
@@ -173,6 +179,9 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setMessage("Products found!");
             responseDto.setStatus("OK");
             List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(responseEntityList);
+            for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
+                generalProductResponseDto.setImageData(imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId())).getImageData());
+            }
             responseDto.setPayload(generalProductResponseDtos);
         } else {
             responseDto.setCode(400);

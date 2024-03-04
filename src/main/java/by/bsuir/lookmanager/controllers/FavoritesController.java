@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/favorites")
 public class FavoritesController {
     @Autowired
-    FavoritesService favoritesService;
+    private FavoritesService favoritesService;
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getFavouritesByUserId(@PathVariable Long id){
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavouritesByUserId(id);

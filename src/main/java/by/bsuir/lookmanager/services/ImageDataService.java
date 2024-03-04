@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface ImageDataService {
     ApplicationResponseDto<List<ImageDataResponseDto>> getImageDataByProductId(Long id);
-    ApplicationResponseDto<ImageDataResponseDto> getFirstImageDataByProductId(Long id);
     ApplicationResponseDto<List<ImageDataResponseDto>> addImageDataByProductId(Long id, ImageDataRequestDto requestDto);
     ApplicationResponseDto<Object> deleteImageDataById(Long id);
 }

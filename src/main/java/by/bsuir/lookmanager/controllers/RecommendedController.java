@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/recommended")
 public class RecommendedController {
     @Autowired
-    RecommendedService recommendedService;
+    private RecommendedService recommendedService;
     @GetMapping()
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getRecommendedProducts(@RequestParam Long userId,
                                                                                @RequestParam Long numberOfProducts) {

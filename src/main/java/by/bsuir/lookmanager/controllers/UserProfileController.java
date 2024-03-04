@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/profile")
 public class UserProfileController {
     @Autowired
-    UserService userService;
+    private UserService userService;
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getUserById(@PathVariable Long id) {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(id);

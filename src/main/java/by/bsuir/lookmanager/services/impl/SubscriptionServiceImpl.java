@@ -14,9 +14,9 @@ import java.util.List;
 @Component
 public class SubscriptionServiceImpl implements SubscriptionService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserSubscribersListMapper userSubscribersListMapper;
+    private UserSubscribersListMapper userSubscribersListMapper;
 
     @Override
     public ApplicationResponseDto<List<UserSubscriberResponseDto>> getSubscriptions(Long userId) {

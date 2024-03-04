@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/product")
 public class ProductController {
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> getProductById(@PathVariable Long id) {

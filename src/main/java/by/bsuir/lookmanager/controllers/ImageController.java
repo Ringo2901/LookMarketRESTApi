@@ -15,26 +15,12 @@ import java.util.List;
 @RequestMapping("/image")
 public class ImageController {
     @Autowired
-    ImageDataService imageDataService;
-    @Autowired
-    UserServiceImpl userService;
+    private ImageDataService imageDataService;
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<List<ImageDataResponseDto>>> getImageDataByProductId(@PathVariable Long id) {
         ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = imageDataService.getImageDataByProductId(id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
-    @GetMapping("productList/{id}")
-    public ResponseEntity<ApplicationResponseDto<ImageDataResponseDto>> getFirstImageDataByProductId(@PathVariable Long id) {
-        ApplicationResponseDto<ImageDataResponseDto> responseDto = imageDataService.getFirstImageDataByProductId(id);
-        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
-    }
-
-    @GetMapping("/user/{id}")
-    public ResponseEntity<ApplicationResponseDto<ImageDataResponseDto>> getUserImageDataByUserId(@PathVariable Long id) {
-        ApplicationResponseDto<ImageDataResponseDto> responseDto = userService.findProfileImageByUserId(id);
-        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
-    }
-
     @PostMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<List<ImageDataResponseDto>>> addImageDataByProductId(@PathVariable Long id, @RequestBody ImageDataRequestDto requestDto) {
         ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = imageDataService.addImageDataByProductId(id, requestDto);

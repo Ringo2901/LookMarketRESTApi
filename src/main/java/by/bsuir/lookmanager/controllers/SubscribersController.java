@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 public class SubscribersController {
     @Autowired
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
 
     @GetMapping("/subscriptions/{id}")
     public ResponseEntity<ApplicationResponseDto<List<UserSubscriberResponseDto>>> getAllSubscriptions(@PathVariable Long id) {
