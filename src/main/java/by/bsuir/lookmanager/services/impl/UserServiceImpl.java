@@ -25,9 +25,9 @@ public class UserServiceImpl implements UserService {
     private UserProfileMapper userProfileMapper;
 
     @Override
-    public ApplicationResponseDto<Object> userRegister(UserRegisterRequestDto userRegisterRequestDto) {
+    public ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto) {
         UserEntity user = userRegisterMapper.userRegisterRequestToUserEntity(userRegisterRequestDto);
-        ApplicationResponseDto<Object> userRegisterResponseDto = new ApplicationResponseDto<>();
+        ApplicationResponseDto<?> userRegisterResponseDto = new ApplicationResponseDto<>();
         if (userRepository.countByEmail(user.getEmail()) > 0) {
             userRegisterResponseDto.setCode(401);
             userRegisterResponseDto.setStatus("Error");
@@ -48,9 +48,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationResponseDto<Object> userLogin(UserLoginRequestDto userLoginRequestDto) {
+    public ApplicationResponseDto<?> userLogin(UserLoginRequestDto userLoginRequestDto) {
         UserEntity user = userLoginMapper.userLoginRequestToUserEntity(userLoginRequestDto);
-        ApplicationResponseDto<Object> userLoginResponseDto = new ApplicationResponseDto<>();
+        ApplicationResponseDto<?> userLoginResponseDto = new ApplicationResponseDto<>();
         if (userRepository.findByLoginAndPassword(user.getLogin(), user.getPassword()).isPresent()) {
             userLoginResponseDto.setCode(200);
             userLoginResponseDto.setStatus("OK");

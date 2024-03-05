@@ -10,6 +10,7 @@ import by.bsuir.lookmanager.dto.product.details.mapper.ProductDetailsRequestMapp
 import by.bsuir.lookmanager.dto.product.details.mapper.ProductDetailsResponseMapper;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataListToDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
@@ -56,6 +57,8 @@ public class ProductServiceImpl implements ProductService {
     private ImageDataRepository imageDataRepository;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id) {
@@ -180,7 +183,8 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setStatus("OK");
             List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(responseEntityList);
             for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
-                generalProductResponseDto.setImageData(imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId())).getImageData());
+                ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+                generalProductResponseDto.setImageData(imageDataResponseDto==null?null:imageDataResponseDto.getImageData());
             }
             responseDto.setPayload(generalProductResponseDtos);
         } else {

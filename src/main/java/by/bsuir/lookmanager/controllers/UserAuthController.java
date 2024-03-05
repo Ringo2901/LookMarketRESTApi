@@ -18,14 +18,14 @@ public class UserAuthController {
     private UserService userService;
 
     @PostMapping("/signIn")
-    public ResponseEntity<ApplicationResponseDto<Object>> userLogin(@RequestBody UserLoginRequestDto requestDto) {
-        ApplicationResponseDto<Object> responseDto = userService.userLogin(requestDto);
+    public ResponseEntity<ApplicationResponseDto<?>> userLogin(@RequestBody UserLoginRequestDto requestDto) {
+        ApplicationResponseDto<?> responseDto = userService.userLogin(requestDto);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<ApplicationResponseDto<Object>> userRegister(@RequestBody UserRegisterRequestDto requestDto) {
-        ApplicationResponseDto<Object> responseDto = userService.userRegister(requestDto);
+    public ResponseEntity<ApplicationResponseDto<?>> userRegister(@RequestBody UserRegisterRequestDto requestDto) {
+        ApplicationResponseDto<?> responseDto = userService.userRegister(requestDto);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 }

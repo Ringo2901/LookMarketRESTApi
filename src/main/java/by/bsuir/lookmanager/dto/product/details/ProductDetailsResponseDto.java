@@ -37,4 +37,6 @@ public class ProductDetailsResponseDto {
 
     private String login;
     private Long userId;
+
+    private boolean isFavourite;
 }

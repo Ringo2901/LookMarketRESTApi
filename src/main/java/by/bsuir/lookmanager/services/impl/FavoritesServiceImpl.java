@@ -1,11 +1,13 @@
 package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.ImageDataRepository;
+import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
+import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.services.FavoritesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ import java.util.List;
 public class FavoritesServiceImpl implements FavoritesService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ProductRepository productRepository;
     @Autowired
     private ProductListMapper productListMapper;
     @Autowired
@@ -42,6 +46,38 @@ public class FavoritesServiceImpl implements FavoritesService {
             }
             responseDto.setPayload(generalProductResponseDtos);
         }
+        return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<?> addFavourite(Long userId, Long productId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        if (user.getFavouriteProducts().contains(product)){
+            throw new RuntimeException("Already in favourites");
+        }
+        user.getFavouriteProducts().add(product);
+        userRepository.save(user);
+        ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
+        responseDto.setMessage("Product add to favourites!");
+        responseDto.setStatus("OK");
+        responseDto.setCode(200);
+        return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<?> deleteFavourite(Long userId, Long productId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        if (!user.getFavouriteProducts().contains(product)){
+            throw new RuntimeException("Not in favourites");
+        }
+        user.getFavouriteProducts().remove(product);
+        userRepository.save(user);
+        ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
+        responseDto.setMessage("Product remove to favourites!");
+        responseDto.setStatus("OK");
+        responseDto.setCode(200);
         return responseDto;
     }
 }

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface FavoritesService {
     ApplicationResponseDto<List<GeneralProductResponseDto>> getFavouritesByUserId (Long id);
+    ApplicationResponseDto<?> addFavourite (Long userId, Long productId);
+    ApplicationResponseDto<?> deleteFavourite (Long userId, Long productId);
 }

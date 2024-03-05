@@ -5,7 +5,7 @@ import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.user.*;
 
 public interface UserService {
-    ApplicationResponseDto<Object> userRegister(UserRegisterRequestDto userRegisterRequestDto);
-    ApplicationResponseDto<Object> userLogin(UserLoginRequestDto userLoginRequestDto);
+    ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto);
+    ApplicationResponseDto<?> userLogin(UserLoginRequestDto userLoginRequestDto);
     ApplicationResponseDto<UserProfileResponseDto> findUserById(Long id);
 }

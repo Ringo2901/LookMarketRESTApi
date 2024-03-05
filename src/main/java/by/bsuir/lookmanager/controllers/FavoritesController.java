@@ -19,4 +19,16 @@ public class FavoritesController {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavouritesByUserId(id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
+
+    @PostMapping("/{userId}/{productId}")
+    public ResponseEntity<ApplicationResponseDto<?>> addFavourites(@PathVariable Long userId, @PathVariable Long productId){
+        ApplicationResponseDto<?> responseDto = favoritesService.addFavourite(userId, productId);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
+    }
+
+    @DeleteMapping("/{userId}/{productId}")
+    public ResponseEntity<ApplicationResponseDto<?>> deleteFavourites(@PathVariable Long userId, @PathVariable Long productId){
+        ApplicationResponseDto<?> responseDto = favoritesService.deleteFavourite(userId, productId);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
+    }
 }
