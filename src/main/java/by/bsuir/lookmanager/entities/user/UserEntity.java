@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -43,10 +44,4 @@ public class UserEntity {
             joinColumns=@JoinColumn (name="user_id"),
             inverseJoinColumns=@JoinColumn(name="product_id"))
     private List<ProductEntity> favouriteProducts;
-
-    @OneToMany(mappedBy = "subscriber", fetch = FetchType.LAZY)
-    private List<SubscriptionEntity> subscribers;
-
-    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
-    private List<SubscriptionEntity> subscriptions;
 }

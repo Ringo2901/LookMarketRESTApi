@@ -6,7 +6,7 @@ import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import java.util.List;
 
 public interface FavoritesService {
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getFavouritesByUserId (Long id);
-    ApplicationResponseDto<?> addFavourite (Long userId, Long productId);
-    ApplicationResponseDto<?> deleteFavourite (Long userId, Long productId);
+    ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id);
+    ApplicationResponseDto<?> addFavorite(Long userId, Long productId);
+    ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId);
 }

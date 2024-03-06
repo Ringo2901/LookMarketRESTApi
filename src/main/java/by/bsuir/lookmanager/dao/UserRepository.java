@@ -12,5 +12,4 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     Optional<UserEntity> findByLoginAndPassword (String login, String password);
     int countByEmail (String email);
     int countByLogin (String login);
-    List<UserEntity> findBySubscriptionsSubscriberId(Long userId);
 }

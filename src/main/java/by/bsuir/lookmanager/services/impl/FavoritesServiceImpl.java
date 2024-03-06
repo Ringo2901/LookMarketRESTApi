@@ -29,7 +29,7 @@ public class FavoritesServiceImpl implements FavoritesService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavouritesByUserId(Long id) {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user == null) {
@@ -50,7 +50,7 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
-    public ApplicationResponseDto<?> addFavourite(Long userId, Long productId) {
+    public ApplicationResponseDto<?> addFavorite(Long userId, Long productId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         if (user.getFavouriteProducts().contains(product)){
@@ -66,7 +66,7 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
-    public ApplicationResponseDto<?> deleteFavourite(Long userId, Long productId) {
+    public ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         if (!user.getFavouriteProducts().contains(product)){

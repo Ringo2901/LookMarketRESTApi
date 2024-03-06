@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SubscriptionService {
     ApplicationResponseDto<List<UserSubscriberResponseDto>> getSubscriptions (Long userId);
+    ApplicationResponseDto<?> subscribe(Long subscriberId, Long subscriptionId);
+    ApplicationResponseDto<?> unsubscribe(Long subscriberId, Long subscriptionId);
 }

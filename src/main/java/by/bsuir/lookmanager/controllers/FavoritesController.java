@@ -15,20 +15,20 @@ public class FavoritesController {
     @Autowired
     private FavoritesService favoritesService;
     @GetMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getFavouritesByUserId(@PathVariable Long id){
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavouritesByUserId(id);
+    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getFavoritesByUserId(@PathVariable Long id){
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavoritesByUserId(id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @PostMapping("/{userId}/{productId}")
-    public ResponseEntity<ApplicationResponseDto<?>> addFavourites(@PathVariable Long userId, @PathVariable Long productId){
-        ApplicationResponseDto<?> responseDto = favoritesService.addFavourite(userId, productId);
+    public ResponseEntity<ApplicationResponseDto<?>> addFavorites(@PathVariable Long userId, @PathVariable Long productId){
+        ApplicationResponseDto<?> responseDto = favoritesService.addFavorite(userId, productId);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<ApplicationResponseDto<?>> deleteFavourites(@PathVariable Long userId, @PathVariable Long productId){
-        ApplicationResponseDto<?> responseDto = favoritesService.deleteFavourite(userId, productId);
+    public ResponseEntity<ApplicationResponseDto<?>> deleteFavorites(@PathVariable Long userId, @PathVariable Long productId){
+        ApplicationResponseDto<?> responseDto = favoritesService.deleteFavorite(userId, productId);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 }
