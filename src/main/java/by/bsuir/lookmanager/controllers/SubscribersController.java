@@ -21,15 +21,15 @@ public class SubscribersController {
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
-    @PostMapping("/{subscriberId}/{subscriptionId}")
-    public ResponseEntity<ApplicationResponseDto<?>> subscribe(@PathVariable Long subscriberId, @PathVariable Long subscriptionId) {
-        ApplicationResponseDto<?> responseDto = subscriptionService.subscribe(subscriberId, subscriptionId);
+    @PostMapping("/{subscriberId}/{sellerId}")
+    public ResponseEntity<ApplicationResponseDto<?>> subscribe(@PathVariable Long subscriberId, @PathVariable Long sellerId) {
+        ApplicationResponseDto<?> responseDto = subscriptionService.subscribe(subscriberId, sellerId);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
-    @DeleteMapping("/{subscriberId}/{subscriptionId}")
-    public ResponseEntity<ApplicationResponseDto<?>> unsubscribe(@PathVariable Long subscriberId, @PathVariable Long subscriptionId) {
-        ApplicationResponseDto<?> responseDto = subscriptionService.unsubscribe(subscriberId, subscriptionId);
+    @DeleteMapping("/{subscriberId}/{sellerId}")
+    public ResponseEntity<ApplicationResponseDto<?>> unsubscribe(@PathVariable Long subscriberId, @PathVariable Long sellerId) {
+        ApplicationResponseDto<?> responseDto = subscriptionService.unsubscribe(subscriberId, sellerId);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 }

@@ -36,7 +36,7 @@ public class UserEntity {
     private Date registrationDate;
     @Column(name = "last_sign_in")
     private Timestamp lastSignIn;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "profile_id")
     private UserProfile userProfile;
     @ManyToMany

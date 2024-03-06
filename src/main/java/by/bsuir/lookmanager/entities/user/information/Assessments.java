@@ -19,10 +19,10 @@ public class Assessments {
     private Integer assessment;
     @Column(name = "description")
     private String description;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "seller_id")
     private UserEntity seller;
 }

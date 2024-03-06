@@ -33,16 +33,16 @@ public class ProductEntity {
     @Column(name = "status")
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private ProductStatus status;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "product_information_id")
     private ProductInformation productInformation;
-    @ManyToOne(optional = false, cascade = CascadeType.DETACH)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "catalog_id")
     private Catalog catalog;
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @ManyToOne
     @JoinColumn(name = "sub_category_id")
     private SubCategory subCategory;
-    @OneToOne (cascade=CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name="promotion_id")
     private Promotion promotion;
 }

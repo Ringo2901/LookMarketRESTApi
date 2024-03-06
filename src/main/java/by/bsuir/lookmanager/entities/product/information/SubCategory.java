@@ -18,7 +18,7 @@ public class SubCategory {
     private Long id;
     @Column(name = "name")
     private String name;
-    @ManyToOne (cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn (name = "category_id")
     private Category category;
 }

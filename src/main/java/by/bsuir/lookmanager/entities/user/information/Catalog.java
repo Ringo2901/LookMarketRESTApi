@@ -17,7 +17,7 @@ public class Catalog {
     private Long id;
     @Column(name = "name")
     private String name;
-    @ManyToOne (optional=false, cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne (optional=false, fetch = FetchType.LAZY)
     @JoinColumn (name="seller_id")
     private UserEntity user;
 }

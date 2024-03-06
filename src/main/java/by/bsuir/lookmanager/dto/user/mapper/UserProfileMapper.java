@@ -2,8 +2,10 @@ package by.bsuir.lookmanager.dto.user.mapper;
 
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
+import by.bsuir.lookmanager.dto.user.UserProfileRequestDto;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
+import by.bsuir.lookmanager.entities.user.information.UserProfile;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -27,7 +29,6 @@ public interface UserProfileMapper {
     @Mapping(source = "userProfile.city.name", target = "cityName")
     @Mapping(source = "userProfile.country.name", target = "countryName")
     UserProfileResponseDto userEntityToUserProfileResponseDto(UserEntity entity);
-
 
     @AfterMapping
     default void mapImageData(UserEntity user, @MappingTarget UserProfileResponseDto userProfileResponseDto) {

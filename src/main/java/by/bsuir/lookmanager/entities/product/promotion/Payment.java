@@ -24,10 +24,10 @@ public class Payment {
     private Timestamp paymentDate;
     @Column(name = "payment_status")
     private PaymentStatus status;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "promotion_id")
     private Promotion promotion;
 

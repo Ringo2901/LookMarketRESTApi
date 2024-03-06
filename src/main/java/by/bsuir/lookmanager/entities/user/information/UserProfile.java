@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.sql.Date;
 
@@ -28,14 +30,15 @@ public class UserProfile {
     @Column(name = "phone_number")
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
+    @Column(name = "gender", columnDefinition = "user_gender")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private UserGender gender;
     @Column(name = "postal_code")
     private String postalCode;
-    @ManyToOne (cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn (name="city_id")
     private City city;
-    @ManyToOne (cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn (name="country_id")
     private Country country;
     @Column(name = "profile_image", columnDefinition = "bytea")
