@@ -15,7 +15,7 @@ import java.util.List;
 public class ProductTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     @Column(name = "name")
     private String tagName;
 }

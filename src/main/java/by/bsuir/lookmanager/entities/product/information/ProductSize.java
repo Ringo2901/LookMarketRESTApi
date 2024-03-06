@@ -15,7 +15,7 @@ import java.util.List;
 public class ProductSize {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     @Column(name = "size_name")
     private Integer size;
 }

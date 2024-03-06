@@ -15,7 +15,7 @@ import java.util.List;
 public class ProductBrand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     @Column(name = "brand_name")
     private String brandName;
 }

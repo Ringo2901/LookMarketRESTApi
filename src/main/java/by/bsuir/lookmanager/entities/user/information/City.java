@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     @Column (name = "name")
     private String name;
 }
