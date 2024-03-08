@@ -11,7 +11,6 @@ import by.bsuir.lookmanager.dto.product.details.mapper.ProductDetailsResponseMap
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
-import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataListToDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.*;
@@ -39,6 +38,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductSpecification productSpecification;
     @Autowired
     private ProductDetailsRequestMapper productDetailsRequestMapper;
+    @Autowired
+    private ProductInformationRepository productInformationRepository;
     @Autowired
     private ColorRepository colorRepository;
     @Autowired
@@ -131,6 +132,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductMaterial> materials = materialRepository.findAllById(requestDto.getMaterialsId());
         //exception
         entityToSave.getProductInformation().setMaterials(materials);
+        productInformationRepository.save(entityToSave.getProductInformation());
         ProductEntity product = productRepository.save(entityToSave);
         responseDto.setCode(200);
         responseDto.setStatus("OK");
@@ -182,9 +184,9 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setMessage("Products found!");
             responseDto.setStatus("OK");
             List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(responseEntityList);
-            for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
+            for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-                generalProductResponseDto.setImageData(imageDataResponseDto==null?null:imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
             }
             responseDto.setPayload(generalProductResponseDtos);
         } else {
