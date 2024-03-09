@@ -59,7 +59,7 @@ public class FavoritesServiceImpl implements FavoritesService {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         responseDto.setMessage("Product add to favourites!");
         responseDto.setStatus("OK");
-        responseDto.setCode(200);
+        responseDto.setCode(201);
         return responseDto;
     }
 

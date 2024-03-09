@@ -68,7 +68,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         responseDto.setMessage("Subscribed successfully!");
         responseDto.setStatus("OK");
-        responseDto.setCode(200);
+        responseDto.setCode(201);
         return responseDto;
     }
 

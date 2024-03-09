@@ -126,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
         entityToSave.getProductInformation().setMaterials(materials);
         productInformationRepository.save(entityToSave.getProductInformation());
         ProductEntity product = productRepository.save(entityToSave);
-        responseDto.setCode(200);
+        responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("Product save!");
         ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
@@ -152,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
         productInformation.setSizes(sizeRepository.findAllById(requestDto.getSizesId()));
         entityToUpdate.setProductInformation(productInformation);
         ProductEntity product = productRepository.save(entityToUpdate);
-        responseDto.setCode(200);
+        responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("Product update!");
         ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
@@ -182,7 +182,6 @@ public class ProductServiceImpl implements ProductService {
             }
             responseDto.setPayload(generalProductResponseDtos);
         } else {
-            responseDto.setCode(400);
             throw new NotFoundException("Products not found!");
         }
         return responseDto;

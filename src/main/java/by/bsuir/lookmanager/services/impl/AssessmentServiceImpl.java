@@ -35,7 +35,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         assessmentRepository.save(assessments);
         responseDto.setMessage("Assessment add!");
         responseDto.setStatus("OK");
-        responseDto.setCode(200);
+        responseDto.setCode(201);
         return responseDto;
     }
 

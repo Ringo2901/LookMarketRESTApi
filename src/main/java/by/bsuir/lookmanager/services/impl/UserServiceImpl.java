@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         }
         userProfileRepository.save(user.getUserProfile());
         userRepository.save(user);
-        userRegisterResponseDto.setCode(200);
+        userRegisterResponseDto.setCode(201);
         userRegisterResponseDto.setStatus("OK");
         userRegisterResponseDto.setMessage("Registration success!");
 
@@ -65,13 +65,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto) throws NotFoundException {
+    public ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto) throws NotFoundException, BadParameterValueException {
         UserEntity user = null;
         if (userLoginRequestDto.getPhone() != null) {
             user = userRepository.findByUserProfilePhoneNumberAndPassword(userLoginRequestDto.getPhone(), userLoginRequestDto.getPassword()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
         }
         if (userLoginRequestDto.getEmail() != null) {
             user = userRepository.findByEmailAndPassword(userLoginRequestDto.getEmail(), userLoginRequestDto.getPassword()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
+        }
+        if (user == null){
+            throw new BadParameterValueException("User not found, not enough parameters");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
         userLoginResponseDto.setCode(200);
@@ -113,7 +116,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setCountry(countryRepository.getReferenceById(requestDto.getCountryId()));
         user.setUserProfile(userProfile);
         user = userRepository.save(user);
-        responseDto.setCode(200);
+        responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("User profile update!");
         responseDto.setPayload(userProfileMapper.userEntityToUserProfileResponseDto(user));
