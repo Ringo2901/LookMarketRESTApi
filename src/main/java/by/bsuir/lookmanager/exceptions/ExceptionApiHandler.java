@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.exceptions;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import io.jsonwebtoken.JwtException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,6 +57,17 @@ public class ExceptionApiHandler {
     public ResponseEntity<ApplicationResponseDto<?>> catchUnauthorizedAccessError(UnauthorizedAccessError exception) {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         responseDto.setMessage(exception.getMessage());
+        responseDto.setStatus("ERROR");
+        responseDto.setCode(401);
+        return ResponseEntity
+                .status(responseDto.getCode())
+                .body(responseDto);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ApplicationResponseDto<?>> catchJwtExceptionError(JwtException exception) {
+        ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
+        responseDto.setMessage("Unauthorized access");
         responseDto.setStatus("ERROR");
         responseDto.setCode(401);
         return ResponseEntity

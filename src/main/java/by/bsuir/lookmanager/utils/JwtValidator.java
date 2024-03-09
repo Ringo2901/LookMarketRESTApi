@@ -2,6 +2,7 @@ package by.bsuir.lookmanager.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ public class JwtValidator {
         this.secret = secret;
     }
 
-    public Long validateTokenAndGetUserId(String token) {
+    public Long validateTokenAndGetUserId(String token) throws JwtException {
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         Jws<Claims> parsedToken = Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
         Claims claims = parsedToken.getBody();
