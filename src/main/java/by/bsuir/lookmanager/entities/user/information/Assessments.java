@@ -19,10 +19,8 @@ public class Assessments {
     private Integer assessment;
     @Column(name = "description")
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private UserEntity seller;
+    @Column(name = "user_id")
+    private Long userId;
+    @Column(name = "seller_id")
+    private Long sellerId;
 }
