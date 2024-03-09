@@ -9,7 +9,6 @@ import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserProfileRequestDto;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
-import by.bsuir.lookmanager.dto.user.mapper.UserLoginMapper;
 import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
 import by.bsuir.lookmanager.dto.user.mapper.UserRegisterMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
@@ -19,13 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserLoginMapper userLoginMapper;
     @Autowired
     private UserRegisterMapper userRegisterMapper;
     @Autowired
@@ -41,33 +39,54 @@ public class UserServiceImpl implements UserService {
     public ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto) {
         UserEntity user = userRegisterMapper.userRegisterRequestToUserEntity(userRegisterRequestDto);
         ApplicationResponseDto<?> userRegisterResponseDto = new ApplicationResponseDto<>();
-        if (userRepository.countByEmail(user.getEmail()) > 0) {
-            userRegisterResponseDto.setCode(401);
-            userRegisterResponseDto.setStatus("Error");
-            userRegisterResponseDto.setMessage("Registration failed! A user with this email already exists!");
-        } else {
-            if (userRepository.countByLogin(user.getLogin()) > 0) {
+        if (userRegisterRequestDto.getEmail() != null) {
+            user.setEmail(userRegisterRequestDto.getEmail());
+            if (userRepository.countByEmail(user.getEmail()) > 0) {
                 userRegisterResponseDto.setCode(401);
-                userRegisterResponseDto.setStatus("ERROR");
-                userRegisterResponseDto.setMessage("Registration failed! A user with this login already exists!");
-            } else {
-                userRepository.save(user);
-                userRegisterResponseDto.setCode(200);
-                userRegisterResponseDto.setStatus("OK");
-                userRegisterResponseDto.setMessage("Registration success!");
+                userRegisterResponseDto.setStatus("Error");
+                userRegisterResponseDto.setMessage("Registration failed! A user with this email already exists!");
+                return userRegisterResponseDto;
             }
         }
+        if (userRegisterRequestDto.getPhone() != null) {
+            user.getUserProfile().setPhoneNumber(userRegisterRequestDto.getPhone());
+            if (userRepository.countByUserProfilePhoneNumber(userRegisterRequestDto.getPhone()) > 0) {
+                userRegisterResponseDto.setCode(401);
+                userRegisterResponseDto.setStatus("ERROR");
+                userRegisterResponseDto.setMessage("Registration failed! A user with this phone already exists!");
+                return userRegisterResponseDto;
+            }
+        }
+        if (userRepository.countByLogin(userRegisterRequestDto.getLogin()) > 0) {
+            userRegisterResponseDto.setCode(401);
+            userRegisterResponseDto.setStatus("ERROR");
+            userRegisterResponseDto.setMessage("Registration failed! A user with this login already exists!");
+            return userRegisterResponseDto;
+        }
+        userProfileRepository.save(user.getUserProfile());
+        userRepository.save(user);
+        userRegisterResponseDto.setCode(200);
+        userRegisterResponseDto.setStatus("OK");
+        userRegisterResponseDto.setMessage("Registration success!");
+
         return userRegisterResponseDto;
     }
 
     @Override
-    public ApplicationResponseDto<?> userLogin(UserLoginRequestDto userLoginRequestDto) {
-        UserEntity user = userLoginMapper.userLoginRequestToUserEntity(userLoginRequestDto);
-        ApplicationResponseDto<?> userLoginResponseDto = new ApplicationResponseDto<>();
-        if (userRepository.findByLoginAndPassword(user.getLogin(), user.getPassword()).isPresent()) {
+    public ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto) {
+        Optional<UserEntity> user = Optional.empty();
+        if (userLoginRequestDto.getPhone() != null) {
+            user = userRepository.findByUserProfilePhoneNumberAndPassword(userLoginRequestDto.getPhone(), userLoginRequestDto.getPassword());
+        }
+        if (userLoginRequestDto.getEmail() != null) {
+            user = userRepository.findByEmailAndPassword(userLoginRequestDto.getEmail(), userLoginRequestDto.getPassword());
+        }
+        ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
+        if (user.isPresent()) {
             userLoginResponseDto.setCode(200);
             userLoginResponseDto.setStatus("OK");
             userLoginResponseDto.setMessage("Authorization success!");
+            userLoginResponseDto.setPayload(user.get().getId());
         } else {
             userLoginResponseDto.setCode(401);
             userLoginResponseDto.setStatus("ERROR");

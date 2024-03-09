@@ -32,7 +32,7 @@ public class UserEntity {
     private String email;
     @Column(name = "authorisation_status")
     private boolean authorisationStatus;
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", insertable = false)
     private Date registrationDate;
     @Column(name = "last_sign_in")
     private Timestamp lastSignIn;
