@@ -7,6 +7,8 @@ import by.bsuir.lookmanager.dto.user.UserSubscriberResponseDto;
 import by.bsuir.lookmanager.dto.user.mapper.UserSubscribersListMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.entities.user.information.SubscriptionEntity;
+import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private SubscriptionRepository subscriptionRepository;
 
     @Override
-    public ApplicationResponseDto<List<UserSubscriberResponseDto>> getSubscriptions(Long userId) {
+    public ApplicationResponseDto<List<UserSubscriberResponseDto>> getSubscriptions(Long userId) throws NotFoundException {
         ApplicationResponseDto<List<UserSubscriberResponseDto>> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user != null) {
@@ -39,25 +41,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             }
             responseDto.setPayload(userSubscribersListMapper.toSubscribersList(userEntities));
         } else {
-            responseDto.setCode(400);
-            responseDto.setStatus("ERROR");
-            responseDto.setMessage("User not found!");
+            throw new NotFoundException("User not found!");
         }
         return responseDto;
     }
 
     @Override
     @Transactional
-    public ApplicationResponseDto<?> subscribe(Long subscriberId, Long sellerId) {
+    public ApplicationResponseDto<?> subscribe(Long subscriberId, Long sellerId) throws NotFoundException, AlreadyExistsException {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         if (!userRepository.existsById(subscriberId)) {
-            throw new RuntimeException("Subscriber not found!");
+            throw new NotFoundException("Subscriber not found!");
         }
         if (!userRepository.existsById(sellerId)) {
-            throw new RuntimeException("Seller not found!");
+            throw new NotFoundException("Seller not found!");
         }
         if (subscriptionRepository.existsBySubscriberIdAndSellerId(subscriberId, sellerId)) {
-            throw new RuntimeException("Already subscribe");
+            throw new AlreadyExistsException("Already subscribe");
         }
 
         SubscriptionEntity subscriptionEntity = new SubscriptionEntity();
@@ -74,16 +74,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public ApplicationResponseDto<?> unsubscribe(Long subscriberId, Long sellerId) {
+    public ApplicationResponseDto<?> unsubscribe(Long subscriberId, Long sellerId) throws NotFoundException, AlreadyExistsException{
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         if (!userRepository.existsById(subscriberId)) {
-            throw new RuntimeException("Subscriber not found!");
+            throw new NotFoundException("Subscriber not found!");
         }
         if (!userRepository.existsById(sellerId)) {
-            throw new RuntimeException("Seller not found!");
+            throw new NotFoundException("Seller not found!");
         }
 
-        subscriptionRepository.delete(subscriptionRepository.findBySubscriberIdAndSellerId(subscriberId, sellerId).orElseThrow(() -> new RuntimeException("Not subscribed!")));
+        subscriptionRepository.delete(subscriptionRepository.findBySubscriberIdAndSellerId(subscriberId, sellerId).orElseThrow(() -> new AlreadyExistsException("Not subscribed!")));
 
         responseDto.setMessage("Unsubscribed successfully!");
         responseDto.setStatus("OK");

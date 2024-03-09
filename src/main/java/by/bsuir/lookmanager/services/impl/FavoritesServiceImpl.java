@@ -9,7 +9,10 @@ import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.user.UserEntity;
+import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.FavoritesService;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,32 +32,27 @@ public class FavoritesServiceImpl implements FavoritesService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id) {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-        UserEntity user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            responseDto.setMessage("User not found!");
-            responseDto.setStatus("ERROR");
-            responseDto.setCode(404);
-        } else {
-            responseDto.setMessage("User found!");
-            responseDto.setStatus("OK");
-            responseDto.setCode(200);
-            List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(user.getFavouriteProducts());
-            for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
-                generalProductResponseDto.setImageData(imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId())).getImageData());
-            }
-            responseDto.setPayload(generalProductResponseDtos);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+
+        responseDto.setMessage("User found!");
+        responseDto.setStatus("OK");
+        responseDto.setCode(200);
+        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(user.getFavouriteProducts());
+        for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
+            generalProductResponseDto.setImageData(imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId())).getImageData());
         }
+        responseDto.setPayload(generalProductResponseDtos);
         return responseDto;
     }
 
     @Override
-    public ApplicationResponseDto<?> addFavorite(Long userId, Long productId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-        if (user.getFavouriteProducts().contains(product)){
-            throw new RuntimeException("Already in favourites");
+    public ApplicationResponseDto<?> addFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found!"));
+        if (user.getFavouriteProducts().contains(product)) {
+            throw new AlreadyExistsException("Already in favourites");
         }
         user.getFavouriteProducts().add(product);
         userRepository.save(user);
@@ -66,11 +64,11 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
-    public ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-        if (!user.getFavouriteProducts().contains(product)){
-            throw new RuntimeException("Not in favourites");
+    public ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found!"));
+        if (!user.getFavouriteProducts().contains(product)) {
+            throw new AlreadyExistsException("Not in favourites");
         }
         user.getFavouriteProducts().remove(product);
         userRepository.save(user);

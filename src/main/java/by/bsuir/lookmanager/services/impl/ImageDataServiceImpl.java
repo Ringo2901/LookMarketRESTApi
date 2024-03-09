@@ -7,6 +7,7 @@ import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataListToDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.information.ImageData;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ImageDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,11 @@ public class ImageDataServiceImpl implements ImageDataService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
-    public ApplicationResponseDto<List<ImageDataResponseDto>> getImageDataByProductId(Long id) {
+    public ApplicationResponseDto<List<ImageDataResponseDto>> getImageDataByProductId(Long id) throws NotFoundException {
         ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = new ApplicationResponseDto<>();
         List<ImageData> imageData = imageDataRepository.findByProductId(id);
         if (imageData == null) {
-            responseDto.setCode(400);
-            responseDto.setStatus("ERROR");
-            responseDto.setMessage("Images not found!");
+            throw new NotFoundException("Images not found!");
         } else {
             responseDto.setCode(200);
             responseDto.setStatus("OK");

@@ -15,6 +15,7 @@ import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -62,13 +63,11 @@ public class ProductServiceImpl implements ProductService {
     private UserRepository userRepository;
 
     @Override
-    public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id) {
+    public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
         ProductEntity product = productRepository.findById(id).orElse(null);
         if (product == null) {
-            responseDto.setCode(400);
-            responseDto.setStatus("ERROR");
-            responseDto.setMessage("Product not found!");
+            throw new NotFoundException("Product not found!");
         } else {
             responseDto.setCode(200);
             responseDto.setStatus("OK");
@@ -80,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
@@ -93,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Specification<ProductEntity> spec = productSpecification.byCategoryId(categoryId);
         Pageable pageable;
@@ -112,25 +111,18 @@ public class ProductServiceImpl implements ProductService {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToSave = productDetailsRequestMapper.productRequestDtoToEntity(requestDto);
         Catalog catalog = catalogRepository.getReferenceById(requestDto.getCatalogId());
-        //exception
         entityToSave.setCatalog(catalog);
         ProductBrand brand = brandRepository.getReferenceById(requestDto.getBrandId());
-        //exception
         entityToSave.getProductInformation().setProductBrand(brand);
         SubCategory subCategory = subCategoryRepository.getReferenceById(requestDto.getSubCategoryId());
-        //exception
         entityToSave.setSubCategory(subCategory);
         List<ProductSize> sizes = sizeRepository.findAllById(requestDto.getSizesId());
-        //exception
         entityToSave.getProductInformation().setSizes(sizes);
         List<ProductTag> tags = tagRepository.findAllById(requestDto.getTagsId());
-        //exception
         entityToSave.getProductInformation().setTags(tags);
         List<ProductColor> colors = colorRepository.findAllById(requestDto.getColorsId());
-        //exception
         entityToSave.getProductInformation().setColors(colors);
         List<ProductMaterial> materials = materialRepository.findAllById(requestDto.getMaterialsId());
-        //exception
         entityToSave.getProductInformation().setMaterials(materials);
         productInformationRepository.save(entityToSave.getProductInformation());
         ProductEntity product = productRepository.save(entityToSave);
@@ -143,9 +135,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long id, ProductInformationRequestDto requestDto) {
+    public ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long id, ProductInformationRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
-        ProductEntity entityToUpdate = productRepository.findById(id).orElse(null);//.orElseThrow();
+        ProductEntity entityToUpdate = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found!"));
         ProductInformation productInformation = entityToUpdate.getProductInformation();
         productInformation.setDescription(requestDto.getDescription());
         productInformation.setPrice(requestDto.getPrice());
@@ -178,7 +170,7 @@ public class ProductServiceImpl implements ProductService {
         return responseDto;
     }
 
-    private ApplicationResponseDto<List<GeneralProductResponseDto>> getListApplicationResponseDto(ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList) {
+    private ApplicationResponseDto<List<GeneralProductResponseDto>> getListApplicationResponseDto(ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList) throws NotFoundException {
         if (!responseEntityList.isEmpty()) {
             responseDto.setCode(200);
             responseDto.setMessage("Products found!");
@@ -191,8 +183,7 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setPayload(generalProductResponseDtos);
         } else {
             responseDto.setCode(400);
-            responseDto.setMessage("Products not found!");
-            responseDto.setStatus("ERROR");
+            throw new NotFoundException("Products not found!");
         }
         return responseDto;
     }

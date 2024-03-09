@@ -7,6 +7,8 @@ import by.bsuir.lookmanager.dto.user.AssessmentRequestDto;
 import by.bsuir.lookmanager.dto.user.AssessmentResponseDto;
 import by.bsuir.lookmanager.dto.user.mapper.AssessmentMapper;
 import by.bsuir.lookmanager.entities.user.information.Assessments;
+import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.AssessmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,11 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Autowired
     private AssessmentMapper assessmentMapper;
     @Override
-    public ApplicationResponseDto<?> addAssessment(Long userId, AssessmentRequestDto requestDto) {
+    public ApplicationResponseDto<?> addAssessment(Long userId, AssessmentRequestDto requestDto) throws AlreadyExistsException{
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
+        if (assessmentRepository.existsByUserIdAndSellerId(userId, requestDto.getSellerId())){
+            throw new AlreadyExistsException("Assessment already exists");
+        }
         Assessments assessments = assessmentMapper.requestDtoToAssessmentEntity(requestDto);
         assessments.setUserId(userId);
         assessmentRepository.save(assessments);
@@ -35,9 +40,9 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public ApplicationResponseDto<?> removeAssessment(Long userId,Long sellerId) {
+    public ApplicationResponseDto<?> removeAssessment(Long userId,Long sellerId) throws NotFoundException{
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
-        Assessments assessments = assessmentRepository.findFirstByUserIdAndSellerId(userId, sellerId).orElseThrow(() -> new RuntimeException("exception"));
+        Assessments assessments = assessmentRepository.findFirstByUserIdAndSellerId(userId, sellerId).orElseThrow(() -> new NotFoundException("Assessment not found!"));
         assessmentRepository.delete(assessments);
         responseDto.setMessage("Assessment delete!");
         responseDto.setStatus("OK");
@@ -46,7 +51,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public ApplicationResponseDto<List<AssessmentResponseDto>> getAssessmentsBySellerId(Long sellerId) {
+    public ApplicationResponseDto<List<AssessmentResponseDto>> getAssessmentsBySellerId(Long sellerId) throws NotFoundException{
         ApplicationResponseDto<List<AssessmentResponseDto>> responseDto = new ApplicationResponseDto<>();
         List<Assessments> assessments = assessmentRepository.findBySellerId(sellerId);
         List<AssessmentResponseDto> assessmentResponseDtos = new ArrayList<>();
@@ -54,7 +59,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             AssessmentResponseDto assessmentResponseDto = new AssessmentResponseDto();
             assessmentResponseDto.setAssessment(assessment.getAssessment());
             assessmentResponseDto.setDescription(assessment.getDescription());
-            assessmentResponseDto.setLogin(userRepository.findById(assessment.getUserId()).orElseThrow(()->new RuntimeException("exception")).getLogin());
+            assessmentResponseDto.setLogin(userRepository.findById(assessment.getUserId()).orElseThrow(()->new NotFoundException("User not found!")).getLogin());
             assessmentResponseDto.setUserId(assessment.getUserId());
             assessmentResponseDtos.add(assessmentResponseDto);
         }

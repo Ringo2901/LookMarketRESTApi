@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface AssessmentRepository extends JpaRepository<Assessments, Long>, JpaSpecificationExecutor<Assessments> {
     Optional<Assessments> findFirstByUserIdAndSellerId (Long userId, Long sellerId);
     List<Assessments> findBySellerId (Long sellerId);
+    boolean existsByUserIdAndSellerId (Long userId, Long sellerId);
 }
