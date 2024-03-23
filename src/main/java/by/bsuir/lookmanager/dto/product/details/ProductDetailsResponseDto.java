@@ -35,6 +35,8 @@ public class ProductDetailsResponseDto {
     private String subCategoryName;
     private String categoryName;
 
+    private String firstname;
+    private String lastname;
     private String login;
     private Long userId;
 
