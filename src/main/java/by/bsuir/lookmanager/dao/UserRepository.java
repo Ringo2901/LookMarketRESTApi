@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmailAndPassword (String email, String password);
     Optional<UserEntity> findByUserProfilePhoneNumberAndPassword (String phoneNumber, String password);
+    Optional<UserEntity> findByEmail (String email);
     int countByEmail (String email);
     int countByUserProfilePhoneNumber (String phoneNumber);
     int countByLogin (String login);

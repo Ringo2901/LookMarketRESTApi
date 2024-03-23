@@ -5,10 +5,7 @@ import by.bsuir.lookmanager.dao.CountryRepository;
 import by.bsuir.lookmanager.dao.UserProfileRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
-import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
-import by.bsuir.lookmanager.dto.user.UserProfileRequestDto;
-import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
-import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
+import by.bsuir.lookmanager.dto.user.*;
 import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
 import by.bsuir.lookmanager.dto.user.mapper.UserRegisterMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
@@ -20,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -73,7 +71,7 @@ public class UserServiceImpl implements UserService {
         if (userLoginRequestDto.getEmail() != null) {
             user = userRepository.findByEmailAndPassword(userLoginRequestDto.getEmail(), userLoginRequestDto.getPassword()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
         }
-        if (user == null){
+        if (user == null) {
             throw new BadParameterValueException("User not found, not enough parameters");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
@@ -132,5 +130,24 @@ public class UserServiceImpl implements UserService {
         responseDto.setStatus("OK");
         responseDto.setMessage("User delete!");
         return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<Long> userGoogleAuth(UserGoogleAuthDto dto) {
+        Optional<UserEntity> user = userRepository.findByEmail(dto.getEmail());
+        ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
+        if (user.isEmpty()) {
+            UserEntity userToSave = new UserEntity();
+            userToSave.setEmail(dto.getEmail());
+            userToSave.setLogin(dto.getLogin());
+            userToSave = userRepository.save(userToSave);
+            userLoginResponseDto.setPayload(userToSave.getId());
+        } else {
+            userLoginResponseDto.setPayload(user.get().getId());
+        }
+        userLoginResponseDto.setCode(200);
+        userLoginResponseDto.setStatus("OK");
+        userLoginResponseDto.setMessage("Authorization success!");
+        return userLoginResponseDto;
     }
 }

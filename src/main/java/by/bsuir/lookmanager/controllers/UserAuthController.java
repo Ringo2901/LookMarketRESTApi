@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.controllers;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.user.UserGoogleAuthDto;
 import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
 import by.bsuir.lookmanager.services.UserService;
@@ -24,6 +25,16 @@ public class UserAuthController {
     @PostMapping("/signIn")
     public ResponseEntity<ApplicationResponseDto<?>> userLogin(@RequestBody UserLoginRequestDto requestDto) {
         ApplicationResponseDto<Long> responseDto = userService.userLogin(requestDto);
+        return getApplicationResponseDtoResponseEntity(responseDto);
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<ApplicationResponseDto<?>> userGoogleAuth(@RequestBody UserGoogleAuthDto requestDto) {
+        ApplicationResponseDto<Long> responseDto = userService.userGoogleAuth(requestDto);
+        return getApplicationResponseDtoResponseEntity(responseDto);
+    }
+
+    private ResponseEntity<ApplicationResponseDto<?>> getApplicationResponseDtoResponseEntity(ApplicationResponseDto<Long> responseDto) {
         if (responseDto.getPayload()!=null) {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.AUTHORIZATION, jwtProvider.createToken(responseDto.getPayload()));
