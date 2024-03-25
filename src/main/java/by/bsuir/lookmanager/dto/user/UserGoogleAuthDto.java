@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserGoogleAuthDto {
     private String email;
-    private String login;
+    private String firstname;
+    private String lastname;
 }

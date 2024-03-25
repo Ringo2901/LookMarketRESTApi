@@ -139,7 +139,11 @@ public class UserServiceImpl implements UserService {
         if (user.isEmpty()) {
             UserEntity userToSave = new UserEntity();
             userToSave.setEmail(dto.getEmail());
-            userToSave.setLogin(dto.getLogin());
+            UserProfile profile = new UserProfile();
+            profile.setFirstname(dto.getFirstname());
+            profile.setLastname(dto.getLastname());
+            userToSave.setUserProfile(profile);
+            userProfileRepository.save(profile);
             userToSave = userRepository.save(userToSave);
             userLoginResponseDto.setPayload(userToSave.getId());
         } else {
