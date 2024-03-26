@@ -1,30 +1,28 @@
 package by.bsuir.lookmanager.services.impl;
 
+import by.bsuir.lookmanager.dao.ImageDataRepository;
 import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
+import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
-import by.bsuir.lookmanager.entities.user.UserEntity;
+import by.bsuir.lookmanager.exceptions.BadParameterValueException;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
+import by.bsuir.lookmanager.recomended.ProductSimilarityCalculator;
 import by.bsuir.lookmanager.services.RecommendedService;
-import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.eval.RecommenderBuilder;
-import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
-import org.apache.mahout.cf.taste.impl.common.FastIDSet;
-import org.apache.mahout.cf.taste.impl.model.GenericBooleanPrefDataModel;
-import org.apache.mahout.cf.taste.impl.recommender.GenericBooleanPrefItemBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
-import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class RecommendedServiceImpl implements RecommendedService {
@@ -34,55 +32,48 @@ public class RecommendedServiceImpl implements RecommendedService {
     private ProductRepository productRepository;
     @Autowired
     private ProductListMapper productResponseMapper;
+    @Autowired
+    private ImageDataRepository imageDataRepository;
+    @Autowired
+    private ImageDataToDtoMapper imageDataToDtoMapper;
+    @Autowired
+    private ProductSimilarityCalculator productSimilarityCalculator;
 
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Long numberOfRecommendedItems) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        Pageable pageable = PageRequest.of(0, 100, Sort.by("updateTime").descending());
+        List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+        List<ProductEntity> favouriteProducts = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Not Found!")).getFavouriteProducts();
+        Map<ProductEntity, Double> similarityMap = new HashMap<>();
+        for (ProductEntity product : responseEntityList) {
+            similarityMap.put(product, 0.0);
+        }
         try {
-            DataModel model = buildDataModel();
-            RecommenderBuilder recommenderBuilder = new RecommenderBuilder() {
-                public Recommender buildRecommender(DataModel model) throws TasteException {
-                    //ItemSimilarity similarity = new EuclideanDistanceSimilarity(model);
-                    ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
-
-                    //Optimizer optimizer = new NonNegativeQuadraticOptimizer();
-                    return new GenericBooleanPrefItemBasedRecommender(model, similarity);
+            productSimilarityCalculator.initializeIndex(responseEntityList);
+            for (ProductEntity favouriteProduct : favouriteProducts) {
+                for (ProductEntity product : similarityMap.keySet()) {
+                    similarityMap.put(product, similarityMap.get(product) + productSimilarityCalculator.calculateSimilarity(favouriteProduct, product));
                 }
-            };
-
-            Recommender recommender = recommenderBuilder.buildRecommender(model);
-            List<RecommendedItem> recommendations = recommender.recommend(userId, Math.toIntExact(numberOfRecommendedItems));
-
-            List<ProductEntity> recommendedProducts = new ArrayList<>();
-
-            List<ProductEntity> allProducts = productRepository.findAll();
-
-            for (RecommendedItem recommendedItem : recommendations) {
-                long productId = recommendedItem.getItemID();
-                allProducts.stream()
-                        .filter(product -> product.getId() == productId)
-                        .findFirst().ifPresent(recommendedProducts::add);
             }
-            responseDto.setPayload(productResponseMapper.toGeneralProductResponseDtoList(recommendedProducts));
-        } catch (TasteException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new BadParameterValueException("Some troubles!");
         }
+        List<ProductEntity> topNKeys = similarityMap.entrySet().stream()
+                .sorted(Map.Entry.<ProductEntity, Double>comparingByValue().reversed())
+                .limit(numberOfRecommendedItems)
+                .map(Map.Entry::getKey)
+                .toList();
+        responseDto.setCode(200);
+        responseDto.setStatus("OK");
+        responseDto.setMessage("Product delete!");
+        List<GeneralProductResponseDto> responseDtos = productResponseMapper.toGeneralProductResponseDtoList(topNKeys);
+        for (GeneralProductResponseDto generalProductResponseDto : responseDtos) {
+            ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+        }
+        responseDto.setPayload(responseDtos);
         return responseDto;
-    }
-
-    private DataModel buildDataModel() {
-        FastByIDMap<FastIDSet> userData = new FastByIDMap<>();
-
-        List<UserEntity> users = (List<UserEntity>) userRepository.findAll();
-
-        for (UserEntity user : users) {
-            FastIDSet preferences = new FastIDSet();
-            for (ProductEntity product : user.getFavouriteProducts()) {
-                preferences.add(product.getId());
-            }
-            userData.put(user.getId(), preferences);
-        }
-
-        return new GenericBooleanPrefDataModel(userData);
     }
 }

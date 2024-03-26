@@ -59,8 +59,6 @@ public class ProductServiceImpl implements ProductService {
     private ImageDataRepository imageDataRepository;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id) throws NotFoundException {
