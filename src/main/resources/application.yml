@@ -1,5 +1,4 @@
 server:
-  port: 12200
   servlet:
     context-path: /api/web
 
