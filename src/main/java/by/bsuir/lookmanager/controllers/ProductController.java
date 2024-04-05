@@ -30,10 +30,8 @@ public class ProductController {
                                                                                @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                                @RequestParam(required = false, defaultValue = "id") String sortBy,
                                                                                @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
-        //ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProducts(pageNumber, pageSize, sortBy, sortOrder);
-        ApplicationResponseDto responseDto = new ApplicationResponseDto<>();
-        responseDto.setPayload(List.of(new GeneralProductResponseDto()));
-        return ResponseEntity.status(200).body(responseDto);//responseDto.getCode()).body(responseDto);
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProducts(pageNumber, pageSize, sortBy, sortOrder);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @GetMapping("/by-category/{id}")
