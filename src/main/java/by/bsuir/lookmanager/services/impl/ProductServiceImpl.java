@@ -15,9 +15,13 @@ import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
+import by.bsuir.lookmanager.enums.AgeType;
+import by.bsuir.lookmanager.enums.ProductGender;
+import by.bsuir.lookmanager.enums.Season;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -101,6 +105,22 @@ public class ProductServiceImpl implements ProductService {
         }
         List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
         return getListApplicationResponseDto(responseDto, responseEntityList);
+    }
+
+    @Override
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
+                                                                                          List<Integer> size, List<String> color, String brand, List<String> filtSeason, List<String> filtGender,
+                                                                                          List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
+                                                                                          Double minPrice, Double maxPrice)
+    {
+        List<GeneralProductResponseDto> products = productRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice);
+
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        responseDto.setStatus("Product found!");
+        responseDto.setCode(200);
+        responseDto.setStatus("OK");
+        responseDto.setPayload(products);
+        return responseDto;
     }
 
     @Override
