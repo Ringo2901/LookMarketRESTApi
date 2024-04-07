@@ -66,7 +66,7 @@ public class ProductController {
                                                                                                           @RequestParam(required = false) List<String> category,
                                                                                                           @RequestParam(required = false, defaultValue = "0") Double minPrice,
                                                                                                           @RequestParam(required = false, defaultValue = "1000") Double maxPrice) throws SQLException {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(query, pageSize, pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice);
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(query, pageSize, ++pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
