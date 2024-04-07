@@ -113,7 +113,7 @@ public class ProductServiceImpl implements ProductService {
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice)
     {
-        List<GeneralProductResponseDto> products = productRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size.toArray(new Integer[size.size()]), color.toArray(new String[color.size()]), brand, filtSeason.toArray(new String[filtSeason.size()]), filtGender.toArray(new String[filtGender.size()]), filtAgeType.toArray(new String[filtAgeType.size()]), tags.toArray(new String[tags.size()]), materials.toArray(new String[materials.size()]), subcategory.toArray(new String[subcategory.size()]), category.toArray(new String[category.size()]), minPrice, maxPrice);
+        List<GeneralProductResponseDto> products = productRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size.toArray(new Integer[0]), color.toArray(new String[0]), brand, filtSeason.toArray(new String[0]), filtGender.toArray(new String[0]), filtAgeType.toArray(new String[0]), tags.toArray(new String[0]), materials.toArray(new String[0]), subcategory.toArray(new String[0]), category.toArray(new String[0]), minPrice, maxPrice);
 
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         responseDto.setStatus("Product found!");
