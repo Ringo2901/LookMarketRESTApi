@@ -19,7 +19,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
     Page<ProductEntity> findAll(Specification<ProductEntity> spec, Pageable pageable);
 
-    @Procedure
+    @Procedure(name = "get_products")
     List<GeneralProductResponseDto> getProducts(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                 Integer[] size, String[] color, String brand, String[] filtSeason, String[] filtGender,
                                                 String[] filtAgeType, String[] tags, String[] materials, String[] subcategory, String[] category,
