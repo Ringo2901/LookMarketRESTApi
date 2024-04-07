@@ -9,6 +9,7 @@ import by.bsuir.lookmanager.enums.AgeType;
 import by.bsuir.lookmanager.enums.ProductGender;
 import by.bsuir.lookmanager.enums.Season;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface ProductService {
@@ -21,7 +22,7 @@ public interface ProductService {
     ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                                                    List<Integer> size, List<String> color, String brand, List<String> filtSeason, List<String> filtGender,
                                                                                    List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
-                                                                                   Double minPrice, Double maxPrice);
+                                                                                   Double minPrice, Double maxPrice) throws SQLException;
     ApplicationResponseDto<ProductDetailsResponseDto> saveProduct(ProductDetailsRequestDto requestDto);
 
     ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long id, ProductInformationRequestDto requestDto);
