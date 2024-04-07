@@ -56,7 +56,7 @@ public class ProductController {
                                                                                                           @RequestParam(required = false, defaultValue = "desc") String sortOrder,
                                                                                                           @RequestParam(required = false) List<Integer> sizes,
                                                                                                           @RequestParam(required = false) List<String> colors,
-                                                                                                          @RequestParam(required = false) String brand,
+                                                                                                          @RequestParam(required = false) List<String> brand,
                                                                                                           @RequestParam(required = false) List<String> seasons,
                                                                                                           @RequestParam(required = false) List<String> genders,
                                                                                                           @RequestParam(required = false) List<String> ageTypes,

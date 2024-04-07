@@ -108,10 +108,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
-                                                                                          List<Integer> size, List<String> color, String brand, List<String> filtSeason, List<String> filtGender,
+                                                                                          List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
-        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size!=null?size.toArray(new Integer[size.size()]):null, color!=null?color.toArray(new String[color.size()]):null, brand, filtSeason!=null?filtSeason.toArray(new String[filtSeason.size()]):null, filtGender!=null?filtGender.toArray(new String[0]):null, filtAgeType!=null?filtAgeType.toArray(new String[0]):null, tags!=null?tags.toArray(new String[0]):null, materials!=null?materials.toArray(new String[0]):null, subcategory!=null?subcategory.toArray(new String[0]):null, category!=null?category.toArray(new String[0]):null, minPrice, maxPrice);
+        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size!=null?size.toArray(new Integer[size.size()]):null, color!=null?color.toArray(new String[color.size()]):null, brand!=null?brand.toArray(new String[brand.size()]):null, filtSeason!=null?filtSeason.toArray(new String[filtSeason.size()]):null, filtGender!=null?filtGender.toArray(new String[0]):null, filtAgeType!=null?filtAgeType.toArray(new String[0]):null, tags!=null?tags.toArray(new String[0]):null, materials!=null?materials.toArray(new String[0]):null, subcategory!=null?subcategory.toArray(new String[0]):null, category!=null?category.toArray(new String[0]):null, minPrice, maxPrice);
 
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         responseDto.setStatus("Product found!");

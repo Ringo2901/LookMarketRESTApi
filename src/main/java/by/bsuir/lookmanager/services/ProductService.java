@@ -20,7 +20,7 @@ public interface ProductService {
     ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
-                                                                                   List<Integer> size, List<String> color, String brand, List<String> filtSeason, List<String> filtGender,
+                                                                                   List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                    List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                    Double minPrice, Double maxPrice) throws SQLException;
     ApplicationResponseDto<ProductDetailsResponseDto> saveProduct(ProductDetailsRequestDto requestDto);
