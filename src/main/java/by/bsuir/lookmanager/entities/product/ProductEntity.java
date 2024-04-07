@@ -19,31 +19,6 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@NamedNativeQuery(
-        name = "get_products",
-        query = "SELECT * FROM get_products(:query, :pageSize, :pageNumber, :sortBy, :sortOrder, :size, :color, :brand, :filtSeason, :filtGender, :filtAgeType, :tags, :materials, :subcategory, :category, :minPrice, :maxPrice)",
-        resultSetMapping = "GeneralProductResponseMapping"
-)
-@SqlResultSetMapping(
-        name = "GeneralProductResponseMapping",
-        classes = @ConstructorResult(
-                targetClass = GeneralProductResponseDto.class,
-                columns = {
-                        @ColumnResult(name = "id", type = Long.class),
-                        @ColumnResult(name = "status", type = String.class),
-                        @ColumnResult(name = "title", type = String.class),
-                        @ColumnResult(name = "price", type = BigDecimal.class),
-                        @ColumnResult(name = "createdtime", type = Timestamp.class),
-                        @ColumnResult(name = "updatetime", type = Timestamp.class),
-                        @ColumnResult(name = "subcategoryname", type = String.class),
-                        @ColumnResult(name = "categoryname", type = String.class),
-                        @ColumnResult(name = "userid", type = Long.class),
-                        @ColumnResult(name = "login", type = String.class),
-                        @ColumnResult(name = "imageid", type = Long.class),
-                        @ColumnResult(name = "imagedata", type = byte[].class)
-                }
-        )
-)
 @Entity
 @Table(name = "product")
 public class ProductEntity {

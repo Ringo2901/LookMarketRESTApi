@@ -1,5 +1,6 @@
 package by.bsuir.lookmanager.dto.product.general;
 
+import by.bsuir.lookmanager.enums.ProductStatus;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
@@ -15,10 +16,9 @@ import java.util.Base64;
 public class GeneralProductResponseDto {
     private Long id;
     private String title;
-    @Temporal(TemporalType.TIMESTAMP)
+    private ProductStatus status;
     private Timestamp createdTime;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private Timestamp updateTime;
     private Double price;
     private String subCategoryName;
@@ -30,13 +30,4 @@ public class GeneralProductResponseDto {
     private Long imageId;
     private String imageData;
     //private boolean isFavourite;
-
-
-    public void setImageData(byte[] imageData) {
-        this.imageData = Base64.getEncoder().encodeToString(imageData);;
-    }
-
-    public void setImageData(String imageData) {
-        this.imageData = imageData;;
-    }
 }
