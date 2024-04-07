@@ -32,6 +32,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
+    private ProductNativeRepository productNativeRepository;
+    @Autowired
     private ProductDetailsResponseMapper productDetailsResponseMapper;
     @Autowired
     private ProductListMapper productListMapper;
@@ -109,7 +111,7 @@ public class ProductServiceImpl implements ProductService {
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice)
     {
-        List<GeneralProductResponseDto> products = productRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size!=null?size.toArray(new Integer[size.size()]):null, color!=null?color.toArray(new String[color.size()]):null, brand, filtSeason!=null?filtSeason.toArray(new String[filtSeason.size()]):null, filtGender!=null?filtGender.toArray(new String[0]):null, filtAgeType!=null?filtAgeType.toArray(new String[0]):null, tags!=null?tags.toArray(new String[0]):null, materials!=null?materials.toArray(new String[0]):null, subcategory!=null?subcategory.toArray(new String[0]):null, category!=null?category.toArray(new String[0]):null, minPrice, maxPrice);
+        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size!=null?size.toArray(new Integer[size.size()]):null, color!=null?color.toArray(new String[color.size()]):null, brand, filtSeason!=null?filtSeason.toArray(new String[filtSeason.size()]):null, filtGender!=null?filtGender.toArray(new String[0]):null, filtAgeType!=null?filtAgeType.toArray(new String[0]):null, tags!=null?tags.toArray(new String[0]):null, materials!=null?materials.toArray(new String[0]):null, subcategory!=null?subcategory.toArray(new String[0]):null, category!=null?category.toArray(new String[0]):null, minPrice, maxPrice);
 
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         responseDto.setStatus("Product found!");
