@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, J
 
     @Procedure
     List<GeneralProductResponseDto> getProducts(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
-                                                List<Integer> size, List<String> color, String brand, List<String> filtSeason, List<String> filtGender,
-                                                List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
+                                                Integer[] size, String[] color, String brand, String[] filtSeason, String[] filtGender,
+                                                String[] filtAgeType, String[] tags, String[] materials, String[] subcategory, String[] category,
                                                 Double minPrice, Double maxPrice);
 }
