@@ -54,19 +54,19 @@ public class ProductController {
                                                                                                           @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                           @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
                                                                                                           @RequestParam(required = false, defaultValue = "desc") String sortOrder,
-                                                                                                          @RequestParam(required = false) List<Integer> size,
-                                                                                                          @RequestParam(required = false) List<String> color,
+                                                                                                          @RequestParam(required = false) List<Integer> sizes,
+                                                                                                          @RequestParam(required = false) List<String> colors,
                                                                                                           @RequestParam(required = false) String brand,
-                                                                                                          @RequestParam(required = false) List<String> filtSeason,
-                                                                                                          @RequestParam(required = false) List<String> filtGender,
-                                                                                                          @RequestParam(required = false) List<String> filtAgeType,
+                                                                                                          @RequestParam(required = false) List<String> seasons,
+                                                                                                          @RequestParam(required = false) List<String> genders,
+                                                                                                          @RequestParam(required = false) List<String> ageTypes,
                                                                                                           @RequestParam(required = false) List<String> tags,
                                                                                                           @RequestParam(required = false) List<String> materials,
                                                                                                           @RequestParam(required = false) List<String> subcategory,
                                                                                                           @RequestParam(required = false) List<String> category,
                                                                                                           @RequestParam(required = false, defaultValue = "0") Double minPrice,
                                                                                                           @RequestParam(required = false, defaultValue = "1000") Double maxPrice) throws SQLException {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(query, pageSize, ++pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice);
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(query, pageSize, ++pageNumber, sortBy, sortOrder, sizes, colors, brand, seasons, genders, ageTypes, tags, materials, subcategory, category, minPrice, maxPrice);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
