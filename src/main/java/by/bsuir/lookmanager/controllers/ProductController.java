@@ -63,8 +63,8 @@ public class ProductController {
                                                                                                           @RequestParam(required = false) List<String> materials,
                                                                                                           @RequestParam(required = false) List<String> subcategory,
                                                                                                           @RequestParam(required = false) List<String> category,
-                                                                                                          @RequestParam(required = false) Double minPrice,
-                                                                                                          @RequestParam(required = false) Double maxPrice) {
+                                                                                                          @RequestParam(required = false, defaultValue = "0") Double minPrice,
+                                                                                                          @RequestParam(required = false, defaultValue = "1000") Double maxPrice) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(query, pageSize, pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
