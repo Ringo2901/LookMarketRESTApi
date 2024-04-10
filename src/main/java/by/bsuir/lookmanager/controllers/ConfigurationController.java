@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/assessments")
+@RequestMapping("/configuration")
 public class ConfigurationController {
     @Autowired
     private ConfigurationService configurationService;

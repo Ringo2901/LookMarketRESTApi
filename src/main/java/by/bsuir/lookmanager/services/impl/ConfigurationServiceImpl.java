@@ -3,6 +3,8 @@ package by.bsuir.lookmanager.services.impl;
 import by.bsuir.lookmanager.dao.*;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.configuration.ConfigurationResponseDto;
+import by.bsuir.lookmanager.dto.configuration.SubCategoryDto;
+import by.bsuir.lookmanager.entities.product.information.SubCategory;
 import by.bsuir.lookmanager.enums.*;
 import by.bsuir.lookmanager.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private ColorRepository colorRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+
     @Override
     public ApplicationResponseDto<ConfigurationResponseDto> getConfiguration() {
         ApplicationResponseDto<ConfigurationResponseDto> responseDto = new ApplicationResponseDto<>();
@@ -42,7 +45,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         configurationResponseDto.setProductMaterials(materialRepository.findAll());
         configurationResponseDto.setProductTags(tagRepository.findAll());
         configurationResponseDto.setProductSizes(sizeRepository.findAll());
-        configurationResponseDto.setSubCategories(subCategoryRepository.findAll());
+        List<SubCategory> subCategories = subCategoryRepository.findAll();
+        List<SubCategoryDto> subCategoryDtos = new ArrayList<>();
+        for (SubCategory subCategory: subCategories){
+            subCategoryDtos.add(new SubCategoryDto(subCategory.getId(), subCategory.getName()));
+        }
+        configurationResponseDto.setSubCategories(subCategoryDtos);
         configurationResponseDto.setUserGenders(getNames(UserGender.class));
         responseDto.setStatus("OK");
         responseDto.setCode(200);

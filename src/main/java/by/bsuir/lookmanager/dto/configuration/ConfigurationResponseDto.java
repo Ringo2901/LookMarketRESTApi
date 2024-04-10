@@ -17,7 +17,7 @@ public class ConfigurationResponseDto {
     private List<ProductTag> productTags;
     private List<ProductMaterial> productMaterials;
     private List<Category> categories;
-    private List<SubCategory> subCategories;
+    private List<SubCategoryDto> subCategories;
     private List<String> seasons;
     private List<String> conditions;
     private List<String> ageTypes;
