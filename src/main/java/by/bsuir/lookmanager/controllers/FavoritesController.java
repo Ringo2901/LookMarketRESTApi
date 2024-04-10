@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/favorites")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class FavoritesController {
     @Autowired
     private FavoritesService favoritesService;

@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/assessments")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class AssessmentController {
     @Autowired
     private AssessmentService assessmentService;

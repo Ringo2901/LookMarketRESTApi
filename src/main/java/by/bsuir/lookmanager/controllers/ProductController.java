@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/product")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class ProductController {
     @Autowired
     private ProductService productService;

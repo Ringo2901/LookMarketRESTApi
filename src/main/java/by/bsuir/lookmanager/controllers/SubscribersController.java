@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController()
 @RequestMapping("/subscriptions")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class SubscribersController {
     @Autowired
     private SubscriptionService subscriptionService;

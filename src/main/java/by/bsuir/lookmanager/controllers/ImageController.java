@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/image")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class ImageController {
     @Autowired
     private ImageDataService imageDataService;

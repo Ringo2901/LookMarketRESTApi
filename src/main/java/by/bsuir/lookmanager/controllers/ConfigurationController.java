@@ -5,12 +5,14 @@ import by.bsuir.lookmanager.dto.configuration.ConfigurationResponseDto;
 import by.bsuir.lookmanager.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/configuration")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class ConfigurationController {
     @Autowired
     private ConfigurationService configurationService;

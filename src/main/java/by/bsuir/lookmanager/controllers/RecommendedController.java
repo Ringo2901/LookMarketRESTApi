@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/recommended")
+@CrossOrigin(origins = "https://ringo2901.github.io")
 public class RecommendedController {
     @Autowired
     private RecommendedService recommendedService;
