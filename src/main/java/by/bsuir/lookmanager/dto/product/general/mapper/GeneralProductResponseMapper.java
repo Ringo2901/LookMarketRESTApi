@@ -11,5 +11,6 @@ public interface GeneralProductResponseMapper {
     @Mapping(source = "subCategory.category.name", target = "categoryName")
     @Mapping(source = "catalog.user.login", target = "login")
     @Mapping(source = "catalog.user.id", target = "userId")
+    @Mapping(source = "productInformation.price", target = "price")
     GeneralProductResponseDto productEntityToResponseDto(ProductEntity product);
 }
