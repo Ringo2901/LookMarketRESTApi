@@ -1,14 +1,11 @@
 package by.bsuir.lookmanager.dto.product.general;
 
 import by.bsuir.lookmanager.enums.ProductStatus;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.Base64;
 
 @Data
 @AllArgsConstructor
