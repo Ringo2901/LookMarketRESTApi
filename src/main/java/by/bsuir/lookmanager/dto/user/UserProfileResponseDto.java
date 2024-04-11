@@ -1,5 +1,6 @@
 package by.bsuir.lookmanager.dto.user;
 
+import by.bsuir.lookmanager.dto.catalog.CatalogResponseDto;
 import by.bsuir.lookmanager.entities.user.information.City;
 import by.bsuir.lookmanager.entities.user.information.Country;
 import by.bsuir.lookmanager.entities.user.information.UserProfile;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -34,4 +36,5 @@ public class UserProfileResponseDto {
     private String countryName;
 
     private String imageData;
+    private List<Long> catalogsIdList;
 }

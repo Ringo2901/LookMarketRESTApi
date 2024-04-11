@@ -1,14 +1,12 @@
 package by.bsuir.lookmanager.services.impl;
 
-import by.bsuir.lookmanager.dao.CityRepository;
-import by.bsuir.lookmanager.dao.CountryRepository;
-import by.bsuir.lookmanager.dao.UserProfileRepository;
-import by.bsuir.lookmanager.dao.UserRepository;
+import by.bsuir.lookmanager.dao.*;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.user.*;
 import by.bsuir.lookmanager.dto.user.mapper.UserProfileMapper;
 import by.bsuir.lookmanager.dto.user.mapper.UserRegisterMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
+import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.entities.user.information.UserProfile;
 import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private CountryRepository countryRepository;
     @Autowired
     private UserProfileRepository userProfileRepository;
+    @Autowired
+    private CatalogRepository catalogRepository;
 
     @Override
     public ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto) throws BadParameterValueException {
@@ -86,10 +87,15 @@ public class UserServiceImpl implements UserService {
     public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long id) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+        List<Catalog> catalogs = catalogRepository.findByUserId(user.getId());
+        UserProfileResponseDto userProfileResponseDto = userProfileMapper.userEntityToUserProfileResponseDto(user);
+        for (Catalog catalog: catalogs){
+            userProfileResponseDto.getCatalogsIdList().add(catalog.getId());
+        }
         responseDto.setCode(200);
         responseDto.setStatus("OK");
         responseDto.setMessage("User found!");
-        responseDto.setPayload(userProfileMapper.userEntityToUserProfileResponseDto(user));
+        responseDto.setPayload(userProfileResponseDto);
         return responseDto;
     }
 
