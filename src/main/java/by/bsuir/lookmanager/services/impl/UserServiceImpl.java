@@ -14,6 +14,7 @@ import by.bsuir.lookmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -89,9 +90,11 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
         List<Catalog> catalogs = catalogRepository.findByUserId(user.getId());
         UserProfileResponseDto userProfileResponseDto = userProfileMapper.userEntityToUserProfileResponseDto(user);
+        List<Long> catalogIdsList = new ArrayList<>();
         for (Catalog catalog: catalogs){
-            userProfileResponseDto.getCatalogsIdList().add(catalog.getId());
+            catalogIdsList.add(catalog.getId());
         }
+        userProfileResponseDto.setCatalogsIdList(catalogIdsList);
         responseDto.setCode(200);
         responseDto.setStatus("OK");
         responseDto.setMessage("User found!");
