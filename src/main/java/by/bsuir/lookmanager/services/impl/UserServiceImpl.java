@@ -12,6 +12,7 @@ import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class UserServiceImpl implements UserService {
         if (userRepository.countByLogin(userRegisterRequestDto.getLogin()) > 0) {
             throw new BadParameterValueException("Registration failed! A user with this login already exists!");
         }
+        String password = user.getPassword();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(password));
         userProfileRepository.save(user.getUserProfile());
         userRepository.save(user);
         userRegisterResponseDto.setCode(201);
@@ -69,6 +73,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto) throws NotFoundException, BadParameterValueException {
         UserEntity user = null;
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        userLoginRequestDto.setPassword(passwordEncoder.encode(userLoginRequestDto.getPassword()));
         if (userLoginRequestDto.getPhone() != null) {
             user = userRepository.findByUserProfilePhoneNumberAndPassword(userLoginRequestDto.getPhone(), userLoginRequestDto.getPassword()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
         }
