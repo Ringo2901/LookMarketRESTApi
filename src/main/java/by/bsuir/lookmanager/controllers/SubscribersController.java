@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController()
 @RequestMapping("/subscriptions")
@@ -21,20 +22,20 @@ public class SubscribersController {
     private JwtValidator jwtValidator;
 
     @GetMapping()
-    public ResponseEntity<ApplicationResponseDto<List<UserSubscriberResponseDto>>> getAllSubscriptions(@RequestHeader("Authorization") String token) {
-        ApplicationResponseDto<List<UserSubscriberResponseDto>> responseDto = subscriptionService.getSubscriptions(jwtValidator.validateTokenAndGetUserId(token));
+    public ResponseEntity<ApplicationResponseDto<List<UserSubscriberResponseDto>>> getAllSubscriptions(@RequestHeader(value = "Authorization", required = false) Optional<String> token) {
+        ApplicationResponseDto<List<UserSubscriberResponseDto>> responseDto = subscriptionService.getSubscriptions(jwtValidator.validateTokenAndGetUserId(token.orElse(null)));
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @PostMapping("/{sellerId}")
-    public ResponseEntity<ApplicationResponseDto<?>> subscribe(@RequestHeader("Authorization") String token, @PathVariable Long sellerId) {
-        ApplicationResponseDto<?> responseDto = subscriptionService.subscribe(jwtValidator.validateTokenAndGetUserId(token), sellerId);
+    public ResponseEntity<ApplicationResponseDto<?>> subscribe(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long sellerId) {
+        ApplicationResponseDto<?> responseDto = subscriptionService.subscribe(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), sellerId);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @DeleteMapping("/{sellerId}")
-    public ResponseEntity<ApplicationResponseDto<?>> unsubscribe(@RequestHeader("Authorization") String token, @PathVariable Long sellerId) {
-        ApplicationResponseDto<?> responseDto = subscriptionService.unsubscribe(jwtValidator.validateTokenAndGetUserId(token), sellerId);
+    public ResponseEntity<ApplicationResponseDto<?>> unsubscribe(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long sellerId) {
+        ApplicationResponseDto<?> responseDto = subscriptionService.unsubscribe(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), sellerId);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 }

@@ -21,6 +21,9 @@ public class JwtValidator {
     }
 
     public Long validateTokenAndGetUserId(String token) throws JwtException {
+        if (token == null){
+            return 0L;
+        }
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         Jws<Claims> parsedToken = Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
         Claims claims = parsedToken.getBody();

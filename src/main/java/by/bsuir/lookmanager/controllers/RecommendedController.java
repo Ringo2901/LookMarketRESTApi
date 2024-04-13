@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/recommended")
@@ -18,8 +19,8 @@ public class RecommendedController {
     @Autowired
     private JwtValidator jwtValidator;
     @GetMapping()
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getRecommendedProducts(@RequestHeader("Authorization") String token,
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getRecommendedProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
                                                                                @RequestParam Long numberOfProducts) {
-        return recommendedService.findRecommendedProducts(jwtValidator.validateTokenAndGetUserId(token), numberOfProducts);
+        return recommendedService.findRecommendedProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), numberOfProducts);
     }
 }
