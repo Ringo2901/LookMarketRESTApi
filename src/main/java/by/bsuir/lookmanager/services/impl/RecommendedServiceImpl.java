@@ -46,7 +46,7 @@ public class RecommendedServiceImpl implements RecommendedService {
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Long numberOfRecommendedItems) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-        Pageable pageable = PageRequest.of(0, 100, Sort.by("updateTime").descending());
+        Pageable pageable = PageRequest.of(0, 100, Sort.by("createdTime").descending());
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
         List<ProductEntity> filteredList = responseEntityList.stream()
                 .filter(product -> !favouritesRepository.existsByUserIdAndProductId(userId, product.getId()))
@@ -73,12 +73,13 @@ public class RecommendedServiceImpl implements RecommendedService {
                 .toList();
         responseDto.setCode(200);
         responseDto.setStatus("OK");
-        responseDto.setMessage("Product delete!");
+        responseDto.setMessage("Recommended found!");
         List<GeneralProductResponseDto> responseDtos = productResponseMapper.toGeneralProductResponseDtoList(topNKeys);
         for (GeneralProductResponseDto generalProductResponseDto : responseDtos) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+            generalProductResponseDto.setFavourite(false);
         }
         responseDto.setPayload(responseDtos);
         return responseDto;
