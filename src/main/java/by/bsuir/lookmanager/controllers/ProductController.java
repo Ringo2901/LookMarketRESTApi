@@ -9,6 +9,7 @@ import by.bsuir.lookmanager.enums.AgeType;
 import by.bsuir.lookmanager.enums.ProductGender;
 import by.bsuir.lookmanager.enums.Season;
 import by.bsuir.lookmanager.services.ProductService;
+import by.bsuir.lookmanager.utils.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -23,34 +24,36 @@ import java.util.List;
 public class ProductController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private JwtValidator jwtValidator;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> getProductById(@PathVariable Long id) {
-        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.getProductInformationById(id);
+    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> getProductById(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.getProductInformationById(jwtValidator.validateTokenAndGetUserId(token), id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @GetMapping()
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProducts(@RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProducts(@RequestHeader("Authorization") String token, @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                                                @RequestParam(required = false, defaultValue = "id") String sortBy,
                                                                                                @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProducts(pageNumber, pageSize, sortBy, sortOrder);
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProducts(jwtValidator.validateTokenAndGetUserId(token), pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @GetMapping("/by-category/{id}")
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsByCategory(@PathVariable Long id,
+    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsByCategory(@RequestHeader("Authorization") String token, @PathVariable Long id,
                                                                                                          @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                          @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                                                          @RequestParam(required = false, defaultValue = "id") String sortBy,
                                                                                                          @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsByCategory(id, pageNumber, pageSize, sortBy, sortOrder);
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsByCategory(jwtValidator.validateTokenAndGetUserId(token), id, pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @GetMapping("/sorting")
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsWithSorting(@RequestParam(required = false) String query,
+    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsWithSorting(@RequestHeader("Authorization") String token, @RequestParam(required = false) String query,
                                                                                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                                                           @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                           @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
@@ -67,7 +70,7 @@ public class ProductController {
                                                                                                           @RequestParam(required = false) List<String> category,
                                                                                                           @RequestParam(required = false, defaultValue = "0") Double minPrice,
                                                                                                           @RequestParam(required = false, defaultValue = "1000") Double maxPrice) throws SQLException {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(query, pageSize, ++pageNumber, sortBy, sortOrder, sizes, colors, brand, seasons, genders, ageTypes, tags, materials, subcategory, category, minPrice, maxPrice);
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(jwtValidator.validateTokenAndGetUserId(token), query, pageSize, ++pageNumber, sortBy, sortOrder, sizes, colors, brand, seasons, genders, ageTypes, tags, materials, subcategory, category, minPrice, maxPrice);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
@@ -78,8 +81,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> updateProductInformation(@PathVariable Long id, @RequestBody ProductInformationRequestDto requestDto) {
-        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.updateProduct(id, requestDto);
+    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> updateProductInformation(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody ProductInformationRequestDto requestDto) {
+        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.updateProduct(jwtValidator.validateTokenAndGetUserId(token), id, requestDto);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 

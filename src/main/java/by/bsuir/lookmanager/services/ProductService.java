@@ -13,19 +13,19 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ProductService {
-    ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id);
+    ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long userId, Long id);
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
+    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                                                    List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                    List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                    Double minPrice, Double maxPrice) throws SQLException;
     ApplicationResponseDto<ProductDetailsResponseDto> saveProduct(ProductDetailsRequestDto requestDto);
 
-    ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long id, ProductInformationRequestDto requestDto);
+    ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long userId, Long id, ProductInformationRequestDto requestDto);
 
     ApplicationResponseDto<Object> deleteProduct(Long id);
 }

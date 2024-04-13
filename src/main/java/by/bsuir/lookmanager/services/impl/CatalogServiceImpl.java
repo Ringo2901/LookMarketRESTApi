@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.CatalogRepository;
+import by.bsuir.lookmanager.dao.FavouritesRepository;
 import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
@@ -8,6 +9,7 @@ import by.bsuir.lookmanager.dto.catalog.CatalogRequestDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogResponseDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogWithItemsDto;
 import by.bsuir.lookmanager.dto.catalog.mapper.CatalogMapper;
+import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.GeneralProductResponseMapper;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
@@ -15,6 +17,8 @@ import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CatalogServiceImpl implements CatalogService {
@@ -26,6 +30,8 @@ public class CatalogServiceImpl implements CatalogService {
     private CatalogMapper catalogMapper;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private FavouritesRepository favouritesRepository;
     @Autowired
     private ProductListMapper productListMapper;
 
@@ -73,7 +79,11 @@ public class CatalogServiceImpl implements CatalogService {
         Catalog catalog = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog not found!"));
         catalogWithItemsDto.setId(catalogId);
         catalogWithItemsDto.setName(catalog.getName());
-        catalogWithItemsDto.setResponseDtoList(productListMapper.toGeneralProductResponseDtoList(productRepository.findByCatalogId(catalogId)));
+        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findByCatalogId(catalogId));
+        for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
+            generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
+        }
+        catalogWithItemsDto.setResponseDtoList(generalProductResponseDtos);
         responseDto.setMessage("Catalog found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);

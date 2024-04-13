@@ -1,5 +1,6 @@
 package by.bsuir.lookmanager.services.impl;
 
+import by.bsuir.lookmanager.dao.FavouritesRepository;
 import by.bsuir.lookmanager.dao.ImageDataRepository;
 import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class RecommendedServiceImpl implements RecommendedService {
@@ -38,19 +40,24 @@ public class RecommendedServiceImpl implements RecommendedService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
     @Autowired
     private ProductSimilarityCalculator productSimilarityCalculator;
+    @Autowired
+    private FavouritesRepository favouritesRepository;
 
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Long numberOfRecommendedItems) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Pageable pageable = PageRequest.of(0, 100, Sort.by("updateTime").descending());
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+        List<ProductEntity> filteredList = responseEntityList.stream()
+                .filter(product -> !favouritesRepository.existsByUserIdAndProductId(userId, product.getId()))
+                .toList();
         List<ProductEntity> favouriteProducts = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Not Found!")).getFavouriteProducts();
         Map<ProductEntity, Double> similarityMap = new HashMap<>();
-        for (ProductEntity product : responseEntityList) {
+        for (ProductEntity product : filteredList) {
             similarityMap.put(product, 0.0);
         }
         try {
-            productSimilarityCalculator.initializeIndex(responseEntityList);
+            productSimilarityCalculator.initializeIndex(filteredList);
             for (ProductEntity favouriteProduct : favouriteProducts) {
                 for (ProductEntity product : similarityMap.keySet()) {
                     similarityMap.put(product, similarityMap.get(product) + productSimilarityCalculator.calculateSimilarity(favouriteProduct, product));

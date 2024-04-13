@@ -62,9 +62,11 @@ public class ProductServiceImpl implements ProductService {
     private ImageDataRepository imageDataRepository;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
+    @Autowired
+    private FavouritesRepository favouritesRepository;
 
     @Override
-    public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long id) throws NotFoundException {
+    public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long userId, Long id) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
         ProductEntity product = productRepository.findById(id).orElse(null);
         if (product == null) {
@@ -74,13 +76,14 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setStatus("OK");
             responseDto.setMessage("Product found!");
             ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
+            productResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, id));
             responseDto.setPayload(productResponseDto);
         }
         return responseDto;
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
@@ -89,11 +92,11 @@ public class ProductServiceImpl implements ProductService {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
-        return getListApplicationResponseDto(responseDto, responseEntityList);
+        return getListApplicationResponseDto(userId, responseDto, responseEntityList);
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Specification<ProductEntity> spec = productSpecification.byCategoryId(categoryId);
         Pageable pageable;
@@ -103,16 +106,18 @@ public class ProductServiceImpl implements ProductService {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
         List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
-        return getListApplicationResponseDto(responseDto, responseEntityList);
+        return getListApplicationResponseDto(userId, responseDto, responseEntityList);
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                                                           List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
         List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size!=null?size.toArray(new Integer[size.size()]):null, color!=null?color.toArray(new String[color.size()]):null, brand!=null?brand.toArray(new String[brand.size()]):null, filtSeason!=null?filtSeason.toArray(new String[filtSeason.size()]):null, filtGender!=null?filtGender.toArray(new String[0]):null, filtAgeType!=null?filtAgeType.toArray(new String[0]):null, tags!=null?tags.toArray(new String[0]):null, materials!=null?materials.toArray(new String[0]):null, subcategory!=null?subcategory.toArray(new String[0]):null, category!=null?category.toArray(new String[0]):null, minPrice, maxPrice);
-
+        for (GeneralProductResponseDto product: products){
+            product.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, product.getId()));
+        }
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         responseDto.setStatus("Product found!");
         responseDto.setCode(200);
@@ -146,12 +151,13 @@ public class ProductServiceImpl implements ProductService {
         responseDto.setStatus("OK");
         responseDto.setMessage("Product save!");
         ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
+        productResponseDto.setFavourite(false);
         responseDto.setPayload(productResponseDto);
         return responseDto;
     }
 
     @Override
-    public ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long id, ProductInformationRequestDto requestDto) throws NotFoundException {
+    public ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long userId, Long id, ProductInformationRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToUpdate = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found!"));
         ProductInformation productInformation = entityToUpdate.getProductInformation();
@@ -172,6 +178,7 @@ public class ProductServiceImpl implements ProductService {
         responseDto.setStatus("OK");
         responseDto.setMessage("Product update!");
         ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
+        productResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, id));
         responseDto.setPayload(productResponseDto);
         return responseDto;
     }
@@ -186,7 +193,7 @@ public class ProductServiceImpl implements ProductService {
         return responseDto;
     }
 
-    private ApplicationResponseDto<List<GeneralProductResponseDto>> getListApplicationResponseDto(ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList) throws NotFoundException {
+    private ApplicationResponseDto<List<GeneralProductResponseDto>> getListApplicationResponseDto(Long userId, ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList) throws NotFoundException {
         if (!responseEntityList.isEmpty()) {
             responseDto.setCode(200);
             responseDto.setMessage("Products found!");
@@ -196,6 +203,7 @@ public class ProductServiceImpl implements ProductService {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
                 generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
             }
             responseDto.setPayload(generalProductResponseDtos);
         } else {
