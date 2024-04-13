@@ -15,8 +15,8 @@ import java.util.List;
 public class ProductDetailsResponseDto {
     private Long id;
     private String title;
-    private Timestamp createdTime;
-    private Timestamp updateTime;
+    private String createdTime;
+    private String updateTime;
     private Double price;
     private ProductStatus status;
 

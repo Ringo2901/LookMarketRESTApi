@@ -23,7 +23,7 @@ public class UserProfileResponseDto {
     private String email;
     private boolean authorisationStatus;
     private Date registrationDate;
-    private Timestamp lastSignIn;
+    private String lastSignIn;
 
     private String firstname;
     private String lastname;

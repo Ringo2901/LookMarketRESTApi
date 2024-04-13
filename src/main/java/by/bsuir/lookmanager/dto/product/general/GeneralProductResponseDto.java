@@ -14,9 +14,9 @@ public class GeneralProductResponseDto {
     private Long id;
     private String title;
     private ProductStatus status;
-    private Timestamp createdTime;
+    private String createdTime;
 
-    private Timestamp updateTime;
+    private String updateTime;
     private Double price;
     private String subCategoryName;
     private String categoryName;

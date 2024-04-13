@@ -9,6 +9,8 @@ import by.bsuir.lookmanager.entities.product.information.ProductTag;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,8 +33,17 @@ public interface ProductDetailsResponseMapper {
     @Mapping(source = "catalog.user.id", target = "userId")
     @Mapping(source = "catalog.user.userProfile.firstname", target = "firstname")
     @Mapping(source = "catalog.user.userProfile.lastname", target = "lastname")
+    @Mapping(target = "createdTime", expression = "java(formatTimestamp(product.getCreatedTime()))")
+    @Mapping(target = "updateTime", expression = "java(formatTimestamp(product.getUpdateTime()))")
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);
 
+    default String formatTimestamp(Timestamp timestamp) {
+        if (timestamp == null) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        return sdf.format(timestamp);
+    }
     default List<Integer> mapProductSizes(List<ProductSize> productSizes) {
         return productSizes.stream()
                 .map(ProductSize::getSize)
