@@ -15,4 +15,5 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     int countByEmail (String email);
     int countByUserProfilePhoneNumber (String phoneNumber);
     int countByLogin (String login);
+    Optional<UserEntity> findByUserProfilePhoneNumber(String phoneNumber);
 }

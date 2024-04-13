@@ -74,15 +74,17 @@ public class UserServiceImpl implements UserService {
     public ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto) throws NotFoundException, BadParameterValueException {
         UserEntity user = null;
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        userLoginRequestDto.setPassword(passwordEncoder.encode(userLoginRequestDto.getPassword()));
         if (userLoginRequestDto.getPhone() != null) {
-            user = userRepository.findByUserProfilePhoneNumberAndPassword(userLoginRequestDto.getPhone(), userLoginRequestDto.getPassword()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
+            user = userRepository.findByUserProfilePhoneNumber(userLoginRequestDto.getPhone()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
         }
         if (userLoginRequestDto.getEmail() != null) {
-            user = userRepository.findByEmailAndPassword(userLoginRequestDto.getEmail(), userLoginRequestDto.getPassword()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
+            user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
         }
         if (user == null) {
             throw new BadParameterValueException("User not found, not enough parameters");
+        }
+        if (passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())){
+            throw new NotFoundException("Authorization failed!");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
         userLoginResponseDto.setCode(200);
