@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDetailsResponseDto {
+    private Long id;
     private String title;
     private Timestamp createdTime;
     private Timestamp updateTime;
