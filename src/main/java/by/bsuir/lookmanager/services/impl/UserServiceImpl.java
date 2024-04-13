@@ -35,6 +35,8 @@ public class UserServiceImpl implements UserService {
     private UserProfileRepository userProfileRepository;
     @Autowired
     private CatalogRepository catalogRepository;
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
     @Override
     public ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto) throws BadParameterValueException {
@@ -85,7 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long id) throws NotFoundException {
+    public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
         List<Catalog> catalogs = catalogRepository.findByUserId(user.getId());
@@ -94,6 +96,7 @@ public class UserServiceImpl implements UserService {
         for (Catalog catalog: catalogs){
             catalogIdsList.add(catalog.getId());
         }
+        userProfileResponseDto.setSubscribed(subscriptionRepository.existsBySubscriberIdAndSellerId(userId, id));
         userProfileResponseDto.setCatalogsIdList(catalogIdsList);
         responseDto.setCode(200);
         responseDto.setStatus("OK");

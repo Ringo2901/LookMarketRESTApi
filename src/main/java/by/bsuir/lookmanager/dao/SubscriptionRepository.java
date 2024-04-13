@@ -11,6 +11,5 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
     List<SubscriptionEntity> findAllBySellerId (Long sellerId);
     List<SubscriptionEntity> findAllBySubscriberId (Long subscriberId);
     boolean existsBySubscriberIdAndSellerId (Long subscriberId, Long sellerId);
-
     Optional<SubscriptionEntity> findBySubscriberIdAndSellerId (Long subscriberId, Long sellerId);
 }

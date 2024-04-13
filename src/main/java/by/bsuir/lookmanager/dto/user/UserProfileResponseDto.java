@@ -37,4 +37,6 @@ public class UserProfileResponseDto {
 
     private String imageData;
     private List<Long> catalogsIdList;
+
+    private boolean isSubscribed;
 }

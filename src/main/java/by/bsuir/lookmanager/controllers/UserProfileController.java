@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/profile")
 @CrossOrigin(origins = "https://ringo2901.github.io")
@@ -20,12 +22,12 @@ public class UserProfileController {
     private JwtValidator jwtValidator;
     @GetMapping()
     public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader("Authorization") String token) {
-        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(jwtValidator.validateTokenAndGetUserId(token));
+        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(0L, jwtValidator.validateTokenAndGetUserId(token));
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getUserById(@PathVariable Long id) {
-        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(id);
+    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getUserById(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long id) {
+        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
     @PostMapping()

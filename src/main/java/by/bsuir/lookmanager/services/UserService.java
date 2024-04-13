@@ -8,7 +8,7 @@ public interface UserService {
 
     ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto);
 
-    ApplicationResponseDto<UserProfileResponseDto> findUserById(Long id);
+    ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id);
 
     ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto);
 
