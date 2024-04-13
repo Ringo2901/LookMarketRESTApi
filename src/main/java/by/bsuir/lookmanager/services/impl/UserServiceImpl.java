@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BadParameterValueException("User not found, not enough parameters");
         }
-        if (passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())){
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())){
             throw new NotFoundException("Invalid password error!");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
