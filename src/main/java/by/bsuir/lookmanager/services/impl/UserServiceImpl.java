@@ -62,7 +62,10 @@ public class UserServiceImpl implements UserService {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(password));
         userProfileRepository.save(user.getUserProfile());
-        userRepository.save(user);
+        UserEntity savedUser = userRepository.save(user);
+        Catalog personalCatalog = new Catalog();
+        personalCatalog.setName("Personal catalog");
+        personalCatalog.setUser(savedUser);
         userRegisterResponseDto.setCode(201);
         userRegisterResponseDto.setStatus("OK");
         userRegisterResponseDto.setMessage("Registration success!");
