@@ -23,6 +23,7 @@ public class GeneralProductResponseDto {
 
     private String login;
     private Long userId;
+    private String userImageData;
 
     private Long imageId;
     private String imageData;
