@@ -1,9 +1,6 @@
 package by.bsuir.lookmanager.services.impl;
 
-import by.bsuir.lookmanager.dao.CatalogRepository;
-import by.bsuir.lookmanager.dao.FavouritesRepository;
-import by.bsuir.lookmanager.dao.ProductRepository;
-import by.bsuir.lookmanager.dao.UserRepository;
+import by.bsuir.lookmanager.dao.*;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogRequestDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogResponseDto;
@@ -12,6 +9,8 @@ import by.bsuir.lookmanager.dto.catalog.mapper.CatalogMapper;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.GeneralProductResponseMapper;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
+import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
+import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.CatalogService;
@@ -34,6 +33,10 @@ public class CatalogServiceImpl implements CatalogService {
     private FavouritesRepository favouritesRepository;
     @Autowired
     private ProductListMapper productListMapper;
+    @Autowired
+    private ImageDataRepository imageDataRepository;
+    @Autowired
+    private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
     public ApplicationResponseDto<CatalogResponseDto> addCatalog(Long userId, CatalogRequestDto requestDto) {
@@ -81,6 +84,9 @@ public class CatalogServiceImpl implements CatalogService {
         catalogWithItemsDto.setName(catalog.getName());
         List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findByCatalogId(catalogId));
         for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
+            ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
         }
         catalogWithItemsDto.setResponseDtoList(generalProductResponseDtos);
