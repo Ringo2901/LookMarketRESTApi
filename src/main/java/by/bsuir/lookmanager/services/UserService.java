@@ -5,6 +5,7 @@ import by.bsuir.lookmanager.dto.user.*;
 
 public interface UserService {
     ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto);
+    ApplicationResponseDto<?> userLogout(Long userId);
 
     ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto);
 

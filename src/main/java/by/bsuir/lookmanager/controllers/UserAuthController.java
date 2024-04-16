@@ -6,6 +6,7 @@ import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserRegisterRequestDto;
 import by.bsuir.lookmanager.services.UserService;
 import by.bsuir.lookmanager.utils.JwtProvider;
+import by.bsuir.lookmanager.utils.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +20,19 @@ public class UserAuthController {
     private UserService userService;
     @Autowired
     private JwtProvider jwtProvider;
+    @Autowired
+    private JwtValidator jwtValidator;
 
     @PostMapping("/signIn")
     public ResponseEntity<ApplicationResponseDto<?>> userLogin(@RequestBody UserLoginRequestDto requestDto) {
         ApplicationResponseDto<Long> responseDto = userService.userLogin(requestDto);
         return getApplicationResponseDtoResponseEntity(responseDto);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<ApplicationResponseDto<?>> userLogout(@RequestHeader("Authorization") String token) {
+        ApplicationResponseDto<?> responseDto = userService.userLogout(jwtValidator.validateTokenAndGetUserId(token));
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @PostMapping("/google")

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -66,10 +67,24 @@ public class UserServiceImpl implements UserService {
         Catalog personalCatalog = new Catalog();
         personalCatalog.setName("Personal catalog");
         personalCatalog.setUser(savedUser);
+        catalogRepository.save(personalCatalog);
         userRegisterResponseDto.setCode(201);
         userRegisterResponseDto.setStatus("OK");
         userRegisterResponseDto.setMessage("Registration success!");
 
+        return userRegisterResponseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<?> userLogout(Long userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        ApplicationResponseDto<?> userRegisterResponseDto = new ApplicationResponseDto<>();
+        user.setAuthorisationStatus(false);
+        user.setLastSignIn(new Timestamp(System.currentTimeMillis()));
+        userRepository.save(user);
+        userRegisterResponseDto.setCode(200);
+        userRegisterResponseDto.setStatus("OK");
+        userRegisterResponseDto.setMessage("Logout success!");
         return userRegisterResponseDto;
     }
 
@@ -90,12 +105,16 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Invalid password error!");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
+        user.setAuthorisationStatus(true);
+        userRepository.save(user);
         userLoginResponseDto.setCode(200);
         userLoginResponseDto.setStatus("OK");
         userLoginResponseDto.setMessage("Authorization success!");
         userLoginResponseDto.setPayload(user.getId());
         return userLoginResponseDto;
     }
+
+
 
     @Override
     public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id) throws NotFoundException {
