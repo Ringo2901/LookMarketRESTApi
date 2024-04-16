@@ -12,6 +12,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "https://ringo2901.github.io")
@@ -29,9 +32,11 @@ public class UserAuthController {
         return getApplicationResponseDtoResponseEntity(responseDto);
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<ApplicationResponseDto<?>> userLogout(@RequestHeader("Authorization") String token) {
-        ApplicationResponseDto<?> responseDto = userService.userLogout(jwtValidator.validateTokenAndGetUserId(token));
+    @GetMapping("/setStatus")
+    public ResponseEntity<ApplicationResponseDto<?>> userSetStatus(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
+                                                                   @RequestParam boolean status) {
+        ApplicationResponseDto<?> responseDto;
+        responseDto = userService.userLogout(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), status);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
@@ -42,13 +47,13 @@ public class UserAuthController {
     }
 
     private ResponseEntity<ApplicationResponseDto<?>> getApplicationResponseDtoResponseEntity(ApplicationResponseDto<Long> responseDto) {
-        if (responseDto.getPayload()!=null) {
+        if (responseDto.getPayload() != null) {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.AUTHORIZATION, jwtProvider.createToken(responseDto.getPayload()));
             return ResponseEntity.status(responseDto.getCode())
                     .headers(headers)
                     .body(responseDto);
-        } else{
+        } else {
             return ResponseEntity.status(responseDto.getCode())
                     .body(responseDto);
         }

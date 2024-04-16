@@ -76,15 +76,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationResponseDto<?> userLogout(Long userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        ApplicationResponseDto<?> userRegisterResponseDto = new ApplicationResponseDto<>();
-        user.setAuthorisationStatus(false);
-        user.setLastSignIn(new Timestamp(System.currentTimeMillis()));
-        userRepository.save(user);
-        userRegisterResponseDto.setCode(200);
-        userRegisterResponseDto.setStatus("OK");
-        userRegisterResponseDto.setMessage("Logout success!");
+    public ApplicationResponseDto<?> userLogout(Long userId, boolean status) {
+        ApplicationResponseDto<?> userRegisterResponseDto =  new ApplicationResponseDto<>();
+        userRegisterResponseDto.setCode(403);
+        userRegisterResponseDto.setStatus("ERROR");
+        if (userId != null) {
+            UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+            user.setAuthorisationStatus(status);
+            user.setLastSignIn(new Timestamp(System.currentTimeMillis()));
+            userRepository.save(user);
+            userRegisterResponseDto.setCode(200);
+            userRegisterResponseDto.setStatus("OK");
+            userRegisterResponseDto.setMessage("Status change success!");
+        }
         return userRegisterResponseDto;
     }
 
