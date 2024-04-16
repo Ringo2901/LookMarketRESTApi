@@ -16,4 +16,6 @@ public class City {
     private Integer id;
     @Column (name = "name")
     private String name;
+    @Column (name = "country_id")
+    private Integer countryId;
 }

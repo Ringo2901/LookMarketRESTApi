@@ -24,4 +24,5 @@ public class ConfigurationResponseDto {
     private List<String> productGenders;
     private List<String> userGenders;
 
+    private List<CountryWithCityDto> countryWithCityDtos;
 }
