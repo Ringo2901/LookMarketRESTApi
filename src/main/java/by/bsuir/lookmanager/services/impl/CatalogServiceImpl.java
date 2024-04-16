@@ -17,6 +17,7 @@ import by.bsuir.lookmanager.services.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -90,6 +91,32 @@ public class CatalogServiceImpl implements CatalogService {
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
         }
         catalogWithItemsDto.setResponseDtoList(generalProductResponseDtos);
+        responseDto.setMessage("Catalog found!");
+        responseDto.setStatus("OK");
+        responseDto.setCode(200);
+        responseDto.setPayload(catalogWithItemsDto);
+        return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<List<CatalogWithItemsDto>> getCatalogsItemsByUserId(Long userId) {
+        ApplicationResponseDto<List<CatalogWithItemsDto>> responseDto = new ApplicationResponseDto<>();
+        List<CatalogWithItemsDto> catalogWithItemsDto = new ArrayList<>();
+        List<Catalog> catalogs = catalogRepository.findByUserId(userId);
+        for (Catalog catalog: catalogs){
+            CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
+            newCatalog.setId(catalog.getId());
+            newCatalog.setName(catalog.getName());
+            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(catalog.getId()));
+            for (GeneralProductResponseDto generalProductResponseDto: generalProducts){
+                ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
+            }
+            newCatalog.setResponseDtoList(generalProducts);
+            catalogWithItemsDto.add(newCatalog);
+        }
         responseDto.setMessage("Catalog found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);

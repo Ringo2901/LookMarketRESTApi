@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/catalogs")
 @CrossOrigin(origins = "https://ringo2901.github.io")
@@ -22,6 +24,12 @@ public class CatalogController {
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<CatalogWithItemsDto>> getCatalogInfoById(@PathVariable Long id) {
         ApplicationResponseDto<CatalogWithItemsDto> responseDto = catalogService.getCatalogInfoByCatalogId(id);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<ApplicationResponseDto<List<CatalogWithItemsDto>>> getCatalogsFirst2ProductsById(@PathVariable Long id) {
+        ApplicationResponseDto<List<CatalogWithItemsDto>> responseDto = catalogService.getCatalogsItemsByUserId(id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
