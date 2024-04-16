@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -173,6 +174,7 @@ public class ProductServiceImpl implements ProductService {
         productInformation.setMaterials(materialRepository.findAllById(requestDto.getMaterialsId()));
         productInformation.setSizes(sizeRepository.findAllById(requestDto.getSizesId()));
         entityToUpdate.setProductInformation(productInformation);
+        entityToUpdate.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         ProductEntity product = productRepository.save(entityToUpdate);
         responseDto.setCode(201);
         responseDto.setStatus("OK");
