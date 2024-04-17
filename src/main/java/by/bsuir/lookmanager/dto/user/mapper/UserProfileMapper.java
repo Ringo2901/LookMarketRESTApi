@@ -28,8 +28,8 @@ public interface UserProfileMapper {
     @Mapping(source = "userProfile.phoneNumber", target = "phoneNumber")
     @Mapping(source = "userProfile.gender", target = "gender")
     @Mapping(source = "userProfile.postalCode", target = "postalCode")
-    @Mapping(source = "userProfile.city.name", target = "cityName")
-    @Mapping(source = "userProfile.country.name", target = "countryName")
+    @Mapping(source = "userProfile.city.id", target = "cityId")
+    @Mapping(source = "userProfile.country.id", target = "countryId")
     @Mapping(target = "lastSignIn", expression = "java(formatTimestamp(entity.getLastSignIn()))")
     UserProfileResponseDto userEntityToUserProfileResponseDto(UserEntity entity);
 

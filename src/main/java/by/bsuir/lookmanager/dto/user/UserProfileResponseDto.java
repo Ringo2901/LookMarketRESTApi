@@ -32,8 +32,8 @@ public class UserProfileResponseDto {
     private String phoneNumber;
     private UserGender gender;
     private String postalCode;
-    private String cityName;
-    private String countryName;
+    private Integer cityId;
+    private Integer countryId;
 
     private String imageData;
     private List<Long> catalogsIdList;
