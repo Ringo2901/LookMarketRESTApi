@@ -1,11 +1,8 @@
 package by.bsuir.lookmanager.dto.user.mapper;
 
-import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
-import by.bsuir.lookmanager.dto.user.UserProfileRequestDto;
-import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
-import by.bsuir.lookmanager.entities.user.information.UserProfile;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -50,6 +47,7 @@ public interface UserProfileMapper {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         return sdf.format(date);
     }
+
     @AfterMapping
     default void mapImageData(UserEntity user, @MappingTarget UserProfileResponseDto userProfileResponseDto) {
         if (user != null && user.getUserProfile().getImageData() != null) {
@@ -59,10 +57,15 @@ public interface UserProfileMapper {
 
     @AfterMapping
     default void mapDate(UserEntity user, @MappingTarget UserProfileResponseDto userProfileResponseDto) {
-        if (user != null && user.getUserProfile().getDateOfBirth() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-            userProfileResponseDto.setDateOfBirth(sdf.format(user.getUserProfile().getDateOfBirth()));
-            if (user.getRegistrationDate() != null){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        if (user != null) {
+            if (user.getUserProfile().getDateOfBirth() != null) {
+                userProfileResponseDto.setDateOfBirth(sdf.format(user.getUserProfile().getDateOfBirth()));
+                if (user.getRegistrationDate() != null) {
+                    userProfileResponseDto.setRegistrationDate(sdf.format(user.getRegistrationDate()));
+                }
+            }
+            if (user.getRegistrationDate() != null) {
                 userProfileResponseDto.setRegistrationDate(sdf.format(user.getRegistrationDate()));
             }
         }
