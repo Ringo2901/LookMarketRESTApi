@@ -16,6 +16,22 @@ public class ProductNativeRepository {
 
     public List<GeneralProductResponseDto> getProducts(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder, Integer[] size, String[] color, String[] brand, String[] filtSeason, String[] filtGender, String[] filtAgeType, String[] tags, String[] materials, String[] subcategory, String[] category, Double minPrice, Double maxPrice) throws SQLException {
         String sql = "SELECT * FROM get_products(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        if (isEmptyArray(size)) size = null;
+        if (isEmptyArray(color)) color = null;
+        if (isEmptyArray(brand)) brand = null;
+        if (isEmptyArray(filtSeason)) filtSeason = null;
+        if (isEmptyArray(filtGender)) filtGender = null;
+        if (isEmptyArray(filtAgeType)) filtAgeType = null;
+        if (isEmptyArray(tags)) tags = null;
+        if (isEmptyArray(materials)) materials = null;
+        if (isEmptyArray(subcategory)) subcategory = null;
+        if (isEmptyArray(category)) category = null;
+
         return jdbcTemplate.query(sql, new Object[]{query, pageSize, pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice}, new BeanPropertyRowMapper<>(GeneralProductResponseDto.class));
+    }
+
+    private boolean isEmptyArray(Object[] array) {
+        return array == null || array.length == 0;
     }
 }

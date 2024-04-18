@@ -15,7 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -146,7 +151,9 @@ public class UserServiceImpl implements UserService {
         UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstname(requestDto.getFirstname());
         userProfile.setLastname(requestDto.getLastname());
-        userProfile.setDateOfBirth(requestDto.getDateOfBirth());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate localDate = LocalDate.parse(requestDto.getDateOfBirth(), formatter);
+        userProfile.setDateOfBirth(Date.valueOf(localDate));
         userProfile.setAddress(requestDto.getAddress());
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
         userProfile.setGender(requestDto.getGender());
@@ -156,8 +163,12 @@ public class UserServiceImpl implements UserService {
         } else {
             userProfile.setImageData(null);
         }
-        userProfile.setCity(cityRepository.getReferenceById(requestDto.getCityId()));
-        userProfile.setCountry(countryRepository.getReferenceById(requestDto.getCountryId()));
+        if (cityRepository.existsById(requestDto.getCityId())) {
+            userProfile.setCity(cityRepository.getReferenceById(requestDto.getCityId()));
+        }
+        if (countryRepository.existsById(requestDto.getCountryId())) {
+            userProfile.setCountry(countryRepository.getReferenceById(requestDto.getCountryId()));
+        }
         user.setUserProfile(userProfile);
         user = userRepository.save(user);
         responseDto.setCode(201);
