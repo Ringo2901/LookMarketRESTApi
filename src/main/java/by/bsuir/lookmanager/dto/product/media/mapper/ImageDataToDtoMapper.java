@@ -31,7 +31,9 @@ public interface ImageDataToDtoMapper {
     @AfterMapping
     default void mapImageData(ImageDataRequestDto requestDto, @MappingTarget ImageData imageData) {
         if (requestDto != null && requestDto.getImageData() != null) {
-            imageData.setImageData(Base64.getDecoder().decode(requestDto.getImageData()));
+            String carg = requestDto.getImageData();
+            carg = carg.replace("\n","");
+            imageData.setImageData(Base64.getDecoder().decode(carg));
         }
     }
 }

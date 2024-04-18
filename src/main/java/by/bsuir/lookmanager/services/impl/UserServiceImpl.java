@@ -163,7 +163,9 @@ public class UserServiceImpl implements UserService {
         userProfile.setGender(requestDto.getGender());
         userProfile.setPostalCode(requestDto.getPostalCode());
         if (requestDto.getImageData() != null) {
-            userProfile.setImageData(Base64.getDecoder().decode(requestDto.getImageData()));
+            String carg = requestDto.getImageData();
+            carg = carg.replace("\n","");
+            userProfile.setImageData(Base64.getDecoder().decode(carg));
         } else {
             userProfile.setImageData(null);
         }
