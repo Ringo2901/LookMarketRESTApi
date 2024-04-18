@@ -22,12 +22,12 @@ public class UserProfileResponseDto {
     private String login;
     private String email;
     private boolean authorisationStatus;
-    private Date registrationDate;
+    private String registrationDate;
     private String lastSignIn;
 
     private String firstname;
     private String lastname;
-    private Date dateOfBirth;
+    private String dateOfBirth;
     private String address;
     private String phoneNumber;
     private UserGender gender;

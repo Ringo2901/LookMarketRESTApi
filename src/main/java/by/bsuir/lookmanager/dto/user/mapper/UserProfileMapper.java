@@ -12,6 +12,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -23,7 +24,8 @@ public interface UserProfileMapper {
     @Mapping(target = "imageData", ignore = true)
     @Mapping(source = "userProfile.lastname", target = "lastname")
     @Mapping(source = "userProfile.firstname", target = "firstname")
-    @Mapping(source = "userProfile.dateOfBirth", target = "dateOfBirth")
+    @Mapping(target = "dateOfBirth", ignore = true)
+    @Mapping(target = "registrationDate", ignore = true)
     @Mapping(source = "userProfile.address", target = "address")
     @Mapping(source = "userProfile.phoneNumber", target = "phoneNumber")
     @Mapping(source = "userProfile.gender", target = "gender")
@@ -40,10 +42,29 @@ public interface UserProfileMapper {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         return sdf.format(timestamp);
     }
+
+    default String formatDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        return sdf.format(date);
+    }
     @AfterMapping
     default void mapImageData(UserEntity user, @MappingTarget UserProfileResponseDto userProfileResponseDto) {
         if (user != null && user.getUserProfile().getImageData() != null) {
             userProfileResponseDto.setImageData(Base64.getEncoder().encodeToString(user.getUserProfile().getImageData()));
+        }
+    }
+
+    @AfterMapping
+    default void mapDate(UserEntity user, @MappingTarget UserProfileResponseDto userProfileResponseDto) {
+        if (user != null && user.getUserProfile().getDateOfBirth() != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            userProfileResponseDto.setDateOfBirth(sdf.format(user.getUserProfile().getDateOfBirth()));
+            if (user.getRegistrationDate() != null){
+                userProfileResponseDto.setRegistrationDate(sdf.format(user.getRegistrationDate()));
+            }
         }
     }
 }
