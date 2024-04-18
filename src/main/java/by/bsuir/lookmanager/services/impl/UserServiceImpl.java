@@ -151,9 +151,13 @@ public class UserServiceImpl implements UserService {
         UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstname(requestDto.getFirstname());
         userProfile.setLastname(requestDto.getLastname());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        LocalDate localDate = LocalDate.parse(requestDto.getDateOfBirth(), formatter);
-        userProfile.setDateOfBirth(Date.valueOf(localDate));
+        if (requestDto.getDateOfBirth() != null && !requestDto.getDateOfBirth().isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate localDate = LocalDate.parse(requestDto.getDateOfBirth(), formatter);
+            userProfile.setDateOfBirth(Date.valueOf(localDate));
+        } else {
+            userProfile.setDateOfBirth(null);
+        }
         userProfile.setAddress(requestDto.getAddress());
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
         userProfile.setGender(requestDto.getGender());
@@ -165,9 +169,13 @@ public class UserServiceImpl implements UserService {
         }
         if (cityRepository.existsById(requestDto.getCityId())) {
             userProfile.setCity(cityRepository.getReferenceById(requestDto.getCityId()));
+        } else {
+            userProfile.setCity(null);
         }
         if (countryRepository.existsById(requestDto.getCountryId())) {
             userProfile.setCountry(countryRepository.getReferenceById(requestDto.getCountryId()));
+        } else {
+            userProfile.setCountry(null);
         }
         user.setUserProfile(userProfile);
         user = userRepository.save(user);
