@@ -13,6 +13,7 @@ import java.sql.Date;
 public class UserProfileRequestDto {
     private String firstname;
     private String lastname;
+    private String login;
     private String dateOfBirth;
     private String address;
     private String phoneNumber;

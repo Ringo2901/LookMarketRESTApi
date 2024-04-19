@@ -23,7 +23,7 @@ public interface ProductService {
                                                                                    List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                    List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                    Double minPrice, Double maxPrice) throws SQLException;
-    ApplicationResponseDto<ProductDetailsResponseDto> saveProduct(ProductDetailsRequestDto requestDto);
+    ApplicationResponseDto<Long> saveProduct(ProductDetailsRequestDto requestDto);
 
     ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long userId, Long id, ProductInformationRequestDto requestDto);
 

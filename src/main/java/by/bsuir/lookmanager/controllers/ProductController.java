@@ -76,8 +76,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> saveProduct(@RequestBody ProductDetailsRequestDto requestDto) {
-        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.saveProduct(requestDto);
+    public ResponseEntity<ApplicationResponseDto<Long>> saveProduct(@RequestBody ProductDetailsRequestDto requestDto) {
+        ApplicationResponseDto<Long> responseDto = productService.saveProduct(requestDto);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 

@@ -180,6 +180,7 @@ public class UserServiceImpl implements UserService {
             userProfile.setCountry(null);
         }
         user.setUserProfile(userProfile);
+        user.setLogin(requestDto.getLogin());
         user = userRepository.save(user);
         responseDto.setCode(201);
         responseDto.setStatus("OK");

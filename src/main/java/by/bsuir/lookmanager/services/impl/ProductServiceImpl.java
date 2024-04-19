@@ -129,8 +129,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ApplicationResponseDto<ProductDetailsResponseDto> saveProduct(ProductDetailsRequestDto requestDto) {
-        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
+    public ApplicationResponseDto<Long> saveProduct(ProductDetailsRequestDto requestDto) {
+        ApplicationResponseDto<Long> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToSave = productDetailsRequestMapper.productRequestDtoToEntity(requestDto);
         Catalog catalog = catalogRepository.getReferenceById(requestDto.getCatalogId());
         entityToSave.setCatalog(catalog);
@@ -151,9 +151,9 @@ public class ProductServiceImpl implements ProductService {
         responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("Product save!");
-        ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
-        productResponseDto.setFavourite(false);
-        responseDto.setPayload(productResponseDto);
+        //ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
+        //productResponseDto.setFavourite(false);
+        responseDto.setPayload(product.getId());
         return responseDto;
     }
 
