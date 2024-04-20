@@ -17,7 +17,7 @@ public interface ProductService {
 
     ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                                                    List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,

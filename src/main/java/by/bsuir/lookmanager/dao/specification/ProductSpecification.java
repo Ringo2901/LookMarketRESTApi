@@ -4,6 +4,6 @@ import by.bsuir.lookmanager.entities.product.ProductEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 public interface ProductSpecification {
-    Specification<ProductEntity> byCategoryId(Long categoryId);
+    Specification<ProductEntity> byCategoryId(String sex);
     Specification<ProductEntity> byCatalogId(Long catalogId);
 }

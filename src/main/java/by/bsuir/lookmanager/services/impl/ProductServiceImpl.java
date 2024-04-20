@@ -97,9 +97,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-        Specification<ProductEntity> spec = productSpecification.byCategoryId(categoryId);
+        Specification<ProductEntity> spec = productSpecification.byCategoryId(sex);
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
