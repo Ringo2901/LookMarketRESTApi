@@ -18,4 +18,9 @@ public class ProductSpecificationImpl implements ProductSpecification {
             return criteriaBuilder.equal(categoryJoin.get("id"), categoryId);
         };
     }
+
+    @Override
+    public Specification<ProductEntity> byCatalogId(Long catalogId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("catalog").get("id"), catalogId);
+    }
 }

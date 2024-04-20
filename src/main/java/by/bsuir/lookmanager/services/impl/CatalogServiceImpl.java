@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.services.impl;
 
 import by.bsuir.lookmanager.dao.*;
+import by.bsuir.lookmanager.dao.specification.ProductSpecification;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogRequestDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogResponseDto;
@@ -17,6 +18,10 @@ import by.bsuir.lookmanager.entities.user.information.FavouritesEntity;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,6 +45,8 @@ public class CatalogServiceImpl implements CatalogService {
     private ImageDataRepository imageDataRepository;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
+    @Autowired
+    private ProductSpecification productSpecification;
 
     @Override
     public ApplicationResponseDto<CatalogResponseDto> addCatalog(Long userId, CatalogRequestDto requestDto) {
@@ -79,24 +86,26 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public ApplicationResponseDto<CatalogWithItemsDto> getCatalogInfoByCatalogId(Long catalogId) {
-        ApplicationResponseDto<CatalogWithItemsDto> responseDto = new ApplicationResponseDto<>();
-        CatalogWithItemsDto catalogWithItemsDto = new CatalogWithItemsDto();
-        Catalog catalog = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog not found!"));
-        catalogWithItemsDto.setId(catalogId);
-        catalogWithItemsDto.setName(catalog.getName());
-        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findByCatalogId(catalogId));
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getCatalogInfoByCatalogId(Long catalogId, Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        Specification<ProductEntity> spec = productSpecification.byCatalogId(catalogId);
+        Pageable pageable;
+        if (sortOrder != null && sortOrder.equals("asc")) {
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        }
+        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findAll(spec, pageable).toList());
         for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
-            generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
+            generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
         }
-        catalogWithItemsDto.setResponseDtoList(generalProductResponseDtos);
         responseDto.setMessage("Catalog found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);
-        responseDto.setPayload(catalogWithItemsDto);
+        responseDto.setPayload(generalProductResponseDtos);
         return responseDto;
     }
 

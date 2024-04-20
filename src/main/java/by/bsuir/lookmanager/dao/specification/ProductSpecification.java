@@ -5,4 +5,5 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface ProductSpecification {
     Specification<ProductEntity> byCategoryId(Long categoryId);
+    Specification<ProductEntity> byCatalogId(Long catalogId);
 }

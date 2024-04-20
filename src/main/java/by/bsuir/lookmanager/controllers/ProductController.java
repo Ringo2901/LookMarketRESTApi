@@ -37,7 +37,7 @@ public class ProductController {
     @GetMapping()
     public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                @RequestParam(required = false, defaultValue = "10") Integer pageSize,
-                                                                                               @RequestParam(required = false, defaultValue = "id") String sortBy,
+                                                                                               @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
                                                                                                @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
@@ -47,7 +47,7 @@ public class ProductController {
     public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsByCategory(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long id,
                                                                                                          @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                          @RequestParam(required = false, defaultValue = "10") Integer pageSize,
-                                                                                                         @RequestParam(required = false, defaultValue = "id") String sortBy,
+                                                                                                         @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
                                                                                                          @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsByCategory(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), id, pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
