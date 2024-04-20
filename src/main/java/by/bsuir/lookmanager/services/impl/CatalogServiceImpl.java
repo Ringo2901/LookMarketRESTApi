@@ -11,7 +11,9 @@ import by.bsuir.lookmanager.dto.product.general.mapper.GeneralProductResponseMap
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
+import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
+import by.bsuir.lookmanager.entities.user.information.FavouritesEntity;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +88,7 @@ public class CatalogServiceImpl implements CatalogService {
         List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findByCatalogId(catalogId));
         for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
         }
@@ -102,21 +104,51 @@ public class CatalogServiceImpl implements CatalogService {
     public ApplicationResponseDto<List<CatalogWithItemsDto>> getCatalogsItemsByUserId(Long userId) {
         ApplicationResponseDto<List<CatalogWithItemsDto>> responseDto = new ApplicationResponseDto<>();
         List<CatalogWithItemsDto> catalogWithItemsDto = new ArrayList<>();
+
+
         List<Catalog> catalogs = catalogRepository.findByUserId(userId);
-        for (Catalog catalog: catalogs){
+        {
+            Catalog personalCatalog = catalogs.get(0);
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
-            newCatalog.setId(catalog.getId());
-            newCatalog.setName(catalog.getName());
-            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(catalog.getId()));
-            for (GeneralProductResponseDto generalProductResponseDto: generalProducts){
+            newCatalog.setId(personalCatalog.getId());
+            newCatalog.setName(personalCatalog.getName());
+            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(personalCatalog.getId()));
+            for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
-                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalog.getUser().getId(), generalProductResponseDto.getId()));
+                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(personalCatalog.getUser().getId(), generalProductResponseDto.getId()));
             }
             newCatalog.setResponseDtoList(generalProducts);
             catalogWithItemsDto.add(newCatalog);
         }
+
+        CatalogWithItemsDto favourites = new CatalogWithItemsDto();
+        favourites.setId(0L);
+        favourites.setName("Favorites");
+        List<FavouritesEntity> favouritesEntities = favouritesRepository.findFirst2ByUserId(userId);
+        List <ProductEntity> favouriteProducts = new ArrayList<>();
+        for (FavouritesEntity favouritesEntity: favouritesEntities){
+            favouriteProducts.add(productRepository.findById(favouritesEntity.getProductId()).orElse(null));
+        }
+        favourites.setResponseDtoList(productListMapper.toGeneralProductResponseDtoList(favouriteProducts));
+
+        catalogWithItemsDto.add(favourites);
+        for (int i = 1; i<catalogs.size(); i++){
+            CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
+            newCatalog.setId(catalogs.get(i).getId());
+            newCatalog.setName(catalogs.get(i).getName());
+            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(catalogs.get(i).getId()));
+            for (GeneralProductResponseDto generalProductResponseDto: generalProducts){
+                ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+                //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalogs.get(i).getUser().getId(), generalProductResponseDto.getId()));
+            }
+            newCatalog.setResponseDtoList(generalProducts);
+            catalogWithItemsDto.add(newCatalog);
+        }
+
         responseDto.setMessage("Catalog found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);

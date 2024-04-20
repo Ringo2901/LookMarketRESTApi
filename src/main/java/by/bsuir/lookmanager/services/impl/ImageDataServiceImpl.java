@@ -39,6 +39,17 @@ public class ImageDataServiceImpl implements ImageDataService {
     }
 
     @Override
+    public ApplicationResponseDto<ImageDataResponseDto> getImageDataById(Long id) throws NotFoundException {
+        ApplicationResponseDto<ImageDataResponseDto> responseDto = new ApplicationResponseDto<>();
+        ImageData imageData = imageDataRepository.findById(id).orElseThrow(() -> new NotFoundException("Image not found"));
+        responseDto.setCode(200);
+        responseDto.setStatus("OK");
+        responseDto.setMessage("Images found!");
+        responseDto.setPayload(imageDataToDtoMapper.mediaToDto(imageData));
+        return responseDto;
+    }
+
+    @Override
     public ApplicationResponseDto<Object> addImageDataByProductId(Long id, ImageDataRequestDto requestDto) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
         ImageData imageData = imageDataToDtoMapper.dtoToMedia(requestDto);

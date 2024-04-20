@@ -17,6 +17,12 @@ import java.util.List;
 public class ImageController {
     @Autowired
     private ImageDataService imageDataService;
+
+    @GetMapping("/byId/{id}")
+    public ResponseEntity<ApplicationResponseDto<ImageDataResponseDto>> getImageDataById(@PathVariable Long id) {
+        ApplicationResponseDto<ImageDataResponseDto> responseDto = imageDataService.getImageDataById(id);
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponseDto<List<ImageDataResponseDto>>> getImageDataByProductId(@PathVariable Long id) {
         ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = imageDataService.getImageDataByProductId(id);
