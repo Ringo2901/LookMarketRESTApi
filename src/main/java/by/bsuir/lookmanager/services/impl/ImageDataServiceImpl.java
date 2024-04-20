@@ -39,11 +39,15 @@ public class ImageDataServiceImpl implements ImageDataService {
     }
 
     @Override
-    public ApplicationResponseDto<List<ImageDataResponseDto>> addImageDataByProductId(Long id, ImageDataRequestDto requestDto) {
+    public ApplicationResponseDto<Object> addImageDataByProductId(Long id, ImageDataRequestDto requestDto) {
+        ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
         ImageData imageData = imageDataToDtoMapper.dtoToMedia(requestDto);
         imageData.setProductId(id);
         imageDataRepository.save(imageData);
-        return getImageDataByProductId(id);
+        responseDto.setCode(200);
+        responseDto.setStatus("OK");
+        responseDto.setMessage("Image add!");
+        return responseDto;
     }
 
     @Override

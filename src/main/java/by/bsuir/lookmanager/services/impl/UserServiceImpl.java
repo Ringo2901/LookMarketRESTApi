@@ -14,6 +14,7 @@ import by.bsuir.lookmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -145,8 +146,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
+        if (userRepository.countByLogin(requestDto.getLogin()) > 0) {
+            throw new BadParameterValueException("Update failed! A user with this login already exists!");
+        }
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
         UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstname(requestDto.getFirstname());

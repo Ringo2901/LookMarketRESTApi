@@ -23,8 +23,8 @@ public class ImageController {
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
     @PostMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<List<ImageDataResponseDto>>> addImageDataByProductId(@PathVariable Long id, @RequestBody ImageDataRequestDto requestDto) {
-        ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = imageDataService.addImageDataByProductId(id, requestDto);
+    public ResponseEntity< ApplicationResponseDto<Object>> addImageDataByProductId(@PathVariable Long id, @RequestBody ImageDataRequestDto requestDto) {
+        ApplicationResponseDto<Object> responseDto = imageDataService.addImageDataByProductId(id, requestDto);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
