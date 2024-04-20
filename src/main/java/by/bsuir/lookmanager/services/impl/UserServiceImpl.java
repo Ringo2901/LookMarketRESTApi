@@ -213,6 +213,10 @@ public class UserServiceImpl implements UserService {
             userToSave.setUserProfile(profile);
             userProfileRepository.save(profile);
             userToSave = userRepository.save(userToSave);
+            Catalog personalCatalog = new Catalog();
+            personalCatalog.setName("Personal catalog");
+            personalCatalog.setUser(userToSave);
+            catalogRepository.save(personalCatalog);
             userLoginResponseDto.setPayload(userToSave.getId());
         } else {
             userLoginResponseDto.setPayload(user.get().getId());
