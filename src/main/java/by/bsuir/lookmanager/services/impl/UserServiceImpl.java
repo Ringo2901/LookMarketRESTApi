@@ -158,10 +158,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
-        if (!requestDto.getLogin().isEmpty() && userRepository.countByLogin(requestDto.getLogin()) > 0) {
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+        if (!user.getLogin().equals(requestDto.getLogin()) && userRepository.countByLogin(requestDto.getLogin()) > 0) {
             throw new BadParameterValueException("Update failed! A user with this login already exists!");
         }
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
         UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstname(requestDto.getFirstname());
         userProfile.setLastname(requestDto.getLastname());
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
         userProfile.setGender(requestDto.getGender());
         userProfile.setPostalCode(requestDto.getPostalCode());
-        if (requestDto.getImageData() != null) {
+        if (requestDto.getImageData() != null && !requestDto.getImageData().isEmpty()) {
             String carg = requestDto.getImageData();
             carg = carg.replace("\n","");
             userProfile.setImageData(Base64.getDecoder().decode(carg));
