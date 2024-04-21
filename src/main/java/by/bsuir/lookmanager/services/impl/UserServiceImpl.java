@@ -144,6 +144,7 @@ public class UserServiceImpl implements UserService {
         for (Catalog catalog: catalogs){
             catalogIdsList.add(catalog.getId());
         }
+        userProfileResponseDto.setUserImageUrl(user.getUserProfile().getUserImageUrl());
         userProfileResponseDto.setSubscribed(subscriptionRepository.existsBySubscriberIdAndSellerId(userId, id));
         userProfileResponseDto.setCatalogsIdList(catalogIdsList);
         responseDto.setCode(200);

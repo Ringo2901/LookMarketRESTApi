@@ -14,11 +14,7 @@ public class RestApplication {
         System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
     }
     public static void main(String[] args) {
-        LOGGER.debug("Debugging log");
-        LOGGER.info("Info log");
-        LOGGER.warn("Warning log");
-        LOGGER.error("Error log");
-        LOGGER.fatal("Fatal log");
+        LOGGER.info("Application starts");
         SpringApplication.run(RestApplication.class);
     }
 }
