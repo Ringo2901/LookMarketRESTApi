@@ -3,7 +3,6 @@ server:
   servlet:
     context-path: /api/web
 
-
 spring:
   datasource:
     url: jdbc:postgres://c3lej1b0k5gkeq.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/deen2660hq9ifc
@@ -17,6 +16,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: false
 
 jwt:
   secret: 8a7104032bd4c06dbb5e189f896e48b980de235592c16cb1176c694580bb98dc2257bc3ddb9c774e3e4d215d0d19ee5caba310190b198bb46431d35b612deb20ed640137d185b600daff2ccdd072ae2e2667139b10cffcde12c2854cb8c2e5d5aadd1a40588211735736705d97bdd3ecd655513a2efd330e9a8a773b167fba27
