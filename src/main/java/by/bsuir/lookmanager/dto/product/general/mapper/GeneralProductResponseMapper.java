@@ -22,7 +22,7 @@ public interface GeneralProductResponseMapper {
     @Mapping(source = "productInformation.price", target = "price")
     @Mapping(target = "createdTime", expression = "java(formatTimestamp(product.getCreatedTime()))")
     @Mapping(target = "updateTime", expression = "java(formatTimestamp(product.getUpdateTime()))")
-    @Mapping(target = "userImageData", ignore = true)
+    @Mapping(target = "userImageUrl", source = "catalog.user.userProfile.userImageUrl")
     GeneralProductResponseDto productEntityToResponseDto(ProductEntity product);
 
     default String formatTimestamp(Timestamp timestamp) {
@@ -31,12 +31,5 @@ public interface GeneralProductResponseMapper {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         return sdf.format(timestamp);
-    }
-
-    @AfterMapping
-    default void mapUserImageData(ProductEntity product, @MappingTarget GeneralProductResponseDto productResponseDto) {
-        if (product != null && product.getCatalog().getUser().getUserProfile().getImageData() != null) {
-            productResponseDto.setUserImageData(Base64.getEncoder().encodeToString(product.getCatalog().getUser().getUserProfile().getImageData()));
-        }
     }
 }

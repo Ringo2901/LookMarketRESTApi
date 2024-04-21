@@ -18,7 +18,6 @@ import java.util.Base64;
 public interface UserProfileMapper {
     ImageDataToDtoMapper INSTANCE = Mappers.getMapper(ImageDataToDtoMapper.class);
 
-    @Mapping(target = "imageData", ignore = true)
     @Mapping(source = "userProfile.lastname", target = "lastname")
     @Mapping(source = "userProfile.firstname", target = "firstname")
     @Mapping(target = "dateOfBirth", ignore = true)
@@ -46,13 +45,6 @@ public interface UserProfileMapper {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         return sdf.format(date);
-    }
-
-    @AfterMapping
-    default void mapImageData(UserEntity user, @MappingTarget UserProfileResponseDto userProfileResponseDto) {
-        if (user != null && user.getUserProfile().getImageData() != null) {
-            userProfileResponseDto.setImageData(Base64.getEncoder().encodeToString(user.getUserProfile().getImageData()));
-        }
     }
 
     @AfterMapping

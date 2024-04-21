@@ -43,4 +43,6 @@ public class UserProfile {
     private Country country;
     @Column(name = "profile_image", columnDefinition = "bytea")
     private byte[] imageData;
+    @Column(name = "profile_image_url")
+    private String userImageUrl;
 }

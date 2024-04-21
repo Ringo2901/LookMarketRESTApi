@@ -35,7 +35,7 @@ public class UserProfileResponseDto {
     private Integer cityId;
     private Integer countryId;
 
-    private String imageData;
+    private String userImageUrl;
     private List<Long> catalogsIdList;
 
     private boolean isSubscribed;
