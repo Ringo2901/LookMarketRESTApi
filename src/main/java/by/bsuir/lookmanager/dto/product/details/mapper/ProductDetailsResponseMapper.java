@@ -6,8 +6,11 @@ import by.bsuir.lookmanager.entities.product.information.ProductColor;
 import by.bsuir.lookmanager.entities.product.information.ProductMaterial;
 import by.bsuir.lookmanager.entities.product.information.ProductSize;
 import by.bsuir.lookmanager.entities.product.information.ProductTag;
+import by.bsuir.lookmanager.enums.Season;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -16,28 +19,34 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ProductDetailsResponseMapper {
-    @Mapping(source = "subCategory.name", target = "subCategoryName")
-    @Mapping(source = "subCategory.category.name", target = "categoryName")
-    @Mapping(source = "productInformation.description", target = "description")
-    @Mapping(source = "productInformation.gender", target = "gender")
-    @Mapping(source = "productInformation.season", target = "season")
-    @Mapping(source = "productInformation.condition", target = "condition")
-    @Mapping(source = "productInformation.ageType", target = "ageType")
-    @Mapping(source = "productInformation.productBrand.brandName", target = "brandName")
-    @Mapping(source = "productInformation.sizes", target = "sizes")
-    @Mapping(source = "productInformation.colors", target = "colors")
-    @Mapping(source = "productInformation.materials", target = "materials")
-    @Mapping(source = "productInformation.tags", target = "tags")
-    @Mapping(source = "productInformation.price", target = "price")
-    @Mapping(source = "catalog.user.login", target = "login")
-    @Mapping(source = "catalog.user.id", target = "userId")
-    @Mapping(source = "catalog.user.userProfile.firstname", target = "firstname")
-    @Mapping(source = "catalog.user.userProfile.lastname", target = "lastname")
-    @Mapping(source = "catalog.user.userProfile.userImageUrl", target = "userImageUrl")
-    @Mapping(target = "createdTime", expression = "java(formatTimestamp(product.getCreatedTime()))")
-    @Mapping(target = "updateTime", expression = "java(formatTimestamp(product.getUpdateTime()))")
+    @Mappings({
+            @Mapping(source = "subCategory.name", target = "subCategoryName"),
+            @Mapping(source = "subCategory.category.name", target = "categoryName"),
+            @Mapping(source = "productInformation.description", target = "description"),
+            @Mapping(source = "productInformation.gender", target = "gender"),
+            @Mapping(source = "productInformation.season", target = "season", qualifiedByName = "mapSeason"),
+            @Mapping(source = "productInformation.condition", target = "condition"),
+            @Mapping(source = "productInformation.ageType", target = "ageType"),
+            @Mapping(source = "productInformation.productBrand.brandName", target = "brandName"),
+            @Mapping(source = "productInformation.sizes", target = "sizes"),
+            @Mapping(source = "productInformation.colors", target = "colors"),
+            @Mapping(source = "productInformation.materials", target = "materials"),
+            @Mapping(source = "productInformation.tags", target = "tags"),
+            @Mapping(source = "productInformation.price", target = "price"),
+            @Mapping(source = "catalog.user.login", target = "login"),
+            @Mapping(source = "catalog.user.id", target = "userId"),
+            @Mapping(source = "catalog.user.userProfile.firstname", target = "firstname"),
+            @Mapping(source = "catalog.user.userProfile.lastname", target = "lastname"),
+            @Mapping(source = "catalog.user.userProfile.userImageUrl", target = "userImageUrl"),
+            @Mapping(target = "createdTime", expression = "java(formatTimestamp(product.getCreatedTime()))"),
+            @Mapping(target = "updateTime", expression = "java(formatTimestamp(product.getUpdateTime()))")
+    })
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);
 
+    @Named("mapSeason")
+    default String mapSeason(Season season) {
+        return season == Season.DEMI_SEASON ? "DEMI-SEASON" : season.name();
+    }
     default String formatTimestamp(Timestamp timestamp) {
         if (timestamp == null) {
             return null;

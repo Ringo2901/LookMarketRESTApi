@@ -22,7 +22,7 @@ public class ProductDetailsResponseDto {
 
     private String description;
     private ProductGender gender;
-    private Season season;
+    private String season;
     private Condition condition;
     private AgeType ageType;
     private String brandName;

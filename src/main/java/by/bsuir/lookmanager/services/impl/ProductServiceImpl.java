@@ -15,6 +15,7 @@ import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
+import by.bsuir.lookmanager.enums.Season;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,7 +180,7 @@ public class ProductServiceImpl implements ProductService {
         productInformation.setDescription(requestDto.getDescription());
         productInformation.setPrice(requestDto.getPrice());
         productInformation.setGender(requestDto.getGender());
-        productInformation.setSeason(requestDto.getSeason());
+        productInformation.setSeason(requestDto.getSeason().equals("DEMI-SEASON")?Season.DEMI_SEASON:Season.valueOf(requestDto.getSeason()));
         productInformation.setCondition(requestDto.getCondition());
         productInformation.setAgeType(requestDto.getAgeType());
         productInformation.setProductBrand(brandRepository.getReferenceById(requestDto.getBrandId()));

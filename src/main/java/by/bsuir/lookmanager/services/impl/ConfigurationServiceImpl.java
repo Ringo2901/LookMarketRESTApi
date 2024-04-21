@@ -46,7 +46,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         configurationResponseDto.setConditions(getNames(Condition.class));
         configurationResponseDto.setCategories(categoryRepository.findAll());
         configurationResponseDto.setAgeTypes(getNames(AgeType.class));
-        configurationResponseDto.setSeasons(getNames(Season.class));
+        List<String> seasons = new ArrayList<>();
+        for (String season: getNames(Season.class)){
+            seasons.add(season.equals("DEMI_SEASON")?"DEMI-SEASON":season);
+        }
+        configurationResponseDto.setSeasons(seasons);
         configurationResponseDto.setProductColors(colorRepository.findAll());
         configurationResponseDto.setProductBrands(brandRepository.findAll());
         configurationResponseDto.setProductGenders(getNames(ProductGender.class));
