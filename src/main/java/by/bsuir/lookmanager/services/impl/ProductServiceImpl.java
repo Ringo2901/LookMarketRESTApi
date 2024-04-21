@@ -85,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
                     urls.add(image.getImageUrl());
                 }
             }
-            productResponseDto.setImageUrl(urls);
+            productResponseDto.setImagesUrls(urls);
             productResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, id));
             responseDto.setPayload(productResponseDto);
         }

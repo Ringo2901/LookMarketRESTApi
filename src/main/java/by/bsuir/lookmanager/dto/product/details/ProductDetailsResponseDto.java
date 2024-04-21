@@ -42,7 +42,7 @@ public class ProductDetailsResponseDto {
     private Long userId;
     private String userImageUrl;
 
-    private List<String> imageUrl;
+    private List<String> imagesUrls;
 
     private boolean isFavourite;
 }
