@@ -16,6 +16,8 @@ import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.entities.user.information.FavouritesEntity;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.CatalogService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,12 +48,15 @@ public class CatalogServiceImpl implements CatalogService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
     @Autowired
     private ProductSpecification productSpecification;
+    private static final Logger LOGGER = LogManager.getLogger(CatalogServiceImpl.class);
 
     @Override
     public ApplicationResponseDto<CatalogResponseDto> addCatalog(Long userId, CatalogRequestDto requestDto) {
         ApplicationResponseDto<CatalogResponseDto> responseDto = new ApplicationResponseDto<>();
         Catalog catalogToSave = catalogMapper.catalogRequestToCatalogEntity(requestDto);
-        catalogToSave.setUser(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!")));
+        LOGGER.info("Set user for catalog with user id = " + catalogToSave.getUser().getId());
+        catalogToSave.setUser(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with user id = " + userId + " not found when addCatalog execute!")));
+        LOGGER.info("Save catalog to database");
         Catalog catalog = catalogRepository.save(catalogToSave);
         responseDto.setStatus("OK");
         responseDto.setMessage("Catalog add successfully");
@@ -63,7 +68,9 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     public ApplicationResponseDto<Object> removeCatalog(Long userId, Long catalogId) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
-        Catalog catalog = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog not found!"));
+        LOGGER.info("Find catalog to delete with catalog id = " + catalogId);
+        Catalog catalog = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog with catalog id = " + catalogId + " not found when removeCatalog execute!"));
+        LOGGER.info("Delete catalog with catalog id = " + catalogId);
         catalogRepository.delete(catalog);
         responseDto.setCode(200);
         responseDto.setStatus("OK");
@@ -74,8 +81,10 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     public ApplicationResponseDto<CatalogResponseDto> updateCatalog(Long userId, Long catalogId, CatalogRequestDto requestDto) {
         ApplicationResponseDto<CatalogResponseDto> responseDto = new ApplicationResponseDto<>();
-        Catalog catalogToUpdate = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog not found!"));
+        LOGGER.info("Find catalog to delete with catalog id = " + catalogId);
+        Catalog catalogToUpdate = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog with catalog id = " + catalogId + " not found when updateCatalog execute!"));
         catalogToUpdate.setName(requestDto.getName());
+        LOGGER.info("Update catalog with catalog id = " + catalogId + " with new name = " + requestDto.getName());
         Catalog catalog = catalogRepository.save(catalogToUpdate);
         responseDto.setStatus("OK");
         responseDto.setMessage("Catalog add successfully");
@@ -88,17 +97,22 @@ public class CatalogServiceImpl implements CatalogService {
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getCatalogInfoByCatalogId(Long catalogId, Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Specification<ProductEntity> spec = productSpecification.byCatalogId(catalogId);
+        LOGGER.info("Set pagination for getCatalogInfoByCatalogId");
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
         } else {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
+        LOGGER.info("Pagination for getCatalogInfoByCatalogId = " + pageable);
+        LOGGER.info("Find all products by catalog id = " + catalogId);
         List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findAll(spec, pageable).toList());
         for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
+            LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+            LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
         }
         responseDto.setMessage("Catalog found!");
@@ -112,20 +126,23 @@ public class CatalogServiceImpl implements CatalogService {
     public ApplicationResponseDto<List<CatalogWithItemsDto>> getCatalogsItemsByUserId(Long userId) {
         ApplicationResponseDto<List<CatalogWithItemsDto>> responseDto = new ApplicationResponseDto<>();
         List<CatalogWithItemsDto> catalogWithItemsDto = new ArrayList<>();
-
-
+        LOGGER.info("Find catalogs by user id = " + userId);
         List<Catalog> catalogs = catalogRepository.findByUserId(userId);
         {
             Catalog personalCatalog = catalogs.get(0);
+            LOGGER.info("Find personal catalog by user id = " + userId);
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(personalCatalog.getId());
             newCatalog.setName(personalCatalog.getName());
+            LOGGER.info("Personal catalog for user id = " + userId + " personal catalog without products = " + newCatalog);
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogIdOrderByCreatedTimeDesc(personalCatalog.getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
+                LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
                 generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
-                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(personalCatalog.getUser().getId(), generalProductResponseDto.getId()));
+                LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
+                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
             }
             newCatalog.setResponseDtoList(generalProducts);
             catalogWithItemsDto.add(newCatalog);
@@ -134,6 +151,7 @@ public class CatalogServiceImpl implements CatalogService {
         CatalogWithItemsDto favourites = new CatalogWithItemsDto();
         favourites.setId(0L);
         favourites.setName("Favorites");
+        LOGGER.info("Find first 2 favourites by user id = " + userId);
         List<FavouritesEntity> favouritesEntities = favouritesRepository.findFirst2ByUserId(userId);
         List<ProductEntity> favouriteProducts = new ArrayList<>();
         for (FavouritesEntity favouritesEntity : favouritesEntities) {
@@ -142,25 +160,31 @@ public class CatalogServiceImpl implements CatalogService {
         }
         List<GeneralProductResponseDto> favouriteDto = productListMapper.toGeneralProductResponseDtoList(favouriteProducts);
         for (GeneralProductResponseDto generalProductResponseDto : favouriteDto) {
+            LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
-            generalProductResponseDto.setFavourite(true);
+            LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
+            generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
         }
 
         favourites.setResponseDtoList(favouriteDto);
 
         catalogWithItemsDto.add(favourites);
         for (int i = 1; i < catalogs.size(); i++) {
+            LOGGER.info("Find first 2 favourites by user id = " + userId);
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(catalogs.get(i).getId());
             newCatalog.setName(catalogs.get(i).getName());
+            LOGGER.info("Catalog for user id = " + userId + " catalog without products = " + newCatalog);
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogIdOrderByCreatedTimeDesc(catalogs.get(i).getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
+                LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
                 generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
-                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalogs.get(i).getUser().getId(), generalProductResponseDto.getId()));
+                LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
+                generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
             }
             newCatalog.setResponseDtoList(generalProducts);
             catalogWithItemsDto.add(newCatalog);

@@ -10,6 +10,8 @@ import by.bsuir.lookmanager.entities.user.information.Assessments;
 import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.AssessmentService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +26,19 @@ public class AssessmentServiceImpl implements AssessmentService {
     private UserRepository userRepository;
     @Autowired
     private AssessmentMapper assessmentMapper;
+    private static final Logger LOGGER = LogManager.getLogger(AssessmentServiceImpl.class);
+
     @Override
-    public ApplicationResponseDto<?> addAssessment(Long userId, AssessmentRequestDto requestDto) throws AlreadyExistsException{
+    public ApplicationResponseDto<?> addAssessment(Long userId, AssessmentRequestDto requestDto) throws AlreadyExistsException {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
-        if (assessmentRepository.existsByUserIdAndSellerId(userId, requestDto.getSellerId())){
+        LOGGER.info("Check assessment exist by user id = " + userId + " and seller id = " + requestDto.getSellerId());
+        if (assessmentRepository.existsByUserIdAndSellerId(userId, requestDto.getSellerId())) {
+            LOGGER.warn("Assessment already exist by user id = " + userId + " and seller id = " + requestDto.getSellerId() + " when addAssessment execute");
             throw new AlreadyExistsException("Assessment already exists");
         }
         Assessments assessments = assessmentMapper.requestDtoToAssessmentEntity(requestDto);
         assessments.setUserId(userId);
+        LOGGER.info("Save assessment with user id = " + userId + " and seller id = " + requestDto.getSellerId() + " to database");
         assessmentRepository.save(assessments);
         responseDto.setMessage("Assessment add!");
         responseDto.setStatus("OK");
@@ -40,9 +47,12 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public ApplicationResponseDto<?> removeAssessment(Long userId,Long sellerId) throws NotFoundException{
+    public ApplicationResponseDto<?> removeAssessment(Long userId, Long sellerId) throws NotFoundException {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
-        Assessments assessments = assessmentRepository.findFirstByUserIdAndSellerId(userId, sellerId).orElseThrow(() -> new NotFoundException("Assessment not found!"));
+        LOGGER.info("Check assessment exist by user id = " + userId + " and seller id = " + sellerId);
+        Assessments assessments = assessmentRepository.findFirstByUserIdAndSellerId(userId, sellerId).orElseThrow(() ->
+                new NotFoundException("Assessment with user id = " + userId + " and seller id = " + sellerId + " not found when removeAssessment execute!"));
+        LOGGER.info("Assessment delete with user id = " + userId + " and seller id = " + sellerId);
         assessmentRepository.delete(assessments);
         responseDto.setMessage("Assessment delete!");
         responseDto.setStatus("OK");
@@ -51,15 +61,17 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public ApplicationResponseDto<List<AssessmentResponseDto>> getAssessmentsBySellerId(Long sellerId) throws NotFoundException{
+    public ApplicationResponseDto<List<AssessmentResponseDto>> getAssessmentsBySellerId(Long sellerId) throws NotFoundException {
         ApplicationResponseDto<List<AssessmentResponseDto>> responseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Find assessment with seller id = " + sellerId);
         List<Assessments> assessments = assessmentRepository.findBySellerId(sellerId);
         List<AssessmentResponseDto> assessmentResponseDtos = new ArrayList<>();
-        for (Assessments assessment: assessments){
+        for (Assessments assessment : assessments) {
             AssessmentResponseDto assessmentResponseDto = new AssessmentResponseDto();
             assessmentResponseDto.setAssessment(assessment.getAssessment());
             assessmentResponseDto.setDescription(assessment.getDescription());
-            assessmentResponseDto.setLogin(userRepository.findById(assessment.getUserId()).orElseThrow(()->new NotFoundException("User not found!")).getLogin());
+            LOGGER.info("Set user login for assessment with id = " + assessment.getId());
+            assessmentResponseDto.setLogin(userRepository.findById(assessment.getUserId()).orElseThrow(() -> new NotFoundException("User with user id = " + assessment.getUserId() + " not found when getAssessmentsBySellerId execute!")).getLogin());
             assessmentResponseDto.setUserId(assessment.getUserId());
             assessmentResponseDtos.add(assessmentResponseDto);
         }

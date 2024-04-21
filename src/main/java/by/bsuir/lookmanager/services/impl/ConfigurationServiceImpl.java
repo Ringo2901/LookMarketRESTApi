@@ -11,6 +11,8 @@ import by.bsuir.lookmanager.entities.user.information.City;
 import by.bsuir.lookmanager.entities.user.information.Country;
 import by.bsuir.lookmanager.enums.*;
 import by.bsuir.lookmanager.services.ConfigurationService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +40,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private CountryRepository countryRepository;
     @Autowired
     private CityRepository cityRepository;
-
+    private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
     @Override
     public ApplicationResponseDto<ConfigurationResponseDto> getConfiguration() {
+        LOGGER.info("Get configuration");
         ApplicationResponseDto<ConfigurationResponseDto> responseDto = new ApplicationResponseDto<>();
         ConfigurationResponseDto configurationResponseDto = new ConfigurationResponseDto();
+        LOGGER.info("Get enums config");
         configurationResponseDto.setConditions(getNames(Condition.class));
         configurationResponseDto.setCategories(categoryRepository.findAll());
         configurationResponseDto.setAgeTypes(getNames(AgeType.class));
@@ -51,6 +55,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             seasons.add(season.equals("DEMI_SEASON")?"DEMI-SEASON":season);
         }
         configurationResponseDto.setSeasons(seasons);
+        LOGGER.info("Get lists config");
         configurationResponseDto.setProductColors(colorRepository.findAll());
         configurationResponseDto.setProductBrands(brandRepository.findAll());
         configurationResponseDto.setProductGenders(getNames(ProductGender.class));
@@ -66,6 +71,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         configurationResponseDto.setUserGenders(getNames(UserGender.class));
         List<CountryWithCityDto> countryWithCityDtos = new ArrayList<>();
         List<Country> countries = countryRepository.findAll();
+        LOGGER.info("Get countries and cities config");
         for (Country country:countries){
             CountryWithCityDto countryWithCityDto = new CountryWithCityDto();
             countryWithCityDto.setCountryId(country.getId());

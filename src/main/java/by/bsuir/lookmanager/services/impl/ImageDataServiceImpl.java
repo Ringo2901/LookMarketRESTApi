@@ -13,6 +13,8 @@ import by.bsuir.lookmanager.services.ImageDataService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class ImageDataServiceImpl implements ImageDataService {
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
     private final Cloudinary cloudinary;
+    private static final Logger LOGGER = LogManager.getLogger(ImageDataServiceImpl.class);
 
     ImageDataServiceImpl() {
         Dotenv dotenv = Dotenv.load();
@@ -40,9 +43,10 @@ public class ImageDataServiceImpl implements ImageDataService {
     @Override
     public ApplicationResponseDto<List<ImageDataResponseDto>> getImageDataByProductId(Long id) throws NotFoundException {
         ApplicationResponseDto<List<ImageDataResponseDto>> responseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Find images for product with product id = " + id);
         List<ImageData> imageData = imageDataRepository.findByProductId(id);
         if (imageData == null) {
-            throw new NotFoundException("Images not found!");
+            throw new NotFoundException("Images for product with id = " + id + " not found when getImageDataByProductId execute!");
         } else {
             responseDto.setCode(200);
             responseDto.setStatus("OK");
@@ -55,7 +59,8 @@ public class ImageDataServiceImpl implements ImageDataService {
     @Override
     public ApplicationResponseDto<ImageDataResponseDto> getImageDataById(Long id) throws NotFoundException {
         ApplicationResponseDto<ImageDataResponseDto> responseDto = new ApplicationResponseDto<>();
-        ImageData imageData = imageDataRepository.findById(id).orElseThrow(() -> new NotFoundException("Image not found"));
+        LOGGER.info("Find image with id = " + id);
+        ImageData imageData = imageDataRepository.findById(id).orElseThrow(() -> new NotFoundException("Image with image id = " + id +" not found when getImageDataById execute"));
         responseDto.setCode(200);
         responseDto.setStatus("OK");
         responseDto.setMessage("Images found!");
@@ -86,6 +91,7 @@ public class ImageDataServiceImpl implements ImageDataService {
     @Override
     public ApplicationResponseDto<Object> deleteImageDataById(Long id) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Delete image with id = " + id);
         imageDataRepository.deleteById(id);
         responseDto.setCode(200);
         responseDto.setStatus("OK");

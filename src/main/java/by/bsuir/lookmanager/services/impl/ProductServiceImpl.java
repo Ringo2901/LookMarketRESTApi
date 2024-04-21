@@ -18,6 +18,8 @@ import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.enums.Season;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -70,19 +72,22 @@ public class ProductServiceImpl implements ProductService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
     @Autowired
     private FavouritesRepository favouritesRepository;
+    private static final Logger LOGGER = LogManager.getLogger(ProductServiceImpl.class);
 
     @Override
     public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long userId, Long id) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Find product by id = " + id);
         ProductEntity product = productRepository.findById(id).orElse(null);
         if (product == null) {
-            throw new NotFoundException("Product not found!");
+            throw new NotFoundException("Product with id = " + id + " not found when getProductInformationById execute!");
         } else {
             responseDto.setCode(200);
             responseDto.setStatus("OK");
             responseDto.setMessage("Product found!");
             ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
             List<ImageData> images = imageDataRepository.findByProductId(product.getId());
+            LOGGER.info("Fill product images for product with id = " + id);
             List<String> urls = new ArrayList<>();
             for (ImageData image : images) {
                 if (image.getImageUrl() != null) {
@@ -105,7 +110,9 @@ public class ProductServiceImpl implements ProductService {
         } else {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
+        LOGGER.info("Set pageable for getProducts = " + pageable);
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+        LOGGER.info("Find all products with pagination");
         return getListApplicationResponseDto(userId, responseDto, responseEntityList);
     }
 
@@ -119,7 +126,9 @@ public class ProductServiceImpl implements ProductService {
         } else {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
+        LOGGER.info("Set pageable for getProducts = " + pageable);
         List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
+        LOGGER.info("Find all products with sex = " + sex);
         return getListApplicationResponseDto(userId, responseDto, responseEntityList);
     }
 
@@ -128,7 +137,10 @@ public class ProductServiceImpl implements ProductService {
                                                                                           List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
+        LOGGER.info("Get products with sorting, filtering and pagination");
         List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size != null ? size.toArray(new Integer[size.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+
+        LOGGER.info("Set favourites");
         for (GeneralProductResponseDto product : products) {
             product.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, product.getId()));
         }
@@ -162,6 +174,7 @@ public class ProductServiceImpl implements ProductService {
         entityToSave.getProductInformation().setMaterials(materials);
         productInformationRepository.save(entityToSave.getProductInformation());
         ProductEntity product = productRepository.save(entityToSave);
+        LOGGER.info("Save product with new id = " + product.getId());
         responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("Product save!");
@@ -175,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
     @CacheEvict(value = "recommendedProducts", allEntries = true)
     public ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long userId, Long id, ProductInformationRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
-        ProductEntity entityToUpdate = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found!"));
+        ProductEntity entityToUpdate = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product with id = " + id + " not found when updateProduct execute!"));
         ProductInformation productInformation = entityToUpdate.getProductInformation();
         productInformation.setDescription(requestDto.getDescription());
         productInformation.setPrice(requestDto.getPrice());
@@ -191,6 +204,7 @@ public class ProductServiceImpl implements ProductService {
         entityToUpdate.setProductInformation(productInformation);
         entityToUpdate.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         ProductEntity product = productRepository.save(entityToUpdate);
+        LOGGER.info("Product with id = " + id + " updated");
         responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("Product update!");
@@ -204,6 +218,7 @@ public class ProductServiceImpl implements ProductService {
     @CacheEvict(value = "recommendedProducts", allEntries = true)
     public ApplicationResponseDto<Object> deleteProduct(Long id) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Delete product with id = " + id);
         productRepository.deleteById(id);
         responseDto.setCode(200);
         responseDto.setStatus("OK");
@@ -218,9 +233,11 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setStatus("OK");
             List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(responseEntityList);
             for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
+                LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
                 generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+                LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
             }
             responseDto.setPayload(generalProductResponseDtos);

@@ -14,6 +14,8 @@ import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.recomended.ProductSimilarityCalculator;
 import by.bsuir.lookmanager.services.RecommendedService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,23 +47,30 @@ public class RecommendedServiceImpl implements RecommendedService {
     private ProductSimilarityCalculator productSimilarityCalculator;
     @Autowired
     private FavouritesRepository favouritesRepository;
+    private static final Logger LOGGER = LogManager.getLogger(RecommendedServiceImpl.class);
 
     @Override
     @Cacheable(value = "recommendedProducts", key = "#userId + '_' + #pageNumber + '_' + #pageSize")
     public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Integer pageNumber, Integer pageSize) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+
         Pageable pageable = PageRequest.of(0, 100, Sort.by("createdTime").descending());
+        LOGGER.info("Get pageable for recommended = " + pageable);
+
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
         List<ProductEntity> filteredList = responseEntityList.stream()
                 .filter(product -> !favouritesRepository.existsByUserIdAndProductId(userId, product.getId()))
                 .toList();
+        LOGGER.info("Find favourites product for user with id = " + userId);
         List<ProductEntity> favouriteProducts = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Not Found!")).getFavouriteProducts();
         Map<ProductEntity, Double> similarityMap = new HashMap<>();
+        LOGGER.info("Create similarity map");
         for (ProductEntity product : filteredList) {
             similarityMap.put(product, 0.0);
         }
         try {
             productSimilarityCalculator.initializeIndex(filteredList);
+            LOGGER.info("Calculate similarity");
             for (ProductEntity favouriteProduct : favouriteProducts) {
                 for (ProductEntity product : similarityMap.keySet()) {
                     similarityMap.put(product, similarityMap.get(product) + productSimilarityCalculator.calculateSimilarity(favouriteProduct, product));
@@ -76,6 +85,7 @@ public class RecommendedServiceImpl implements RecommendedService {
                 .toList();
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min(startIndex + pageSize, topNKeys.size());
+        LOGGER.info("Get recommended from " + startIndex + " to " + endIndex);
         responseDto.setCode(200);
         responseDto.setStatus("OK");
         responseDto.setMessage("Recommended found!");

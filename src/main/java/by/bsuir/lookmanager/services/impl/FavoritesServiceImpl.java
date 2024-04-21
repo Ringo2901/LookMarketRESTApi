@@ -13,6 +13,8 @@ import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.FavoritesService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -34,23 +36,30 @@ public class FavoritesServiceImpl implements FavoritesService {
     private ImageDataRepository imageDataRepository;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
+    private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id, Integer pageNumber, Integer pageSize) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+        LOGGER.info("Find user by user id = " + id);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User with user id = " + id + " not found when getFavoritesByUserId execute!"));
+        LOGGER.info("Get favourite products for user with user id = " + id);
         List<ProductEntity> favoriteProducts = user.getFavouriteProducts();
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min(startIndex + pageSize, favoriteProducts.size());
         responseDto.setMessage("User found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);
+        LOGGER.info("Get favourites products for user with ud = " + id + " and start index = " + startIndex + " and end index = " + endIndex);
         List<ProductEntity> paginatedFavorites = favoriteProducts.subList(startIndex, endIndex);
         List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(paginatedFavorites);
         for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
+            LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+            LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
+            generalProductResponseDto.setFavourite(true);
         }
         responseDto.setPayload(generalProductResponseDtos);
         return responseDto;
@@ -59,11 +68,14 @@ public class FavoritesServiceImpl implements FavoritesService {
     @Override
     @CacheEvict(value = "recommendedProducts", key = "#userId + '_' + '*'")
     public ApplicationResponseDto<?> addFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found!"));
+        LOGGER.info("Find user with id = " + userId);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found when addFavorite execute!"));
+        LOGGER.info("Find product with id = " + productId);
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product with id = " + productId + " not found when addFavorite execute!"));
         if (user.getFavouriteProducts().contains(product)) {
-            throw new AlreadyExistsException("Already in favourites");
+            throw new AlreadyExistsException("Product with id = " + productId + " already in favourites for user with id = " + userId + " when addFavorite execute");
         }
+        LOGGER.info("Add product with product id = " + productId + " to favourites for user with user id = " + userId);
         user.getFavouriteProducts().add(product);
         userRepository.save(user);
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
@@ -76,11 +88,15 @@ public class FavoritesServiceImpl implements FavoritesService {
     @Override
     @CacheEvict(value = "recommendedProducts", key = "#userId + '_' + '*'")
     public ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found!"));
+        LOGGER.info("Find user with id = " + userId);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found when deleteFavorite execute!"));
+        LOGGER.info("Find product with id = " + productId);
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product with id = " + productId + " not found when deleteFavorite execute!"));
+
         if (!user.getFavouriteProducts().contains(product)) {
-            throw new AlreadyExistsException("Not in favourites");
+            throw new AlreadyExistsException("Product with id = " + productId + " not in favourites for user with id = " + userId + " when deleteFavorite execute");
         }
+        LOGGER.info("Remove product with product id = " + productId + " from favourites for user with user id = " + userId);
         user.getFavouriteProducts().remove(product);
         userRepository.save(user);
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();

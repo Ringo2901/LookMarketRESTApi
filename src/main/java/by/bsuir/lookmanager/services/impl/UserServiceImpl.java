@@ -14,6 +14,8 @@ import by.bsuir.lookmanager.services.UserService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
     private final Cloudinary cloudinary;
+    private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 
     UserServiceImpl() {
         Dotenv dotenv = Dotenv.load();
@@ -56,24 +59,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto) throws BadParameterValueException {
+
         UserEntity user = userRegisterMapper.userRegisterRequestToUserEntity(userRegisterRequestDto);
         ApplicationResponseDto<?> userRegisterResponseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Check email");
         if (userRegisterRequestDto.getEmail() != null) {
             user.setEmail(userRegisterRequestDto.getEmail());
             if (userRepository.countByEmail(user.getEmail()) > 0) {
                 throw new BadParameterValueException("Registration failed! A user with this email already exists!");
             }
         }
+        LOGGER.info("Check phone");
         if (userRegisterRequestDto.getPhone() != null) {
             user.getUserProfile().setPhoneNumber(userRegisterRequestDto.getPhone());
             if (userRepository.countByUserProfilePhoneNumber(userRegisterRequestDto.getPhone()) > 0) {
                 throw new BadParameterValueException("Registration failed! A user with this phone already exists!");
             }
         }
+        LOGGER.info("Check login");
         if (userRepository.countByLogin(userRegisterRequestDto.getLogin()) > 0) {
             throw new BadParameterValueException("Registration failed! A user with this login already exists!");
         }
         String password = user.getPassword();
+        LOGGER.info("Encrypt password");
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(password));
         userProfileRepository.save(user.getUserProfile());
@@ -95,9 +103,11 @@ public class UserServiceImpl implements UserService {
         userRegisterResponseDto.setCode(403);
         userRegisterResponseDto.setStatus("ERROR");
         if (userId != null) {
-            UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+            LOGGER.info("Find user with user id = " + userId);
+            UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with user id = " + userId + " not found when userLogout execute!"));
             user.setAuthorisationStatus(status);
             user.setLastSignIn(new Timestamp(System.currentTimeMillis()));
+            LOGGER.info("Set auth status and last sign in with user id = " + userId);
             userRepository.save(user);
             userRegisterResponseDto.setCode(200);
             userRegisterResponseDto.setStatus("OK");
@@ -110,11 +120,13 @@ public class UserServiceImpl implements UserService {
     public ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto) throws NotFoundException, BadParameterValueException {
         UserEntity user = null;
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        LOGGER.info("Check phone");
         if (userLoginRequestDto.getPhone() != null) {
-            user = userRepository.findByUserProfilePhoneNumber(userLoginRequestDto.getPhone()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
+            user = userRepository.findByUserProfilePhoneNumber(userLoginRequestDto.getPhone()).orElseThrow(() -> new NotFoundException("Authorization failed with phone = " + userLoginRequestDto.getPhone()));
         }
+        LOGGER.info("Check email");
         if (userLoginRequestDto.getEmail() != null) {
-            user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow(() -> new NotFoundException("Authorization failed!"));
+            user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow(() -> new NotFoundException("Authorization failed with phone = " + userLoginRequestDto.getEmail()));
         }
         if (user == null) {
             throw new BadParameterValueException("User not found, not enough parameters");
@@ -123,6 +135,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Invalid password error!");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Set auth status for user with user id = " + user.getId());
         user.setAuthorisationStatus(true);
         userRepository.save(user);
         userLoginResponseDto.setCode(200);
@@ -137,13 +150,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+        LOGGER.info("Find user by id = " + userId);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found when findUserById execute"));
+        LOGGER.info("Find catalogs by user id = " + userId);
         List<Catalog> catalogs = catalogRepository.findByUserId(user.getId());
         UserProfileResponseDto userProfileResponseDto = userProfileMapper.userEntityToUserProfileResponseDto(user);
         List<Long> catalogIdsList = new ArrayList<>();
         for (Catalog catalog: catalogs){
             catalogIdsList.add(catalog.getId());
         }
+        LOGGER.info("Set imageUrl, subscribed flag and catalogsIdsList for user with id = " + userId);
         userProfileResponseDto.setUserImageUrl(user.getUserProfile().getUserImageUrl());
         userProfileResponseDto.setSubscribed(subscriptionRepository.existsBySubscriberIdAndSellerId(userId, id));
         userProfileResponseDto.setCatalogsIdList(catalogIdsList);
@@ -158,7 +174,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+        LOGGER.info("Find user by id = " + id);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id = " + id + " when saveUserProfileById execute"));
         if (!user.getLogin().equals(requestDto.getLogin()) && userRepository.countByLogin(requestDto.getLogin()) > 0) {
             throw new BadParameterValueException("Update failed! A user with this login already exists!");
         }
@@ -180,9 +197,11 @@ public class UserServiceImpl implements UserService {
             String carg = requestDto.getImageData();
             carg = carg.replace("\n","");
             try {
+                LOGGER.info("Upload image to cloudinary");
                 Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + carg,
                         ObjectUtils.emptyMap());
                 String secureUrl = (String) cloudinaryMap.get("secure_url");
+                LOGGER.info("Image uploaded with url = " + secureUrl);
                 userProfile.setUserImageUrl(secureUrl);
             } catch (IOException e) {
                 throw new BadParameterValueException("Image broke)");
@@ -200,6 +219,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setUserProfile(userProfile);
         user.setLogin(requestDto.getLogin());
+        LOGGER.info("Save user info by user id = " + id);
         user = userRepository.save(user);
         responseDto.setCode(201);
         responseDto.setStatus("OK");
@@ -211,7 +231,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApplicationResponseDto<?> deleteUserById(Long id) throws NotFoundException {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
+        LOGGER.info("Find user by id = " + id);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User with id = " + id + " not found when deleteUserById execute"));
+        LOGGER.info("Delete user with id = " + id);
         userProfileRepository.delete(user.getUserProfile());
         responseDto.setCode(200);
         responseDto.setStatus("OK");
@@ -221,9 +243,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicationResponseDto<Long> userGoogleAuth(UserGoogleAuthDto dto) {
+        LOGGER.info("Find user by email = " + dto.getEmail());
         Optional<UserEntity> user = userRepository.findByEmail(dto.getEmail());
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
         if (user.isEmpty()) {
+            LOGGER.info("User with email = " + dto.getEmail() + " found");
             UserEntity userToSave = new UserEntity();
             userToSave.setEmail(dto.getEmail());
             UserProfile profile = new UserProfile();
@@ -235,9 +259,11 @@ public class UserServiceImpl implements UserService {
             Catalog personalCatalog = new Catalog();
             personalCatalog.setName("Personal catalog");
             personalCatalog.setUser(userToSave);
+            LOGGER.info("Save user with email = " + dto.getEmail());
             catalogRepository.save(personalCatalog);
             userLoginResponseDto.setPayload(userToSave.getId());
         } else {
+            LOGGER.info("User with email = " + dto.getEmail() + " not found");
             userLoginResponseDto.setPayload(user.get().getId());
         }
         userLoginResponseDto.setCode(200);
