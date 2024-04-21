@@ -15,15 +15,9 @@ import java.util.Base64;
 public interface ImageDataToDtoMapper {
     ImageDataToDtoMapper INSTANCE = Mappers.getMapper(ImageDataToDtoMapper.class);
 
-    @Mapping(target = "imageData", ignore = true)
+
     ImageDataResponseDto mediaToDto(ImageData media);
 
-    @AfterMapping
-    default void mapImageData(ImageData media, @MappingTarget ImageDataResponseDto imageDataResponseDto) {
-        if (media != null && media.getImageData() != null) {
-            imageDataResponseDto.setImageData(Base64.getEncoder().encodeToString(media.getImageData()));
-        }
-    }
 
     @Mapping(target = "imageData", ignore = true)
     ImageData dtoToMedia (ImageDataRequestDto requestDto);

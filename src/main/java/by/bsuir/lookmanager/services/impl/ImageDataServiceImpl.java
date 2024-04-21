@@ -7,12 +7,20 @@ import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataListToDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.information.ImageData;
+import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ImageDataService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.google.gson.Gson;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ImageDataServiceImpl implements ImageDataService {
@@ -22,6 +30,13 @@ public class ImageDataServiceImpl implements ImageDataService {
     private ImageDataListToDto imageDataToListDtoMapper;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
+    private Cloudinary cloudinary;
+
+    ImageDataServiceImpl() {
+        Dotenv dotenv = Dotenv.load();
+        cloudinary = new Cloudinary(dotenv.get("CLOUDINARY_URL"));
+        cloudinary.config.secure = true;
+    }
 
     @Override
     public ApplicationResponseDto<List<ImageDataResponseDto>> getImageDataByProductId(Long id) throws NotFoundException {
@@ -54,6 +69,14 @@ public class ImageDataServiceImpl implements ImageDataService {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
         ImageData imageData = imageDataToDtoMapper.dtoToMedia(requestDto);
         imageData.setProductId(id);
+        try {
+            Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + Base64.getEncoder().encodeToString(imageData.getImageData()),
+                    ObjectUtils.emptyMap());
+            String secureUrl = (String) cloudinaryMap.get("secure_url");
+            imageData.setImageUrl(secureUrl);
+        } catch (IOException e) {
+            throw new BadParameterValueException("Image broke)");
+        }
         imageDataRepository.save(imageData);
         responseDto.setCode(200);
         responseDto.setStatus("OK");

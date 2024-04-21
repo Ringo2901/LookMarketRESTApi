@@ -97,7 +97,7 @@ public class CatalogServiceImpl implements CatalogService {
         List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findAll(spec, pageable).toList());
         for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
         }
@@ -123,7 +123,7 @@ public class CatalogServiceImpl implements CatalogService {
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(personalCatalog.getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(personalCatalog.getUser().getId(), generalProductResponseDto.getId()));
             }
@@ -143,7 +143,7 @@ public class CatalogServiceImpl implements CatalogService {
         List<GeneralProductResponseDto> favouriteDto = productListMapper.toGeneralProductResponseDtoList(favouriteProducts);
         for (GeneralProductResponseDto generalProductResponseDto : favouriteDto) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(true);
         }
@@ -158,7 +158,7 @@ public class CatalogServiceImpl implements CatalogService {
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(catalogs.get(i).getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalogs.get(i).getUser().getId(), generalProductResponseDto.getId()));
             }

@@ -18,5 +18,7 @@ public class ImageData {
     private Long productId;
     @Column(name = "media_file", columnDefinition = "bytea")
     private byte[] imageData;
+    @Column(name = "image_url")
+    private String imageUrl;
 }
 

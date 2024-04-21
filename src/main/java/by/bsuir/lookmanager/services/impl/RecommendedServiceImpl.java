@@ -77,7 +77,7 @@ public class RecommendedServiceImpl implements RecommendedService {
         List<GeneralProductResponseDto> responseDtos = productResponseMapper.toGeneralProductResponseDtoList(topNKeys);
         for (GeneralProductResponseDto generalProductResponseDto : responseDtos) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(false);
         }

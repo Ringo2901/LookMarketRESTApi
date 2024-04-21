@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ImageDataResponseDto {
     private Long id;
-    private String imageData;
+    private String imageUrl;
 }
