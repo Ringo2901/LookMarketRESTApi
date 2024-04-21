@@ -15,6 +15,8 @@ import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.recomended.ProductSimilarityCalculator;
 import by.bsuir.lookmanager.services.RecommendedService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@CacheConfig(cacheNames = "recommendedProducts")
 public class RecommendedServiceImpl implements RecommendedService {
     @Autowired
     private UserRepository userRepository;
@@ -44,7 +47,8 @@ public class RecommendedServiceImpl implements RecommendedService {
     private FavouritesRepository favouritesRepository;
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Long numberOfRecommendedItems) {
+    @Cacheable(value = "recommendedProducts", key = "#userId + '_' + #pageNumber + '_' + #pageSize")
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Integer pageNumber, Integer pageSize) {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Pageable pageable = PageRequest.of(0, 100, Sort.by("createdTime").descending());
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
@@ -68,13 +72,14 @@ public class RecommendedServiceImpl implements RecommendedService {
         }
         List<ProductEntity> topNKeys = similarityMap.entrySet().stream()
                 .sorted(Map.Entry.<ProductEntity, Double>comparingByValue().reversed())
-                .limit(numberOfRecommendedItems)
                 .map(Map.Entry::getKey)
                 .toList();
+        int startIndex = pageNumber * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, topNKeys.size());
         responseDto.setCode(200);
         responseDto.setStatus("OK");
         responseDto.setMessage("Recommended found!");
-        List<GeneralProductResponseDto> responseDtos = productResponseMapper.toGeneralProductResponseDtoList(topNKeys);
+        List<GeneralProductResponseDto> responseDtos = productResponseMapper.toGeneralProductResponseDtoList(topNKeys.subList(startIndex, endIndex));
         for (GeneralProductResponseDto generalProductResponseDto : responseDtos) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());

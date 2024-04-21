@@ -18,9 +18,11 @@ public class RecommendedController {
     private RecommendedService recommendedService;
     @Autowired
     private JwtValidator jwtValidator;
+
     @GetMapping()
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getRecommendedProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
-                                                                               @RequestParam Long numberOfProducts) {
-        return recommendedService.findRecommendedProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), numberOfProducts);
+                                                                                          @RequestParam Integer pageNumber,
+                                                                                          @RequestParam Integer pageSize) {
+        return recommendedService.findRecommendedProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), pageNumber, pageSize);
     }
 }

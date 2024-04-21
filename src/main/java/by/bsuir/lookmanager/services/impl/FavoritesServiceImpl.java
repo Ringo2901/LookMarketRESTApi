@@ -15,11 +15,14 @@ import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.FavoritesService;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@CacheConfig(cacheNames = "recommendedProducts")
 public class FavoritesServiceImpl implements FavoritesService {
     @Autowired
     private UserRepository userRepository;
@@ -54,6 +57,7 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
+    @CacheEvict(value = "recommendedProducts", key = "#userId + '_' + '*'")
     public ApplicationResponseDto<?> addFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
         ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found!"));
@@ -70,6 +74,7 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
+    @CacheEvict(value = "recommendedProducts", key = "#userId + '_' + '*'")
     public ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
         ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found!"));

@@ -18,6 +18,8 @@ import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@CacheConfig(cacheNames = "recommendedProducts")
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
@@ -138,6 +141,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "recommendedProducts", allEntries = true)
     public ApplicationResponseDto<Long> saveProduct(ProductDetailsRequestDto requestDto) {
         ApplicationResponseDto<Long> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToSave = productDetailsRequestMapper.productRequestDtoToEntity(requestDto);
@@ -167,6 +171,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "recommendedProducts", allEntries = true)
     public ApplicationResponseDto<ProductDetailsResponseDto> updateProduct(Long userId, Long id, ProductInformationRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToUpdate = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found!"));
@@ -195,6 +200,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "recommendedProducts", allEntries = true)
     public ApplicationResponseDto<Object> deleteProduct(Long id) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
         productRepository.deleteById(id);
