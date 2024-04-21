@@ -33,6 +33,7 @@ public interface ProductDetailsResponseMapper {
     @Mapping(source = "catalog.user.id", target = "userId")
     @Mapping(source = "catalog.user.userProfile.firstname", target = "firstname")
     @Mapping(source = "catalog.user.userProfile.lastname", target = "lastname")
+    @Mapping(source = "catalog.user.userProfile.userImageUrl", target = "userImageUrl")
     @Mapping(target = "createdTime", expression = "java(formatTimestamp(product.getCreatedTime()))")
     @Mapping(target = "updateTime", expression = "java(formatTimestamp(product.getUpdateTime()))")
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);

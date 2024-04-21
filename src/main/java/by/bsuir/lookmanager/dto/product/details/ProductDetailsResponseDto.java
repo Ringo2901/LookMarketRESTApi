@@ -40,6 +40,9 @@ public class ProductDetailsResponseDto {
     private String lastname;
     private String login;
     private Long userId;
+    private String userImageUrl;
+
+    private List<String> imageUrl;
 
     private boolean isFavourite;
 }

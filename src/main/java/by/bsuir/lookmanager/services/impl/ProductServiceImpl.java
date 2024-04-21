@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -77,6 +78,14 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setStatus("OK");
             responseDto.setMessage("Product found!");
             ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
+            List<ImageData> images = imageDataRepository.findByProductId(product.getId());
+            List<String> urls = new ArrayList<>();
+            for (ImageData image : images) {
+                if (image.getImageUrl() != null) {
+                    urls.add(image.getImageUrl());
+                }
+            }
+            productResponseDto.setImageUrl(urls);
             productResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, id));
             responseDto.setPayload(productResponseDto);
         }
@@ -115,8 +124,8 @@ public class ProductServiceImpl implements ProductService {
                                                                                           List<Integer> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
-        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size!=null?size.toArray(new Integer[size.size()]):null, color!=null?color.toArray(new String[color.size()]):null, brand!=null?brand.toArray(new String[brand.size()]):null, filtSeason!=null?filtSeason.toArray(new String[filtSeason.size()]):null, filtGender!=null?filtGender.toArray(new String[0]):null, filtAgeType!=null?filtAgeType.toArray(new String[0]):null, tags!=null?tags.toArray(new String[0]):null, materials!=null?materials.toArray(new String[0]):null, subcategory!=null?subcategory.toArray(new String[0]):null, category!=null?category.toArray(new String[0]):null, minPrice, maxPrice);
-        for (GeneralProductResponseDto product: products){
+        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, size != null ? size.toArray(new Integer[size.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+        for (GeneralProductResponseDto product : products) {
             product.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, product.getId()));
         }
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
