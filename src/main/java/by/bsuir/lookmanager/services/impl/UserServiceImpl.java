@@ -11,21 +11,22 @@ import by.bsuir.lookmanager.entities.user.information.UserProfile;
 import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.UserService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -45,6 +46,13 @@ public class UserServiceImpl implements UserService {
     private CatalogRepository catalogRepository;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    private final Cloudinary cloudinary;
+
+    UserServiceImpl() {
+        Dotenv dotenv = Dotenv.load();
+        cloudinary = new Cloudinary(dotenv.get("CLOUDINARY_URL"));
+        cloudinary.config.secure = true;
+    }
 
     @Override
     public ApplicationResponseDto<?> userRegister(UserRegisterRequestDto userRegisterRequestDto) throws BadParameterValueException {
@@ -149,7 +157,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
-        if (userRepository.countByLogin(requestDto.getLogin()) > 0) {
+        if (!requestDto.getLogin().isEmpty() && userRepository.countByLogin(requestDto.getLogin()) > 0) {
             throw new BadParameterValueException("Update failed! A user with this login already exists!");
         }
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
@@ -171,6 +179,14 @@ public class UserServiceImpl implements UserService {
             String carg = requestDto.getImageData();
             carg = carg.replace("\n","");
             userProfile.setImageData(Base64.getDecoder().decode(carg));
+            try {
+                Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + carg,
+                        ObjectUtils.emptyMap());
+                String secureUrl = (String) cloudinaryMap.get("secure_url");
+                userProfile.setUserImageUrl(secureUrl);
+            } catch (IOException e) {
+                throw new BadParameterValueException("Image broke)");
+            }
         } else {
             userProfile.setImageData(null);
         }

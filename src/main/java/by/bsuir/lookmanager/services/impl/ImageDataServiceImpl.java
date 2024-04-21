@@ -30,7 +30,7 @@ public class ImageDataServiceImpl implements ImageDataService {
     private ImageDataListToDto imageDataToListDtoMapper;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
 
     ImageDataServiceImpl() {
         Dotenv dotenv = Dotenv.load();
