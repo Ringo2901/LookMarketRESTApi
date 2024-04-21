@@ -120,7 +120,7 @@ public class CatalogServiceImpl implements CatalogService {
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(personalCatalog.getId());
             newCatalog.setName(personalCatalog.getName());
-            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(personalCatalog.getId()));
+            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogIdOrderByCreatedTimeDesc(personalCatalog.getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
                 generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
@@ -155,7 +155,7 @@ public class CatalogServiceImpl implements CatalogService {
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(catalogs.get(i).getId());
             newCatalog.setName(catalogs.get(i).getName());
-            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(catalogs.get(i).getId()));
+            List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogIdOrderByCreatedTimeDesc(catalogs.get(i).getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
                 generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
