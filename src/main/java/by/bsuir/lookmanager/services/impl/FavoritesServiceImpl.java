@@ -33,14 +33,17 @@ public class FavoritesServiceImpl implements FavoritesService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id) throws NotFoundException {
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserId(Long id, Integer pageNumber, Integer pageSize) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!"));
-
+        List<ProductEntity> favoriteProducts = user.getFavouriteProducts();
+        int startIndex = pageNumber * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, favoriteProducts.size());
         responseDto.setMessage("User found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);
-        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(user.getFavouriteProducts());
+        List<ProductEntity> paginatedFavorites = favoriteProducts.subList(startIndex, endIndex);
+        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(paginatedFavorites);
         for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());

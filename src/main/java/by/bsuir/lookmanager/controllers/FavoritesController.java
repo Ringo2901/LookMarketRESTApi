@@ -19,8 +19,10 @@ public class FavoritesController {
     @Autowired
     private JwtValidator jwtValidator;
     @GetMapping()
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getFavoritesByUserId(@RequestHeader("Authorization") String token){
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavoritesByUserId(jwtValidator.validateTokenAndGetUserId(token));
+    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getFavoritesByUserId(@RequestHeader("Authorization") String token,
+                                                                                                        @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                                                                        @RequestParam(required = false, defaultValue = "10") Integer pageSize){
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavoritesByUserId(jwtValidator.validateTokenAndGetUserId(token), pageNumber, pageSize);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
