@@ -26,6 +26,7 @@ public class GeneralProductResponseDto {
     private String userImageData;
 
     private Long imageId;
+    private String imageData;
 
     private boolean isFavourite;
 }

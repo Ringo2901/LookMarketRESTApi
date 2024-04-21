@@ -8,7 +8,6 @@ import by.bsuir.lookmanager.dto.catalog.CatalogResponseDto;
 import by.bsuir.lookmanager.dto.catalog.CatalogWithItemsDto;
 import by.bsuir.lookmanager.dto.catalog.mapper.CatalogMapper;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
-import by.bsuir.lookmanager.dto.product.general.mapper.GeneralProductResponseMapper;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
@@ -96,9 +95,9 @@ public class CatalogServiceImpl implements CatalogService {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
         List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(productRepository.findAll(spec, pageable).toList());
-        for (GeneralProductResponseDto generalProductResponseDto: generalProductResponseDtos){
+        for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
             ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-            //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
         }
@@ -124,7 +123,7 @@ public class CatalogServiceImpl implements CatalogService {
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(personalCatalog.getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-                //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(personalCatalog.getUser().getId(), generalProductResponseDto.getId()));
             }
@@ -136,21 +135,30 @@ public class CatalogServiceImpl implements CatalogService {
         favourites.setId(0L);
         favourites.setName("Favorites");
         List<FavouritesEntity> favouritesEntities = favouritesRepository.findFirst2ByUserId(userId);
-        List <ProductEntity> favouriteProducts = new ArrayList<>();
-        for (FavouritesEntity favouritesEntity: favouritesEntities){
+        List<ProductEntity> favouriteProducts = new ArrayList<>();
+        for (FavouritesEntity favouritesEntity : favouritesEntities) {
+
             favouriteProducts.add(productRepository.findById(favouritesEntity.getProductId()).orElse(null));
         }
-        favourites.setResponseDtoList(productListMapper.toGeneralProductResponseDtoList(favouriteProducts));
+        List<GeneralProductResponseDto> favouriteDto = productListMapper.toGeneralProductResponseDtoList(favouriteProducts);
+        for (GeneralProductResponseDto generalProductResponseDto : favouriteDto) {
+            ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+            generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+            generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+            generalProductResponseDto.setFavourite(true);
+        }
+
+        favourites.setResponseDtoList(favouriteDto);
 
         catalogWithItemsDto.add(favourites);
-        for (int i = 1; i<catalogs.size(); i++){
+        for (int i = 1; i < catalogs.size(); i++) {
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(catalogs.get(i).getId());
             newCatalog.setName(catalogs.get(i).getName());
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogId(catalogs.get(i).getId()));
-            for (GeneralProductResponseDto generalProductResponseDto: generalProducts){
+            for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
                 ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
-                //generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
+                generalProductResponseDto.setImageData(imageDataResponseDto == null ? null : imageDataResponseDto.getImageData());
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(catalogs.get(i).getUser().getId(), generalProductResponseDto.getId()));
             }
