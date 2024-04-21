@@ -14,6 +14,7 @@ public interface ProductDetailsRequestMapper {
             @Mapping(source = "entity.gender", target = "productInformation.gender"),
             @Mapping(source = "entity.season", target = "productInformation.season", qualifiedByName = "mapSeason"),
             @Mapping(source = "entity.condition", target = "productInformation.condition"),
+            @Mapping(source = "entity.ageType", target = "productInformation.ageType"),
             @Mapping(source = "entity.description", target = "productInformation.description"),
             @Mapping(source = "entity.price", target = "productInformation.price")
     })

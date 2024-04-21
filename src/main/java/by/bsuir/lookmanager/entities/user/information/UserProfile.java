@@ -41,8 +41,6 @@ public class UserProfile {
     @ManyToOne
     @JoinColumn (name="country_id")
     private Country country;
-    @Column(name = "profile_image", columnDefinition = "bytea")
-    private byte[] imageData;
     @Column(name = "profile_image_url")
     private String userImageUrl;
 }

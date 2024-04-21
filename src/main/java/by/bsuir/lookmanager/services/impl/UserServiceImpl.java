@@ -179,7 +179,6 @@ public class UserServiceImpl implements UserService {
         if (requestDto.getImageData() != null && !requestDto.getImageData().isEmpty()) {
             String carg = requestDto.getImageData();
             carg = carg.replace("\n","");
-            userProfile.setImageData(Base64.getDecoder().decode(carg));
             try {
                 Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + carg,
                         ObjectUtils.emptyMap());
@@ -188,8 +187,6 @@ public class UserServiceImpl implements UserService {
             } catch (IOException e) {
                 throw new BadParameterValueException("Image broke)");
             }
-        } else {
-            userProfile.setImageData(null);
         }
         if (cityRepository.existsById(requestDto.getCityId())) {
             userProfile.setCity(cityRepository.getReferenceById(requestDto.getCityId()));

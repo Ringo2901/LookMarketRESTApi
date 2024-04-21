@@ -69,7 +69,7 @@ public class ImageDataServiceImpl implements ImageDataService {
         ImageData imageData = imageDataToDtoMapper.dtoToMedia(requestDto);
         imageData.setProductId(id);
         try {
-            Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + Base64.getEncoder().encodeToString(imageData.getImageData()),
+            Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + requestDto.getImageData(),
                     ObjectUtils.emptyMap());
             String secureUrl = (String) cloudinaryMap.get("secure_url");
             imageData.setImageUrl(secureUrl);

@@ -18,16 +18,6 @@ public interface ImageDataToDtoMapper {
 
     ImageDataResponseDto mediaToDto(ImageData media);
 
-
-    @Mapping(target = "imageData", ignore = true)
     ImageData dtoToMedia (ImageDataRequestDto requestDto);
 
-    @AfterMapping
-    default void mapImageData(ImageDataRequestDto requestDto, @MappingTarget ImageData imageData) {
-        if (requestDto != null && requestDto.getImageData() != null) {
-            String carg = requestDto.getImageData();
-            carg = carg.replace("\n","");
-            imageData.setImageData(Base64.getDecoder().decode(carg));
-        }
-    }
 }
