@@ -47,6 +47,10 @@ public class FavoritesServiceImpl implements FavoritesService {
         List<ProductEntity> favoriteProducts = user.getFavouriteProducts();
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min(startIndex + pageSize, favoriteProducts.size());
+        if (startIndex > endIndex){
+            LOGGER.info("Products with favourites not found, pagination corrupted ");
+            throw new NotFoundException("Products not found!");
+        }
         responseDto.setMessage("User found!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);

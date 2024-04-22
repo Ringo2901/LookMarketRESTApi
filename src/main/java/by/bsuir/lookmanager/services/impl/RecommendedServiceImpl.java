@@ -85,6 +85,11 @@ public class RecommendedServiceImpl implements RecommendedService {
                 .toList();
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min(startIndex + pageSize, topNKeys.size());
+
+        if (startIndex > endIndex){
+            LOGGER.info("Products with recommended not found, pagination corrupted ");
+            throw new NotFoundException("Products not found!");
+        }
         LOGGER.info("Get recommended from " + startIndex + " to " + endIndex);
         responseDto.setCode(200);
         responseDto.setStatus("OK");
