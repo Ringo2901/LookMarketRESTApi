@@ -33,6 +33,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -258,6 +260,11 @@ public class ProductServiceImpl implements ProductService {
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
+                Double price = generalProductResponseDto.getPrice();
+                if (price != null) {
+                    BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                    generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+                }
             }
             responseDto.setPayload(generalProductResponseDtos);
         } else {
