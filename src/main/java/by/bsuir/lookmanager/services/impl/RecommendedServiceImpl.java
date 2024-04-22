@@ -25,6 +25,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,11 @@ public class RecommendedServiceImpl implements RecommendedService {
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             generalProductResponseDto.setFavourite(false);
+            Double price = generalProductResponseDto.getPrice();
+            if (price != null) {
+                BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+            }
         }
         responseDto.setPayload(responseDtos);
         return responseDto;

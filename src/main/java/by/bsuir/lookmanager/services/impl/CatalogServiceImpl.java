@@ -30,6 +30,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,6 +159,11 @@ public class CatalogServiceImpl implements CatalogService {
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
+            Double price = generalProductResponseDto.getPrice();
+            if (price != null) {
+                BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+            }
         }
         responseDto.setMessage("Catalog found!");
         responseDto.setStatus("OK");
@@ -186,6 +193,11 @@ public class CatalogServiceImpl implements CatalogService {
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
+                Double price = generalProductResponseDto.getPrice();
+                if (price != null) {
+                    BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                    generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+                }
             }
             newCatalog.setResponseDtoList(generalProducts);
             catalogWithItemsDto.add(newCatalog);
@@ -209,6 +221,11 @@ public class CatalogServiceImpl implements CatalogService {
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
             generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
+            Double price = generalProductResponseDto.getPrice();
+            if (price != null) {
+                BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+            }
         }
 
         favourites.setResponseDtoList(favouriteDto);
@@ -228,6 +245,11 @@ public class CatalogServiceImpl implements CatalogService {
                 generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
                 LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
                 generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, generalProductResponseDto.getId()));
+                Double price = generalProductResponseDto.getPrice();
+                if (price != null) {
+                    BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                    generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+                }
             }
             newCatalog.setResponseDtoList(generalProducts);
             catalogWithItemsDto.add(newCatalog);

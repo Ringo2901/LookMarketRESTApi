@@ -27,6 +27,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 
@@ -74,6 +76,11 @@ public class FavoritesServiceImpl implements FavoritesService {
             generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
             generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
             LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
+            Double price = generalProductResponseDto.getPrice();
+            if (price != null) {
+                BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+            }
             generalProductResponseDto.setFavourite(true);
         }
         responseDto.setPayload(generalProductResponseDtos);
