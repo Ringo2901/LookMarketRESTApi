@@ -69,7 +69,7 @@ public class ProductController {
                                                                                                           @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                           @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
                                                                                                           @RequestParam(required = false, defaultValue = "desc") String sortOrder,
-                                                                                                          @RequestParam(required = false) List<Integer> sizes,
+                                                                                                          @RequestParam(required = false) List<String> sizes,
                                                                                                           @RequestParam(required = false) List<String> colors,
                                                                                                           @RequestParam(required = false) List<String> brand,
                                                                                                           @RequestParam(required = false) List<String> seasons,
