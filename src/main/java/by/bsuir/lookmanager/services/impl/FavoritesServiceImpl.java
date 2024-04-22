@@ -19,9 +19,12 @@ import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @CacheConfig(cacheNames = "recommendedProducts")
@@ -36,6 +39,8 @@ public class FavoritesServiceImpl implements FavoritesService {
     private ImageDataRepository imageDataRepository;
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
+    @Autowired
+    private RedisTemplate<String, Serializable> redisTemplate;
     private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     @Override
@@ -70,7 +75,6 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
-    @CacheEvict(value = "recommendedProducts", key = "#userId + '_' + '*'")
     public ApplicationResponseDto<?> addFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
         LOGGER.info("Find user with id = " + userId);
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found when addFavorite execute!"));
@@ -79,6 +83,12 @@ public class FavoritesServiceImpl implements FavoritesService {
         if (user.getFavouriteProducts().contains(product)) {
             throw new AlreadyExistsException("Product with id = " + productId + " already in favourites for user with id = " + userId + " when addFavorite execute");
         }
+        String keyPattern = "recommendedProducts::" + userId + "_*";
+        Set<String> keysToDelete = redisTemplate.keys(keyPattern);
+        if (keysToDelete != null) {
+            redisTemplate.delete(keysToDelete);
+        }
+        LOGGER.info("Deleted keys from cache: " + keysToDelete);
         LOGGER.info("Add product with product id = " + productId + " to favourites for user with user id = " + userId);
         user.getFavouriteProducts().add(product);
         userRepository.save(user);
@@ -90,7 +100,6 @@ public class FavoritesServiceImpl implements FavoritesService {
     }
 
     @Override
-    @CacheEvict(value = "recommendedProducts", key = "#userId + '_' + '*'")
     public ApplicationResponseDto<?> deleteFavorite(Long userId, Long productId) throws NotFoundException, AlreadyExistsException{
         LOGGER.info("Find user with id = " + userId);
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found when deleteFavorite execute!"));
@@ -100,6 +109,12 @@ public class FavoritesServiceImpl implements FavoritesService {
         if (!user.getFavouriteProducts().contains(product)) {
             throw new AlreadyExistsException("Product with id = " + productId + " not in favourites for user with id = " + userId + " when deleteFavorite execute");
         }
+        String keyPattern = "recommendedProducts::" + userId + "_*";
+        Set<String> keysToDelete = redisTemplate.keys(keyPattern);
+        if (keysToDelete != null) {
+            redisTemplate.delete(keysToDelete);
+        }
+        LOGGER.info("Deleted keys from cache: " + keysToDelete);
         LOGGER.info("Remove product with product id = " + productId + " from favourites for user with user id = " + userId);
         user.getFavouriteProducts().remove(product);
         userRepository.save(user);
