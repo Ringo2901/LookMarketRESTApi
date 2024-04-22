@@ -12,10 +12,15 @@ import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.entities.user.information.FavouritesEntity;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.CatalogService;
+import com.moesif.api.models.UserBuilder;
+import com.moesif.api.models.UserModel;
+import com.moesif.servlet.MoesifFilter;
+import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +53,8 @@ public class CatalogServiceImpl implements CatalogService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
     @Autowired
     private ProductSpecification productSpecification;
+    @Autowired
+    private Filter moesifFilter;
     private static final Logger LOGGER = LogManager.getLogger(CatalogServiceImpl.class);
 
     @Override
@@ -58,6 +65,18 @@ public class CatalogServiceImpl implements CatalogService {
         catalogToSave.setUser(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User with user id = " + userId + " not found when addCatalog execute!")));
         LOGGER.info("Save catalog to database");
         Catalog catalog = catalogRepository.save(catalogToSave);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setStatus("OK");
         responseDto.setMessage("Catalog add successfully");
         responseDto.setCode(200);
@@ -72,6 +91,18 @@ public class CatalogServiceImpl implements CatalogService {
         Catalog catalog = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog with catalog id = " + catalogId + " not found when removeCatalog execute!"));
         LOGGER.info("Delete catalog with catalog id = " + catalogId);
         catalogRepository.delete(catalog);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setCode(200);
         responseDto.setStatus("OK");
         responseDto.setMessage("Catalog delete successfully");
@@ -86,6 +117,18 @@ public class CatalogServiceImpl implements CatalogService {
         catalogToUpdate.setName(requestDto.getName());
         LOGGER.info("Update catalog with catalog id = " + catalogId + " with new name = " + requestDto.getName());
         Catalog catalog = catalogRepository.save(catalogToUpdate);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setStatus("OK");
         responseDto.setMessage("Catalog add successfully");
         responseDto.setCode(200);

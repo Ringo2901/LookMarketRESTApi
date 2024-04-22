@@ -10,6 +10,10 @@ import by.bsuir.lookmanager.entities.user.information.SubscriptionEntity;
 import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.SubscriptionService;
+import com.moesif.api.models.UserBuilder;
+import com.moesif.api.models.UserModel;
+import com.moesif.servlet.MoesifFilter;
+import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private UserSubscribersListMapper userSubscribersListMapper;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private Filter moesifFilter;
     private static final Logger LOGGER = LogManager.getLogger(SubscriptionServiceImpl.class);
 
     @Override
@@ -71,6 +77,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         LOGGER.info("Save new subscription with subscriber id = " + subscriberId + " and seller id = " + sellerId);
         subscriptionRepository.save(subscriptionEntity);
 
+        UserEntity user = userRepository.findById(subscriberId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setMessage("Subscribed successfully!");
         responseDto.setStatus("OK");
         responseDto.setCode(201);
@@ -90,6 +108,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         LOGGER.info("Delete subscription with subscriber id = " + subscriberId + " and seller id = " + sellerId);
         subscriptionRepository.delete(subscriptionRepository.findBySubscriberIdAndSellerId(subscriberId, sellerId).orElseThrow(() -> new AlreadyExistsException("Not subscribed!")));
 
+        UserEntity user = userRepository.findById(subscriberId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setMessage("Unsubscribed successfully!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);

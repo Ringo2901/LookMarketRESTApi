@@ -6,10 +6,15 @@ import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.user.AssessmentRequestDto;
 import by.bsuir.lookmanager.dto.user.AssessmentResponseDto;
 import by.bsuir.lookmanager.dto.user.mapper.AssessmentMapper;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.entities.user.information.Assessments;
 import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.AssessmentService;
+import com.moesif.api.models.UserBuilder;
+import com.moesif.api.models.UserModel;
+import com.moesif.servlet.MoesifFilter;
+import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,8 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Autowired
     private AssessmentMapper assessmentMapper;
     private static final Logger LOGGER = LogManager.getLogger(AssessmentServiceImpl.class);
+    @Autowired
+    private Filter moesifFilter;
 
     @Override
     public ApplicationResponseDto<?> addAssessment(Long userId, AssessmentRequestDto requestDto) throws AlreadyExistsException {
@@ -39,7 +46,21 @@ public class AssessmentServiceImpl implements AssessmentService {
         Assessments assessments = assessmentMapper.requestDtoToAssessmentEntity(requestDto);
         assessments.setUserId(userId);
         LOGGER.info("Save assessment with user id = " + userId + " and seller id = " + requestDto.getSellerId() + " to database");
+
         assessmentRepository.save(assessments);
+
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setMessage("Assessment add!");
         responseDto.setStatus("OK");
         responseDto.setCode(201);
@@ -54,6 +75,18 @@ public class AssessmentServiceImpl implements AssessmentService {
                 new NotFoundException("Assessment with user id = " + userId + " and seller id = " + sellerId + " not found when removeAssessment execute!"));
         LOGGER.info("Assessment delete with user id = " + userId + " and seller id = " + sellerId);
         assessmentRepository.delete(assessments);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         responseDto.setMessage("Assessment delete!");
         responseDto.setStatus("OK");
         responseDto.setCode(200);

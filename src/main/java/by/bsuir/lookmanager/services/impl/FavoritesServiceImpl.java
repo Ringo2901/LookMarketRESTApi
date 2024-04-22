@@ -13,6 +13,10 @@ import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.exceptions.AlreadyExistsException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.FavoritesService;
+import com.moesif.api.models.UserBuilder;
+import com.moesif.api.models.UserModel;
+import com.moesif.servlet.MoesifFilter;
+import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.weaver.ast.Not;
@@ -41,6 +45,8 @@ public class FavoritesServiceImpl implements FavoritesService {
     private ImageDataToDtoMapper imageDataToDtoMapper;
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
+    @Autowired
+    private Filter moesifFilter;
     private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     @Override
@@ -92,6 +98,17 @@ public class FavoritesServiceImpl implements FavoritesService {
         LOGGER.info("Add product with product id = " + productId + " to favourites for user with user id = " + userId);
         user.getFavouriteProducts().add(product);
         userRepository.save(user);
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         responseDto.setMessage("Product add to favourites!");
         responseDto.setStatus("OK");
@@ -118,6 +135,17 @@ public class FavoritesServiceImpl implements FavoritesService {
         LOGGER.info("Remove product with product id = " + productId + " from favourites for user with user id = " + userId);
         user.getFavouriteProducts().remove(product);
         userRepository.save(user);
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         responseDto.setMessage("Product remove to favourites!");
         responseDto.setStatus("OK");

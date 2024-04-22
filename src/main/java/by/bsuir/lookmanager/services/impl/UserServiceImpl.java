@@ -14,7 +14,12 @@ import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.UserService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.moesif.api.APIHelper;
+import com.moesif.api.models.UserBuilder;
+import com.moesif.api.models.UserModel;
+import com.moesif.servlet.MoesifFilter;
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -49,6 +55,8 @@ public class UserServiceImpl implements UserService {
     private CatalogRepository catalogRepository;
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private Filter moesifFilter;
     private final Cloudinary cloudinary;
     private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 
@@ -100,7 +108,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicationResponseDto<?> userLogout(Long userId, boolean status) {
-        ApplicationResponseDto<?> userRegisterResponseDto =  new ApplicationResponseDto<>();
+        ApplicationResponseDto<?> userRegisterResponseDto = new ApplicationResponseDto<>();
         userRegisterResponseDto.setCode(403);
         userRegisterResponseDto.setStatus("ERROR");
         if (userId != null) {
@@ -132,7 +140,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BadParameterValueException("User not found, not enough parameters");
         }
-        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())){
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
             throw new NotFoundException("Invalid password error!");
         }
         ApplicationResponseDto<Long> userLoginResponseDto = new ApplicationResponseDto<>();
@@ -147,7 +155,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     @Override
     public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
@@ -157,7 +164,7 @@ public class UserServiceImpl implements UserService {
         List<Catalog> catalogs = catalogRepository.findByUserId(user.getId());
         UserProfileResponseDto userProfileResponseDto = userProfileMapper.userEntityToUserProfileResponseDto(user);
         List<Long> catalogIdsList = new ArrayList<>();
-        for (Catalog catalog: catalogs){
+        for (Catalog catalog : catalogs) {
             catalogIdsList.add(catalog.getId());
         }
         LOGGER.info("Set imageUrl, subscribed flag and catalogsIdsList for user with id = " + userId);
@@ -201,7 +208,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setPostalCode(requestDto.getPostalCode());
         if (requestDto.getImageData() != null && !requestDto.getImageData().isEmpty()) {
             String carg = requestDto.getImageData();
-            carg = carg.replace("\n","");
+            carg = carg.replace("\n", "");
             try {
                 LOGGER.info("Upload image to cloudinary");
                 Map cloudinaryMap = cloudinary.uploader().upload("data:image/png;base64," + carg,
@@ -227,6 +234,19 @@ public class UserServiceImpl implements UserService {
         user.setLogin(requestDto.getLogin());
         LOGGER.info("Save user info by user id = " + id);
         user = userRepository.save(user);
+
+        try {
+            UserModel userModel = new UserBuilder()
+                    .userId(String.valueOf(user.getId()))
+                    .metadata(user)
+                    .build();
+
+            MoesifFilter filter = (MoesifFilter) moesifFilter;
+            filter.updateUser(userModel);
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to send user data");
+        }
+
         responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("User profile update!");
