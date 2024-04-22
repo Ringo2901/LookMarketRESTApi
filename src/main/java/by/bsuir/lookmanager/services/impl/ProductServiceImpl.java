@@ -246,10 +246,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ApplicationResponseDto<List<GeneralProductResponseDto>> getListApplicationResponseDto(Long userId, ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList) throws NotFoundException {
+        responseDto.setCode(200);
+        responseDto.setMessage("Products found!");
+        responseDto.setStatus("OK");
         if (!responseEntityList.isEmpty()) {
-            responseDto.setCode(200);
-            responseDto.setMessage("Products found!");
-            responseDto.setStatus("OK");
             List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(responseEntityList);
             for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
                 LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
@@ -261,7 +261,8 @@ public class ProductServiceImpl implements ProductService {
             }
             responseDto.setPayload(generalProductResponseDtos);
         } else {
-            throw new NotFoundException("Products not found!");
+            responseDto.setPayload(null);
+            //throw new NotFoundException("Products not found!");
         }
         return responseDto;
     }
