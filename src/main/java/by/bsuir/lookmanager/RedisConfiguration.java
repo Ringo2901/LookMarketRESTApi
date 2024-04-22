@@ -53,9 +53,9 @@ public class RedisConfiguration {
         };
         Dotenv dotenv = Dotenv.load();
 
-        MoesifFilter moesifFilter = new MoesifFilter(dotenv.get("MOESIF_APPLICATION_ID"), config, true);
+        MoesifFilter moesifFilter = new MoesifFilter(dotenv.get("MOESIF_APPLICATION_ID"), config, false);
 
-        moesifFilter.setLogBody(true);
+        moesifFilter.setLogBody(false);
 
         return moesifFilter;
     }
