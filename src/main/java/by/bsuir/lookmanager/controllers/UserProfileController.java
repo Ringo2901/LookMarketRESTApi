@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -28,6 +29,18 @@ public class UserProfileController {
         LOGGER.info("Start getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
         ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(0L, jwtValidator.validateTokenAndGetUserId(token));
         LOGGER.info("Finish getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
+    }
+
+    @GetMapping("/isCurrent/{id}")
+    public ResponseEntity<ApplicationResponseDto<Boolean>> isCurrentUser(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long id) {
+        LOGGER.info("Start getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token.orElse(null)));
+        ApplicationResponseDto<Boolean> responseDto = new ApplicationResponseDto<>();
+        responseDto.setCode(200);
+        responseDto.setMessage("");
+        responseDto.setStatus("OK");
+        responseDto.setPayload(Objects.equals(id, jwtValidator.validateTokenAndGetUserId(token.orElse(null))));
+        LOGGER.info("Finish getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token.orElse(null)));
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
     @GetMapping("/{id}")
