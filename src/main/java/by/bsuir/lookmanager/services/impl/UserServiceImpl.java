@@ -177,8 +177,9 @@ public class UserServiceImpl implements UserService {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Find user by id = " + id);
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id = " + id + " when saveUserProfileById execute"));
-        if (!user.getLogin().equals(requestDto.getLogin()) && userRepository.countByLogin(requestDto.getLogin()) > 0) {
-            throw new BadParameterValueException("Update failed! A user with this login already exists!");
+        if (userRepository.countByLogin(requestDto.getLogin()) > 0) {
+            if (user.getLogin() != null && !user.getLogin().equals(requestDto.getLogin()))
+                throw new BadParameterValueException("Update failed! A user with this login already exists!");
         }
         UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstname(requestDto.getFirstname());
