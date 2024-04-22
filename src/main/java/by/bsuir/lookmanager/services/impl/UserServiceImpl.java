@@ -8,6 +8,7 @@ import by.bsuir.lookmanager.dto.user.mapper.UserRegisterMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.entities.user.information.UserProfile;
+import by.bsuir.lookmanager.enums.UserGender;
 import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.UserService;
@@ -191,7 +192,11 @@ public class UserServiceImpl implements UserService {
         }
         userProfile.setAddress(requestDto.getAddress());
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
-        userProfile.setGender(requestDto.getGender());
+        if (requestDto.getGender().isEmpty()) {
+            userProfile.setGender(null);
+        } else {
+            userProfile.setGender(UserGender.valueOf(requestDto.getGender()));
+        }
         userProfile.setPostalCode(requestDto.getPostalCode());
         if (requestDto.getImageData() != null && !requestDto.getImageData().isEmpty()) {
             String carg = requestDto.getImageData();

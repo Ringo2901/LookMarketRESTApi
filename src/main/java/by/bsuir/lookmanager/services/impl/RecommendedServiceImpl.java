@@ -58,6 +58,7 @@ public class RecommendedServiceImpl implements RecommendedService {
         LOGGER.info("Get pageable for recommended = " + pageable);
 
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+
         List<ProductEntity> filteredList = responseEntityList.stream()
                 .filter(product -> !favouritesRepository.existsByUserIdAndProductId(userId, product.getId()))
                 .toList();
@@ -76,9 +77,13 @@ public class RecommendedServiceImpl implements RecommendedService {
                     similarityMap.put(product, similarityMap.get(product) + productSimilarityCalculator.calculateSimilarity(favouriteProduct, product));
                 }
             }
+            for (ProductEntity product : similarityMap.keySet()) {
+                LOGGER.info("Total similarity for user with id = " + userId + " for product with id = " + product.getId() + " and title = " + product.getTitle() + " is " + similarityMap.get(product));
+            }
         } catch (IOException e) {
             throw new BadParameterValueException("Some troubles!");
         }
+
         List<ProductEntity> topNKeys = similarityMap.entrySet().stream()
                 .sorted(Map.Entry.<ProductEntity, Double>comparingByValue().reversed())
                 .map(Map.Entry::getKey)
@@ -87,7 +92,7 @@ public class RecommendedServiceImpl implements RecommendedService {
         int endIndex = Math.min(startIndex + pageSize, topNKeys.size());
 
         if (startIndex > endIndex){
-            LOGGER.info("Products with recommended not found, pagination corrupted ");
+            LOGGER.warn("Products with recommended not found, pagination corrupted ");
             throw new NotFoundException("Products not found!");
         }
         LOGGER.info("Get recommended from " + startIndex + " to " + endIndex);

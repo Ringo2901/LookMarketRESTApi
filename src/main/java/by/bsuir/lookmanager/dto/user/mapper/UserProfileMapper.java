@@ -3,33 +3,41 @@ package by.bsuir.lookmanager.dto.user.mapper;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.entities.user.UserEntity;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import by.bsuir.lookmanager.enums.ProductGender;
+import by.bsuir.lookmanager.enums.UserGender;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 
 @Mapper(componentModel = "spring")
 public interface UserProfileMapper {
     ImageDataToDtoMapper INSTANCE = Mappers.getMapper(ImageDataToDtoMapper.class);
 
-    @Mapping(source = "userProfile.lastname", target = "lastname")
-    @Mapping(source = "userProfile.firstname", target = "firstname")
-    @Mapping(target = "dateOfBirth", ignore = true)
-    @Mapping(target = "registrationDate", ignore = true)
-    @Mapping(source = "userProfile.address", target = "address")
-    @Mapping(source = "userProfile.phoneNumber", target = "phoneNumber")
-    @Mapping(source = "userProfile.gender", target = "gender")
-    @Mapping(source = "userProfile.postalCode", target = "postalCode")
-    @Mapping(source = "userProfile.city.id", target = "cityId")
-    @Mapping(source = "userProfile.country.id", target = "countryId")
-    @Mapping(target = "lastSignIn", expression = "java(formatTimestamp(entity.getLastSignIn()))")
+    @Mappings({
+            @Mapping(source = "userProfile.lastname", target = "lastname"),
+            @Mapping(source = "userProfile.firstname", target = "firstname"),
+            @Mapping(target = "dateOfBirth", ignore = true),
+            @Mapping(target = "registrationDate", ignore = true),
+            @Mapping(source = "userProfile.address", target = "address"),
+            @Mapping(source = "userProfile.phoneNumber", target = "phoneNumber"),
+            @Mapping(source = "userProfile.gender", target = "gender", qualifiedByName = "mapGender"),
+            @Mapping(source = "userProfile.postalCode", target = "postalCode"),
+            @Mapping(source = "userProfile.city.id", target = "cityId"),
+            @Mapping(source = "userProfile.country.id", target = "countryId"),
+            @Mapping(target = "lastSignIn", expression = "java(formatTimestamp(entity.getLastSignIn()))")
+    })
     UserProfileResponseDto userEntityToUserProfileResponseDto(UserEntity entity);
+
+    @Named("mapGender")
+    default UserGender mapGender(String gender) {
+        if (gender.isEmpty()) {
+            return null;
+        }
+        return UserGender.valueOf(gender);
+    }
 
     default String formatTimestamp(Timestamp timestamp) {
         if (timestamp == null) {

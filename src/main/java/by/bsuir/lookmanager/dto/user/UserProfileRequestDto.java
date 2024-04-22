@@ -17,7 +17,7 @@ public class UserProfileRequestDto {
     private String dateOfBirth;
     private String address;
     private String phoneNumber;
-    private UserGender gender;
+    private String gender;
     private String postalCode;
     private Long cityId;
     private Long countryId;
