@@ -14,7 +14,7 @@ public class ProductNativeRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<GeneralProductResponseDto> getProducts(String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder, Integer[] size, String[] color, String[] brand, String[] filtSeason, String[] filtGender, String[] filtAgeType, String[] tags, String[] materials, String[] subcategory, String[] category, Double minPrice, Double maxPrice) throws SQLException {
+    public List<GeneralProductResponseDto> getProducts(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder, Integer[] size, String[] color, String[] brand, String[] filtSeason, String[] filtGender, String[] filtAgeType, String[] tags, String[] materials, String[] subcategory, String[] category, Double minPrice, Double maxPrice) throws SQLException {
         String sql = "SELECT * FROM get_products(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         if (isEmptyArray(size)) size = null;
@@ -28,7 +28,7 @@ public class ProductNativeRepository {
         if (isEmptyArray(subcategory)) subcategory = null;
         if (isEmptyArray(category)) category = null;
 
-        return jdbcTemplate.query(sql, new Object[]{query, pageSize, pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice}, new BeanPropertyRowMapper<>(GeneralProductResponseDto.class));
+        return jdbcTemplate.query(sql, new Object[]{userId, query, pageSize, pageNumber, sortBy, sortOrder, size, color, brand, filtSeason, filtGender, filtAgeType, tags, materials, subcategory, category, minPrice, maxPrice}, new BeanPropertyRowMapper<>(GeneralProductResponseDto.class));
     }
 
     private boolean isEmptyArray(Object[] array) {

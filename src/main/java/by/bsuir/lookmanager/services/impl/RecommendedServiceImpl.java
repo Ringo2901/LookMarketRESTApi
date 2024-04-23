@@ -4,6 +4,7 @@ import by.bsuir.lookmanager.dao.FavouritesRepository;
 import by.bsuir.lookmanager.dao.ImageDataRepository;
 import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
+import by.bsuir.lookmanager.dao.specification.ProductSpecification;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
@@ -22,6 +23,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -49,6 +51,8 @@ public class RecommendedServiceImpl implements RecommendedService {
     private ProductSimilarityCalculator productSimilarityCalculator;
     @Autowired
     private FavouritesRepository favouritesRepository;
+    @Autowired
+    private ProductSpecification productSpecification;
     private static final Logger LOGGER = LogManager.getLogger(RecommendedServiceImpl.class);
 
     @Override
@@ -58,12 +62,13 @@ public class RecommendedServiceImpl implements RecommendedService {
 
         Pageable pageable = PageRequest.of(0, 100, Sort.by("createdTime").descending());
         LOGGER.info("Get pageable for recommended = " + pageable);
-
+        Specification<ProductEntity> spec = productSpecification.byUserId(userId);
         List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
 
         List<ProductEntity> filteredList = responseEntityList.stream()
                 .filter(product -> !favouritesRepository.existsByUserIdAndProductId(userId, product.getId()))
                 .toList();
+
         LOGGER.info("Find favourites product for user with id = " + userId);
         List<ProductEntity> favouriteProducts = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Not Found!")).getFavouriteProducts();
         Map<ProductEntity, Double> similarityMap = new HashMap<>();

@@ -109,6 +109,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        Specification<ProductEntity> spec = productSpecification.byUserId(userId);
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
@@ -116,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         }
         LOGGER.info("Set pageable for getProducts = " + pageable);
-        List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+        List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
         LOGGER.info("Find all products with pagination");
         return getListApplicationResponseDto(userId, responseDto, responseEntityList);
     }
@@ -124,7 +125,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-        Specification<ProductEntity> spec = productSpecification.byCategoryId(sex);
+        Specification<ProductEntity> spec = productSpecification.byCategoryId(sex, userId.toString());
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
@@ -151,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
         } else {
             sizes=null;
         }
-        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(query, pageSize, pageNumber, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(userId, query, pageSize, pageNumber, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
 
         LOGGER.info("Set favourites");
         for (GeneralProductResponseDto product : products) {
