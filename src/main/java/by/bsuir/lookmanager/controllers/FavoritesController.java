@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/favorites")
@@ -28,6 +29,17 @@ public class FavoritesController {
         LOGGER.info("Start getting favourites by user id = " + jwtValidator.validateTokenAndGetUserId(token));
         ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavoritesByUserId(jwtValidator.validateTokenAndGetUserId(token), pageNumber, pageSize);
         LOGGER.info("Finish getting favourites by user id = " + jwtValidator.validateTokenAndGetUserId(token));
+        return ResponseEntity.status(responseDto.getCode()).body(responseDto);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getFavoritesByUserIdWithoutCurrent(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
+                                                                                                                      @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                                                                                      @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                                                                                                      @PathVariable Long id){
+        LOGGER.info("Start getting favourites by user id = " + jwtValidator.validateTokenAndGetUserId(token.orElse(null)));
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = favoritesService.getFavoritesByUserIdWithoutCurrent(id, jwtValidator.validateTokenAndGetUserId(token.orElse(null)), pageNumber, pageSize);
+        LOGGER.info("Finish getting favourites by user id = " + jwtValidator.validateTokenAndGetUserId(token.orElse(null)));
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 

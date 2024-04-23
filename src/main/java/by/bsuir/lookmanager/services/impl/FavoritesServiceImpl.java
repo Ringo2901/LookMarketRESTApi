@@ -1,5 +1,6 @@
 package by.bsuir.lookmanager.services.impl;
 
+import by.bsuir.lookmanager.dao.FavouritesRepository;
 import by.bsuir.lookmanager.dao.ImageDataRepository;
 import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
@@ -49,6 +50,8 @@ public class FavoritesServiceImpl implements FavoritesService {
     private RedisTemplate<String, Serializable> redisTemplate;
     @Autowired
     private Filter moesifFilter;
+    @Autowired
+    private FavouritesRepository favouritesRepository;
     private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     @Override
@@ -82,6 +85,42 @@ public class FavoritesServiceImpl implements FavoritesService {
                 generalProductResponseDto.setPrice(roundedPrice.doubleValue());
             }
             generalProductResponseDto.setFavourite(true);
+        }
+        responseDto.setPayload(generalProductResponseDtos);
+        return responseDto;
+    }
+
+    @Override
+    public ApplicationResponseDto<List<GeneralProductResponseDto>> getFavoritesByUserIdWithoutCurrent(Long id, Long currentId, Integer pageNumber, Integer pageSize) throws NotFoundException {
+        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        LOGGER.info("Find user by user id = " + id);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User with user id = " + id + " not found when getFavoritesByUserId execute!"));
+        LOGGER.info("Get favourite products for user with user id = " + id);
+        List<ProductEntity> favoriteProducts = user.getFavouriteProducts();
+        int startIndex = pageNumber * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, favoriteProducts.size());
+        if (startIndex > endIndex){
+            LOGGER.warn("Products with favourites not found, pagination corrupted ");
+            throw new NotFoundException("Products not found!");
+        }
+        responseDto.setMessage("User found!");
+        responseDto.setStatus("OK");
+        responseDto.setCode(200);
+        LOGGER.info("Get favourites products for user with id = " + id + " and start index = " + startIndex + " and end index = " + endIndex);
+        List<ProductEntity> paginatedFavorites = favoriteProducts.subList(startIndex, endIndex);
+        List<GeneralProductResponseDto> generalProductResponseDtos = productListMapper.toGeneralProductResponseDtoList(paginatedFavorites);
+        for (GeneralProductResponseDto generalProductResponseDto : generalProductResponseDtos) {
+            LOGGER.info("Find media for product with id = " + generalProductResponseDto.getId());
+            ImageDataResponseDto imageDataResponseDto = imageDataToDtoMapper.mediaToDto(imageDataRepository.findFirstByProductId(generalProductResponseDto.getId()));
+            generalProductResponseDto.setImageUrl(imageDataResponseDto == null ? null : imageDataResponseDto.getImageUrl());
+            generalProductResponseDto.setImageId(imageDataResponseDto == null ? null : imageDataResponseDto.getId());
+            LOGGER.info("Set favourite flag for product with id = " + generalProductResponseDto.getId());
+            Double price = generalProductResponseDto.getPrice();
+            if (price != null) {
+                BigDecimal roundedPrice = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+                generalProductResponseDto.setPrice(roundedPrice.doubleValue());
+            }
+            generalProductResponseDto.setFavourite(favouritesRepository.existsByUserIdAndProductId(currentId, generalProductResponseDto.getId()));
         }
         responseDto.setPayload(generalProductResponseDtos);
         return responseDto;
