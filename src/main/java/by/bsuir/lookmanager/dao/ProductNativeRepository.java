@@ -15,7 +15,7 @@ public class ProductNativeRepository {
     private JdbcTemplate jdbcTemplate;
 
     public List<GeneralProductResponseDto> getProducts(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder, Integer[] size, String[] color, String[] brand, String[] filtSeason, String[] filtGender, String[] filtAgeType, String[] tags, String[] materials, String[] subcategory, String[] category, Double minPrice, Double maxPrice) throws SQLException {
-        String sql = "SELECT * FROM get_products(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "SELECT * FROM get_products(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         if (isEmptyArray(size)) size = null;
         if (isEmptyArray(color)) color = null;
