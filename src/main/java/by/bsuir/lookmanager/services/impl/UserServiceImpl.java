@@ -185,7 +185,7 @@ public class UserServiceImpl implements UserService {
         LOGGER.info("Find user by id = " + id);
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id = " + id + " when saveUserProfileById execute"));
         if (userRepository.countByLogin(requestDto.getLogin()) > 0) {
-            if (user.getLogin() != null && !user.getLogin().equals(requestDto.getLogin()))
+            if (user.getLogin() == null || !user.getLogin().equals(requestDto.getLogin()))
                 throw new BadParameterValueException("Update failed! A user with this login already exists!");
         }
         UserProfile userProfile = user.getUserProfile();
