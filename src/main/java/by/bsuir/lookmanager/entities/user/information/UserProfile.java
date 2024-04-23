@@ -43,4 +43,8 @@ public class UserProfile {
     private Country country;
     @Column(name = "profile_image_url")
     private String userImageUrl;
+    @Column(name = "latitude")
+    private Double latitude;
+    @Column(name = "longitude")
+    private Double longitude;
 }

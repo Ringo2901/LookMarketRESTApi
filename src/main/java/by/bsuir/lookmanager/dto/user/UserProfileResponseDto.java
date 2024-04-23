@@ -35,6 +35,9 @@ public class UserProfileResponseDto {
     private Integer cityId;
     private Integer countryId;
 
+    private Double latitude;
+    private Double longitude;
+
     private String userImageUrl;
     private List<Long> catalogsIdList;
 

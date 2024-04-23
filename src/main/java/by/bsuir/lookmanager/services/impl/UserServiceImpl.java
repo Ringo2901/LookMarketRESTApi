@@ -19,6 +19,7 @@ import com.moesif.api.models.UserBuilder;
 import com.moesif.api.models.UserModel;
 import com.moesif.servlet.MoesifFilter;
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.persistence.Column;
 import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -198,6 +199,8 @@ public class UserServiceImpl implements UserService {
         } else {
             userProfile.setDateOfBirth(null);
         }
+        userProfile.setLatitude(requestDto.getLatitude());
+        userProfile.setLongitude(requestDto.getLongitude());
         userProfile.setAddress(requestDto.getAddress());
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
         if (requestDto.getGender().isEmpty()) {
@@ -246,7 +249,6 @@ public class UserServiceImpl implements UserService {
         } catch (Throwable e) {
             LOGGER.warn("Failed to send user data");
         }
-
         responseDto.setCode(201);
         responseDto.setStatus("OK");
         responseDto.setMessage("User profile update!");

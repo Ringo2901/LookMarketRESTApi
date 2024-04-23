@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.dto.user;
 
 import by.bsuir.lookmanager.enums.UserGender;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class UserProfileRequestDto {
     private String postalCode;
     private Long cityId;
     private Long countryId;
+    private Double latitude;
+    private Double longitude;
 
     private String imageData;
 }
