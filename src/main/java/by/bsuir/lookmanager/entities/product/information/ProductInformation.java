@@ -32,6 +32,10 @@ public class ProductInformation {
     private ProductGender gender;
     @Column(name = "description")
     private String description;
+    @Column(name = "latitude")
+    private Double latitude;
+    @Column(name = "longitude")
+    private Double longitude;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "season", columnDefinition = "season")

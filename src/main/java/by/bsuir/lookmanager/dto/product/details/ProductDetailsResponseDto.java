@@ -27,6 +27,9 @@ public class ProductDetailsResponseDto {
     private AgeType ageType;
     private String brandName;
 
+    private Double latitude;
+    private Double longitude;
+
     private List<Integer> sizes;
     private List<String> colors;
     private List<String> materials;

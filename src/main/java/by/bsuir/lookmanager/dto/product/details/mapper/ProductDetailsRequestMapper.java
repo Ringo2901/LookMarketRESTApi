@@ -20,7 +20,9 @@ public interface ProductDetailsRequestMapper {
             @Mapping(source = "entity.condition", target = "productInformation.condition", qualifiedByName = "mapCondition"),
             @Mapping(source = "entity.ageType", target = "productInformation.ageType", qualifiedByName = "mapAgeType"),
             @Mapping(source = "entity.description", target = "productInformation.description"),
-            @Mapping(source = "entity.price", target = "productInformation.price")
+            @Mapping(source = "entity.price", target = "productInformation.price"),
+            @Mapping(source = "entity.latitude", target = "productInformation.latitude"),
+            @Mapping(source = "entity.longitude", target = "productInformation.longitude")
     })
     ProductEntity productRequestDtoToEntity(ProductDetailsRequestDto entity);
 

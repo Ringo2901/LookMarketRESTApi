@@ -4,6 +4,7 @@ import by.bsuir.lookmanager.enums.AgeType;
 import by.bsuir.lookmanager.enums.Condition;
 import by.bsuir.lookmanager.enums.ProductGender;
 import by.bsuir.lookmanager.enums.Season;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,9 @@ public class ProductDetailsRequestDto {
     private List<Long> colorsId;
     private List<Long> materialsId;
     private List<Long> tagsId;
+
+    private Double latitude;
+    private Double longitude;
 
     private String createdTime;
     private Long subCategoryId;
