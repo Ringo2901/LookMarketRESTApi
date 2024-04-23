@@ -22,8 +22,6 @@ public class UserProfileRequestDto {
     private String postalCode;
     private Long cityId;
     private Long countryId;
-    private Double latitude;
-    private Double longitude;
 
     private String imageData;
 }

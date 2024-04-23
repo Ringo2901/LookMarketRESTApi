@@ -199,8 +199,6 @@ public class UserServiceImpl implements UserService {
         } else {
             userProfile.setDateOfBirth(null);
         }
-        userProfile.setLatitude(requestDto.getLatitude());
-        userProfile.setLongitude(requestDto.getLongitude());
         userProfile.setAddress(requestDto.getAddress());
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
         if (requestDto.getGender().isEmpty()) {

@@ -27,8 +27,6 @@ public interface UserProfileMapper {
             @Mapping(source = "userProfile.postalCode", target = "postalCode"),
             @Mapping(source = "userProfile.city.id", target = "cityId"),
             @Mapping(source = "userProfile.country.id", target = "countryId"),
-            @Mapping(source = "userProfile.latitude", target = "latitude"),
-            @Mapping(source = "userProfile.longitude", target = "longitude"),
             @Mapping(target = "lastSignIn", expression = "java(formatTimestamp(entity.getLastSignIn()))")
     })
     UserProfileResponseDto userEntityToUserProfileResponseDto(UserEntity entity);
