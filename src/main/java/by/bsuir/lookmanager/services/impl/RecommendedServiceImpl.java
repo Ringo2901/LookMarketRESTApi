@@ -63,7 +63,7 @@ public class RecommendedServiceImpl implements RecommendedService {
         Pageable pageable = PageRequest.of(0, 100, Sort.by("createdTime").descending());
         LOGGER.info("Get pageable for recommended = " + pageable);
         Specification<ProductEntity> spec = productSpecification.byUserId(userId);
-        List<ProductEntity> responseEntityList = productRepository.findAll(pageable).toList();
+        List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
 
         List<ProductEntity> filteredList = responseEntityList.stream()
                 .filter(product -> !favouritesRepository.existsByUserIdAndProductId(userId, product.getId()))
