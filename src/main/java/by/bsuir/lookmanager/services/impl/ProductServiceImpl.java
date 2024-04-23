@@ -19,6 +19,7 @@ import by.bsuir.lookmanager.enums.AgeType;
 import by.bsuir.lookmanager.enums.Condition;
 import by.bsuir.lookmanager.enums.ProductGender;
 import by.bsuir.lookmanager.enums.Season;
+import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -172,6 +176,14 @@ public class ProductServiceImpl implements ProductService {
     public ApplicationResponseDto<Long> saveProduct(ProductDetailsRequestDto requestDto) {
         ApplicationResponseDto<Long> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToSave = productDetailsRequestMapper.productRequestDtoToEntity(requestDto);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH.mm");
+        try {
+            Date parsedDate = dateFormat.parse(requestDto.getCreatedTime());
+            Timestamp timestamp = new Timestamp(parsedDate.getTime());
+            entityToSave.setCreatedTime(timestamp);
+        } catch (ParseException e) {
+            throw new BadParameterValueException("Bad time on request!");
+        }
         Catalog catalog = catalogRepository.getReferenceById(requestDto.getCatalogId());
         entityToSave.setCatalog(catalog);
         ProductBrand brand = brandRepository.getReferenceById(requestDto.getBrandId());

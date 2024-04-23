@@ -34,6 +34,7 @@ public class ProductDetailsRequestDto {
     private List<Long> materialsId;
     private List<Long> tagsId;
 
+    private String createdTime;
     private Long subCategoryId;
 
     @NotBlank

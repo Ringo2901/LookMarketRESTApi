@@ -14,6 +14,7 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface ProductDetailsRequestMapper {
     @Mappings({
+            @Mapping(target = "createdTime", ignore = true),
             @Mapping(source = "entity.gender", target = "productInformation.gender", qualifiedByName = "mapGender"),
             @Mapping(source = "entity.season", target = "productInformation.season", qualifiedByName = "mapSeason"),
             @Mapping(source = "entity.condition", target = "productInformation.condition", qualifiedByName = "mapCondition"),
