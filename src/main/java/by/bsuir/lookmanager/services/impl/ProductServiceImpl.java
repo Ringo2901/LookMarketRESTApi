@@ -33,6 +33,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -154,6 +155,7 @@ public class ProductServiceImpl implements ProductService {
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
         LOGGER.info("Get products with sorting, filtering and pagination");
+        String decodedQuery = UriUtils.decode(query, "UTF-8");
         List<Integer> sizes = new ArrayList<>();
         if (size!=null) {
             for (String name : size) {
@@ -162,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
         } else {
             sizes=null;
         }
-        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(userId, query, pageSize, pageNumber, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(userId, decodedQuery, pageSize, pageNumber, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
 
         LOGGER.info("Set favourites");
         for (GeneralProductResponseDto product : products) {
