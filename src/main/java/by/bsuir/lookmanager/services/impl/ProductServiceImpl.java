@@ -266,6 +266,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @CacheEvict(value = "recommendedProducts", allEntries = true)
+    @Transactional
     public ApplicationResponseDto<Object> deleteProduct(Long id) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Delete product with id = " + id);
