@@ -34,7 +34,7 @@ public class UserProfileResponseDto {
     private String postalCode;
     private Integer cityId;
     private Integer countryId;
-    private float averageAssessment;
+    private Float averageAssessment;
 
     private String userImageUrl;
     private List<Long> catalogsIdList;
