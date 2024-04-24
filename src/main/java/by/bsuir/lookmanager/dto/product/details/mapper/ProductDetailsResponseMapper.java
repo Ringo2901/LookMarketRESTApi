@@ -41,7 +41,8 @@ public interface ProductDetailsResponseMapper {
             @Mapping(target = "createdTime", expression = "java(formatTimestamp(product.getCreatedTime()))"),
             @Mapping(target = "updateTime", expression = "java(formatTimestamp(product.getUpdateTime()))"),
             @Mapping(source = "productInformation.latitude", target = "latitude"),
-            @Mapping(source = "productInformation.longitude", target = "longitude")
+            @Mapping(source = "productInformation.longitude", target = "longitude"),
+            @Mapping(source = "productInformation.viewNumber", target = "viewNumber")
     })
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);
 

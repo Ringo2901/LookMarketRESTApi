@@ -43,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @CacheConfig(cacheNames = "recommendedProducts")
@@ -91,6 +92,11 @@ public class ProductServiceImpl implements ProductService {
         if (product == null) {
             throw new NotFoundException("Product with id = " + id + " not found when getProductInformationById execute!");
         } else {
+            if (!Objects.equals(userId, product.getCatalog().getUser().getId())){
+                Integer viewNumber = product.getProductInformation().getViewNumber();
+                product.getProductInformation().setViewNumber(viewNumber+1);
+                productInformationRepository.save(product.getProductInformation());
+            }
             responseDto.setCode(200);
             responseDto.setStatus("OK");
             responseDto.setMessage("Product found!");
@@ -261,6 +267,7 @@ public class ProductServiceImpl implements ProductService {
     public ApplicationResponseDto<Object> deleteProduct(Long id) {
         ApplicationResponseDto<Object> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Delete product with id = " + id);
+        productInformationRepository.deleteById(productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product with id = " + id + " not found!")).getProductInformation().getId());
         productRepository.deleteById(id);
         responseDto.setCode(200);
         responseDto.setStatus("OK");

@@ -36,6 +36,8 @@ public class ProductInformation {
     private Double latitude;
     @Column(name = "longitude")
     private Double longitude;
+    @Column(name = "view_number")
+    private Integer viewNumber;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "season", columnDefinition = "season")

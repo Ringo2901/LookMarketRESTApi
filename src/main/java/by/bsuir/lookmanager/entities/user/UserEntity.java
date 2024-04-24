@@ -33,6 +33,8 @@ public class UserEntity {
     private Date registrationDate;
     @Column(name = "last_sign_in")
     private Timestamp lastSignIn;
+    @Column(name = "average_assessment")
+    private float averageAssessment;
     @OneToOne
     @JoinColumn(name = "profile_id")
     private UserProfile userProfile;

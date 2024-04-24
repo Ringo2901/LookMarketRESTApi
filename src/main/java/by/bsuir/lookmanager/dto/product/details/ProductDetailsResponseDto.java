@@ -29,6 +29,7 @@ public class ProductDetailsResponseDto {
 
     private Double latitude;
     private Double longitude;
+    private Integer viewNumber;
 
     private List<Integer> sizes;
     private List<String> colors;
