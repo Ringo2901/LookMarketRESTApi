@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AssessmentResponseDto {
     private String description;
-    private Integer assessment;
+    private Double assessment;
     private String login;
     private Long userId;
 }

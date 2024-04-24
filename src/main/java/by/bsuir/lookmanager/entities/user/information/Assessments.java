@@ -16,7 +16,7 @@ public class Assessments {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "assessment")
-    private Integer assessment;
+    private Double assessment;
     @Column(name = "description")
     private String description;
     @Column(name = "user_id")

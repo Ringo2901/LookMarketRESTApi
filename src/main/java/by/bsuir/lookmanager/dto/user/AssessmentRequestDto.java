@@ -14,9 +14,7 @@ import lombok.NoArgsConstructor;
 public class AssessmentRequestDto {
     private String description;
     @NotBlank
-    @DecimalMax("5")
-    @DecimalMin("0")
-    private Integer assessment;
+    private Double assessment;
     @NotBlank
     private Long sellerId;
 }
