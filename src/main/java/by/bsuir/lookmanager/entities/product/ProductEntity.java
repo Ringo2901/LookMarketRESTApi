@@ -27,7 +27,7 @@ public class ProductEntity {
     private Long id;
     @Column(name = "title")
     private String title;
-    @Column(name = "created_time", insertable = false)
+    @Column(name = "created_time")
     private Timestamp createdTime;
     @Column(name = "update_time")
     private Timestamp updateTime;
