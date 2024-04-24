@@ -95,7 +95,11 @@ public class ProductServiceImpl implements ProductService {
         } else {
             if (!Objects.equals(userId, product.getCatalog().getUser().getId())){
                 Integer viewNumber = product.getProductInformation().getViewNumber();
-                product.getProductInformation().setViewNumber(viewNumber+1);
+                if (viewNumber == null){
+                    product.getProductInformation().setViewNumber(1);
+                } else {
+                    product.getProductInformation().setViewNumber(viewNumber + 1);
+                }
                 productInformationRepository.save(product.getProductInformation());
             }
             responseDto.setCode(200);
