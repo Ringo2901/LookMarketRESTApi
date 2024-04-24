@@ -184,7 +184,7 @@ public class ProductServiceImpl implements ProductService {
     public ApplicationResponseDto<Long> saveProduct(ProductDetailsRequestDto requestDto) {
         ApplicationResponseDto<Long> responseDto = new ApplicationResponseDto<>();
         ProductEntity entityToSave = productDetailsRequestMapper.productRequestDtoToEntity(requestDto);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH.mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         try {
             Date parsedDate = dateFormat.parse(requestDto.getCreatedTime());
             Timestamp timestamp = new Timestamp(parsedDate.getTime());
