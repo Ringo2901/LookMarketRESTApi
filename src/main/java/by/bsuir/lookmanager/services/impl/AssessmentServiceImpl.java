@@ -71,21 +71,24 @@ public class AssessmentServiceImpl implements AssessmentService {
     public ApplicationResponseDto<?> removeAssessment(Long userId, Long sellerId) throws NotFoundException {
         ApplicationResponseDto<?> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Check assessment exist by user id = " + userId + " and seller id = " + sellerId);
-        Assessments assessments = assessmentRepository.findFirstByUserIdAndSellerId(userId, sellerId).orElseThrow(() ->
-                new NotFoundException("Assessment with user id = " + userId + " and seller id = " + sellerId + " not found when removeAssessment execute!"));
-        LOGGER.info("Assessment delete with user id = " + userId + " and seller id = " + sellerId);
-        assessmentRepository.delete(assessments);
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
-        try {
-            UserModel userModel = new UserBuilder()
-                    .userId(String.valueOf(user.getId()))
-                    .metadata(user)
-                    .build();
+        Assessments assessments = assessmentRepository.findFirstByUserIdAndSellerId(userId, sellerId).orElse(null);
+        if (assessments == null){
+            LOGGER.warn("Assessment with user id = " + userId + " and seller id = " + sellerId + " not found when removeAssessment execute!");
+        } else {
+            LOGGER.info("Assessment delete with user id = " + userId + " and seller id = " + sellerId);
+            assessmentRepository.delete(assessments);
+            UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+            try {
+                UserModel userModel = new UserBuilder()
+                        .userId(String.valueOf(user.getId()))
+                        .metadata(user)
+                        .build();
 
-            MoesifFilter filter = (MoesifFilter) moesifFilter;
-            filter.updateUser(userModel);
-        } catch (Throwable e) {
-            LOGGER.warn("Failed to send user data");
+                MoesifFilter filter = (MoesifFilter) moesifFilter;
+                filter.updateUser(userModel);
+            } catch (Throwable e) {
+                LOGGER.warn("Failed to send user data");
+            }
         }
         responseDto.setMessage("Assessment delete!");
         responseDto.setStatus("OK");
