@@ -33,6 +33,7 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @CacheConfig(cacheNames = "recommendedProducts")
@@ -70,7 +71,7 @@ public class RecommendedServiceImpl implements RecommendedService {
                 .toList();
 
         LOGGER.info("Find favourites product for user with id = " + userId);
-        UserEntity user = userRepository.findById(userId);
+        UserEntity user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             throw new NotFoundException("User not found!");
         }
