@@ -21,7 +21,7 @@ spring:
         show_sql: false
   data:
     redis:
-      url: ${REDISCLOUD_URL:redis://default:hDb4hOkgXtc2uMBRVXXmqAynVxZeV0ae@redis-12507.c233.eu-west-1-1.ec2.cloud.redislabs.com:12507}
+      url: ${REDISCLOUD_URL:redis://default:2RWTlAJuKcUASRvF16FtUd6he7jJEdUX@redis-16169.c242.eu-west-1-2.ec2.redns.redis-cloud.com:16169}
 
 jwt:
   secret: 8a7104032bd4c06dbb5e189f896e48b980de235592c16cb1176c694580bb98dc2257bc3ddb9c774e3e4d215d0d19ee5caba310190b198bb46431d35b612deb20ed640137d185b600daff2ccdd072ae2e2667139b10cffcde12c2854cb8c2e5d5aadd1a40588211735736705d97bdd3ecd655513a2efd330e9a8a773b167fba27
