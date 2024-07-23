@@ -11,6 +11,7 @@ import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
+import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.recomended.ProductSimilarityCalculator;
@@ -32,7 +33,6 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @CacheConfig(cacheNames = "recommendedProducts")
@@ -70,7 +70,11 @@ public class RecommendedServiceImpl implements RecommendedService {
                 .toList();
 
         LOGGER.info("Find favourites product for user with id = " + userId);
-        List<ProductEntity> favouriteProducts = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Not Found!")).getFavouriteProducts();
+        UserEntity user = userRepository.findById(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found!");
+        }
+        List<ProductEntity> favouriteProducts = user.getFavouriteProducts();
         Map<ProductEntity, Double> similarityMap = new HashMap<>();
         LOGGER.info("Create similarity map");
         for (ProductEntity product : filteredList) {
@@ -79,26 +83,32 @@ public class RecommendedServiceImpl implements RecommendedService {
         try {
             productSimilarityCalculator.initializeIndex(filteredList);
             LOGGER.info("Calculate similarity");
-            for (ProductEntity favouriteProduct : favouriteProducts) {
-                for (ProductEntity product : similarityMap.keySet()) {
-                    similarityMap.put(product, similarityMap.get(product) + productSimilarityCalculator.calculateSimilarity(favouriteProduct, product));
+            if (favouriteProducts != null) {
+                for (ProductEntity favouriteProduct : favouriteProducts) {
+                    for (ProductEntity product : similarityMap.keySet()) {
+                        similarityMap.put(product, similarityMap.get(product) + productSimilarityCalculator.calculateSimilarity(favouriteProduct, product));
+                    }
                 }
-            }
-            for (ProductEntity product : similarityMap.keySet()) {
-                LOGGER.info("Total similarity for user with id = " + userId + " for product with id = " + product.getId() + " and title = " + product.getTitle() + " is " + similarityMap.get(product));
+                for (ProductEntity product : similarityMap.keySet()) {
+                    LOGGER.info("Total similarity for user with id = " + userId + " for product with id = " + product.getId() + " and title = " + product.getTitle() + " is " + similarityMap.get(product));
+                }
             }
         } catch (IOException e) {
             throw new BadParameterValueException("Some troubles!");
         }
-
-        List<ProductEntity> topNKeys = similarityMap.entrySet().stream()
-                .sorted(Map.Entry.<ProductEntity, Double>comparingByValue().reversed())
-                .map(Map.Entry::getKey)
-                .toList();
+        List<ProductEntity> topNKeys;
+        if (favouriteProducts != null) {
+            topNKeys = similarityMap.entrySet().stream()
+                    .sorted(Map.Entry.<ProductEntity, Double>comparingByValue().reversed())
+                    .map(Map.Entry::getKey)
+                    .toList();
+        } else {
+            topNKeys = filteredList;
+        }
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min(startIndex + pageSize, topNKeys.size());
 
-        if (startIndex > endIndex){
+        if (startIndex > endIndex) {
             LOGGER.warn("Products with recommended not found, pagination corrupted ");
             throw new NotFoundException("Products not found!");
         }
