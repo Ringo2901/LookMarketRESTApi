@@ -9,6 +9,7 @@ import by.bsuir.lookmanager.utils.JwtValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,10 @@ public class UserProfileController {
     private JwtValidator jwtValidator;
     private static final Logger LOGGER = LogManager.getLogger(UserProfileController.class);
     @GetMapping()
-    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String token) {
+        if (token.isEmpty()){
+            return ResponseEntity.status(403).body(null);
+        }
         LOGGER.info("Start getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
         ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(0L, jwtValidator.validateTokenAndGetUserId(token));
         LOGGER.info("Finish getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
