@@ -4,6 +4,7 @@ import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.user.UserLoginRequestDto;
 import by.bsuir.lookmanager.dto.user.UserProfileRequestDto;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
+import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.UserService;
 import by.bsuir.lookmanager.utils.JwtValidator;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,7 @@ public class UserProfileController {
     @GetMapping()
     public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String token) {
         if (token == null){
-            return ResponseEntity.status(403).body(null);
+            throw new NotFoundException("User not found!");
         }
         LOGGER.info("Start getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
         ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(0L, jwtValidator.validateTokenAndGetUserId(token));
