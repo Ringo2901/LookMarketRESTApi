@@ -27,7 +27,7 @@ public class UserProfileController {
     private static final Logger LOGGER = LogManager.getLogger(UserProfileController.class);
     @GetMapping()
     public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String token) {
-        if (token.isEmpty()){
+        if (token == null){
             return ResponseEntity.status(403).body(null);
         }
         LOGGER.info("Start getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
