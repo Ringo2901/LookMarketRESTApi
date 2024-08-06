@@ -6,6 +6,7 @@ import by.bsuir.lookmanager.dao.ProductRepository;
 import by.bsuir.lookmanager.dao.UserRepository;
 import by.bsuir.lookmanager.dao.specification.ProductSpecification;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.ListResponseDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.dto.product.general.mapper.ProductListMapper;
 import by.bsuir.lookmanager.dto.product.media.ImageDataResponseDto;
@@ -58,9 +59,9 @@ public class RecommendedServiceImpl implements RecommendedService {
 
     @Override
     @Cacheable(value = "recommendedProducts", key = "#userId + '_' + #pageNumber + '_' + #pageSize")
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Integer pageNumber, Integer pageSize) {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
-
+    public ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> findRecommendedProducts(Long userId, Integer pageNumber, Integer pageSize) {
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        ListResponseDto<GeneralProductResponseDto> listResponseDto = new ListResponseDto<>();
         Pageable pageable = PageRequest.of(0, 100, Sort.by("createdTime").descending());
         LOGGER.info("Get pageable for recommended = " + pageable);
         Specification<ProductEntity> spec = productSpecification.byUserId(userId);
@@ -129,7 +130,9 @@ public class RecommendedServiceImpl implements RecommendedService {
                 generalProductResponseDto.setPrice(roundedPrice.doubleValue());
             }
         }
-        responseDto.setPayload(responseDtos);
+        listResponseDto.setItems(responseDtos);
+        listResponseDto.setTotalItems(productRepository.count());
+        responseDto.setPayload(listResponseDto);
         return responseDto;
     }
 }

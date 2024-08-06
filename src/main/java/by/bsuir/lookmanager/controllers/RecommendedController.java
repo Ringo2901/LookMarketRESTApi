@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.controllers;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.ListResponseDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.services.RecommendedService;
 import by.bsuir.lookmanager.utils.JwtValidator;
@@ -23,9 +24,9 @@ public class RecommendedController {
     private static final Logger LOGGER = LogManager.getLogger(RecommendedController.class);
 
     @GetMapping()
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getRecommendedProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
-                                                                                          @RequestParam Integer pageNumber,
-                                                                                          @RequestParam Integer pageSize) {
+    public ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getRecommendedProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
+                                                                                                     @RequestParam Integer pageNumber,
+                                                                                                     @RequestParam Integer pageSize) {
         LOGGER.info("Finding recommended for user id = " + jwtValidator.validateTokenAndGetUserId(token.orElse(null)));
         return recommendedService.findRecommendedProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), pageNumber, pageSize);
     }

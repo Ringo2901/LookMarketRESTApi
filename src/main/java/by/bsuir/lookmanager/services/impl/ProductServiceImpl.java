@@ -3,6 +3,7 @@ package by.bsuir.lookmanager.services.impl;
 import by.bsuir.lookmanager.dao.*;
 import by.bsuir.lookmanager.dao.specification.ProductSpecification;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.ListResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsRequestDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductInformationRequestDto;
@@ -122,8 +123,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+    public ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException, SQLException {
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Specification<ProductEntity> spec = productSpecification.byUserId(userId);
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
@@ -133,13 +134,14 @@ public class ProductServiceImpl implements ProductService {
         }
         LOGGER.info("Set pageable for getProducts = " + pageable);
         List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
+        Long totalItems = productNativeRepository.getProductCount(userId,"", sortBy, sortOrder, null,null,null,null, null, null, null, null, null, null, 0d, 1000000d);
         LOGGER.info("Find all products with pagination");
-        return getListApplicationResponseDto(userId, responseDto, responseEntityList);
+        return getListApplicationResponseDto(userId, responseDto, responseEntityList, totalItems);
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException {
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+    public ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws NotFoundException, SQLException {
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         Specification<ProductEntity> spec = productSpecification.byCategoryId(sex, userId.toString());
         Pageable pageable;
         if (sortOrder != null && sortOrder.equals("asc")) {
@@ -149,17 +151,22 @@ public class ProductServiceImpl implements ProductService {
         }
         LOGGER.info("Set pageable for getProducts = " + pageable);
         List<ProductEntity> responseEntityList = productRepository.findAll(spec, pageable).toList();
+        String[] sexes = {sex};
+        Long totalItems = productNativeRepository.getProductCount(userId,"", sortBy, sortOrder, null,null,null,null, sexes, null, null, null, null, null, 0d, 1000000d);
         LOGGER.info("Find all products with sex = " + sex);
-        return getListApplicationResponseDto(userId, responseDto, responseEntityList);
+        return getListApplicationResponseDto(userId, responseDto, responseEntityList, totalItems);
     }
 
     @Override
-    public ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
+    public ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                                                           List<String> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                           List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
         LOGGER.info("Get products with sorting, filtering and pagination");
-        String decodedQuery = UriUtils.decode(query, "UTF-8");
+        String decodedQuery = "";
+        if (query != null) {
+            decodedQuery = UriUtils.decode(query, "UTF-8");
+        }
         List<Integer> sizes = new ArrayList<>();
         if (size!=null) {
             for (String name : size) {
@@ -174,11 +181,15 @@ public class ProductServiceImpl implements ProductService {
         for (GeneralProductResponseDto product : products) {
             product.setFavourite(favouritesRepository.existsByUserIdAndProductId(userId, product.getId()));
         }
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
+        ListResponseDto<GeneralProductResponseDto> listResponseDto = new ListResponseDto<>();
+        Long totalItems = productNativeRepository.getProductCount(userId, decodedQuery, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+        listResponseDto.setItems(products);
+        listResponseDto.setTotalItems(totalItems);
         responseDto.setStatus("Product found!");
         responseDto.setCode(200);
         responseDto.setStatus("OK");
-        responseDto.setPayload(products);
+        responseDto.setPayload(listResponseDto);
         return responseDto;
     }
 
@@ -282,7 +293,7 @@ public class ProductServiceImpl implements ProductService {
         return responseDto;
     }
 
-    private ApplicationResponseDto<List<GeneralProductResponseDto>> getListApplicationResponseDto(Long userId, ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList) throws NotFoundException {
+    private ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getListApplicationResponseDto(Long userId, ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto, List<ProductEntity> responseEntityList, Long totalItems) throws NotFoundException {
         responseDto.setCode(200);
         responseDto.setMessage("Products found!");
         responseDto.setStatus("OK");
@@ -301,7 +312,10 @@ public class ProductServiceImpl implements ProductService {
                     generalProductResponseDto.setPrice(roundedPrice.doubleValue());
                 }
             }
-            responseDto.setPayload(generalProductResponseDtos);
+            ListResponseDto<GeneralProductResponseDto> listResponseDto = new ListResponseDto<>();
+            listResponseDto.setItems(generalProductResponseDtos);
+            listResponseDto.setTotalItems(totalItems);
+            responseDto.setPayload(listResponseDto);
         } else {
             responseDto.setPayload(null);
             //throw new NotFoundException("Products not found!");

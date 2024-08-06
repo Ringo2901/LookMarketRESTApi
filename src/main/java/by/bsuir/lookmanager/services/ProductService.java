@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.services;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.ListResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsRequestDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductInformationRequestDto;
@@ -15,11 +16,11 @@ import java.util.List;
 public interface ProductService {
     ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long userId, Long id);
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProducts(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws SQLException;
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProductsByCategory(Long userId, String sex, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) throws SQLException;
 
-    ApplicationResponseDto<List<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
+    ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
                                                                                    List<String> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
                                                                                    List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
                                                                                    Double minPrice, Double maxPrice) throws SQLException;

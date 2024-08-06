@@ -1,6 +1,7 @@
 package by.bsuir.lookmanager.controllers;
 
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
+import by.bsuir.lookmanager.dto.ListResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsRequestDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductInformationRequestDto;
@@ -40,31 +41,31 @@ public class ProductController {
     }
 
     @GetMapping()
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-                                                                                               @RequestParam(required = false, defaultValue = "10") Integer pageSize,
-                                                                                               @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
-                                                                                               @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
+    public ResponseEntity<ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>>> getProducts(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                                                              @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                                                              @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
+                                                                              @RequestParam(required = false, defaultValue = "desc") String sortOrder) throws SQLException {
         LOGGER.info("Start getting products");
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), pageNumber, pageSize, sortBy, sortOrder);
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = productService.getProducts(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), pageNumber, pageSize, sortBy, sortOrder);
         LOGGER.info("Finish getting products");
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @GetMapping("/by-category")
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsByGender(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
+    public ResponseEntity<ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>>> getProductsByGender(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
                                                                                                        @RequestParam(defaultValue = "MALE") String sex,
                                                                                                        @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                        @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                                                        @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
-                                                                                                       @RequestParam(required = false, defaultValue = "desc") String sortOrder) {
+                                                                                                       @RequestParam(required = false, defaultValue = "desc") String sortOrder) throws SQLException {
         LOGGER.info("Start getting products by gender = " + sex);
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsByCategory(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), sex, pageNumber, pageSize, sortBy, sortOrder);
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = productService.getProductsByCategory(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), sex, pageNumber, pageSize, sortBy, sortOrder);
         LOGGER.info("Finish getting products by gender = " + sex);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
 
     @GetMapping("/sorting")
-    public ResponseEntity<ApplicationResponseDto<List<GeneralProductResponseDto>>> getProductsWithSorting(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @RequestParam(required = false) String query,
+    public ResponseEntity<ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>>> getProductsWithSorting(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @RequestParam(required = false) String query,
                                                                                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                                                                                           @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                           @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
@@ -82,7 +83,7 @@ public class ProductController {
                                                                                                           @RequestParam(required = false, defaultValue = "0") Double minPrice,
                                                                                                           @RequestParam(required = false, defaultValue = "1000") Double maxPrice) throws SQLException {
         LOGGER.info("Start getting products with sorting and filtering");
-        ApplicationResponseDto<List<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), query, pageSize, ++pageNumber, sortBy, sortOrder, sizes, colors, brand, seasons, genders, ageTypes, tags, materials, subcategory, category, minPrice, maxPrice);
+        ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = productService.getProductsWithSorting(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), query, pageSize, ++pageNumber, sortBy, sortOrder, sizes, colors, brand, seasons, genders, ageTypes, tags, materials, subcategory, category, minPrice, maxPrice);
         LOGGER.info("Finish getting products with sorting and filtering");
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }

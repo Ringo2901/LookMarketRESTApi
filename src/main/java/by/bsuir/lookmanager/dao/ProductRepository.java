@@ -17,8 +17,5 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
     Page<ProductEntity> findAll(Specification<ProductEntity> spec, Pageable pageable);
-    Page<ProductEntity> findAll(Pageable pageable);
-    Page<ProductEntity> findAllByCatalogId(Specification<ProductEntity> spec, Pageable pageable, Long catalogId);
-    List<ProductEntity> findByCatalogId (Long catalogId);
     List<ProductEntity> findFirst2ByCatalogIdOrderByCreatedTimeDesc (Long catalogId);
 }
