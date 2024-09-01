@@ -6,9 +6,6 @@ import by.bsuir.lookmanager.dto.product.details.ProductDetailsRequestDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductInformationRequestDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
-import by.bsuir.lookmanager.enums.AgeType;
-import by.bsuir.lookmanager.enums.ProductGender;
-import by.bsuir.lookmanager.enums.Season;
 
 import java.sql.SQLException;
 import java.util.List;

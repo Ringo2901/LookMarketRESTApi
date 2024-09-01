@@ -3,8 +3,7 @@ package by.bsuir.lookmanager.dto.user.mapper;
 import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.dto.user.UserProfileResponseDto;
 import by.bsuir.lookmanager.entities.user.UserEntity;
-import by.bsuir.lookmanager.enums.ProductGender;
-import by.bsuir.lookmanager.enums.UserGender;
+import by.bsuir.lookmanager.entities.user.information.UserGender;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -23,7 +22,7 @@ public interface UserProfileMapper {
             @Mapping(target = "registrationDate", ignore = true),
             @Mapping(source = "userProfile.address", target = "address"),
             @Mapping(source = "userProfile.phoneNumber", target = "phoneNumber"),
-            @Mapping(source = "userProfile.gender", target = "gender", qualifiedByName = "mapGender"),
+            @Mapping(source = "userProfile.gender.nameEn", target = "gender"),
             @Mapping(source = "userProfile.postalCode", target = "postalCode"),
             @Mapping(source = "userProfile.city.id", target = "cityId"),
             @Mapping(source = "userProfile.country.id", target = "countryId"),
@@ -31,13 +30,6 @@ public interface UserProfileMapper {
     })
     UserProfileResponseDto userEntityToUserProfileResponseDto(UserEntity entity);
 
-    @Named("mapGender")
-    default UserGender mapGender(String gender) {
-        if (gender.isEmpty()) {
-            return null;
-        }
-        return UserGender.valueOf(gender);
-    }
 
     default String formatTimestamp(Timestamp timestamp) {
         if (timestamp == null) {

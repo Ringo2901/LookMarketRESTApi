@@ -5,7 +5,7 @@ import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.ProductInformation;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
-import by.bsuir.lookmanager.enums.ProductGender;
+import by.bsuir.lookmanager.entities.product.information.ProductGender;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,7 +22,7 @@ public class ProductSpecificationImpl implements ProductSpecification {
         return (root, query, criteriaBuilder) -> {
             Join<ProductEntity, ProductInformation> productInfoJoin = root.join("productInformation");
 
-            return criteriaBuilder.equal(productInfoJoin.get("gender"), ProductGender.valueOf(sex));
+            return criteriaBuilder.equal(productInfoJoin.get("gender"), sex);
         };
     }
 

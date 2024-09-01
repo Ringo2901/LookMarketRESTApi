@@ -1,12 +1,14 @@
 package by.bsuir.lookmanager.dto.product.details;
 
+import by.bsuir.lookmanager.entities.product.information.AgeType;
+import by.bsuir.lookmanager.entities.product.information.Condition;
+import by.bsuir.lookmanager.entities.product.information.ProductGender;
+import by.bsuir.lookmanager.entities.product.information.ProductStatus;
 import by.bsuir.lookmanager.entities.product.promotion.Promotion;
-import by.bsuir.lookmanager.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Data

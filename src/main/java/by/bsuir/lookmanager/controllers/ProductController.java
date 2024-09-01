@@ -6,15 +6,11 @@ import by.bsuir.lookmanager.dto.product.details.ProductDetailsRequestDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductInformationRequestDto;
 import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
-import by.bsuir.lookmanager.enums.AgeType;
-import by.bsuir.lookmanager.enums.ProductGender;
-import by.bsuir.lookmanager.enums.Season;
 import by.bsuir.lookmanager.services.ProductService;
 import by.bsuir.lookmanager.utils.JwtValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

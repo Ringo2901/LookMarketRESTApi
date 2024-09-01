@@ -1,10 +1,5 @@
 package by.bsuir.lookmanager.dto.product.details;
 
-import by.bsuir.lookmanager.enums.AgeType;
-import by.bsuir.lookmanager.enums.Condition;
-import by.bsuir.lookmanager.enums.ProductGender;
-import by.bsuir.lookmanager.enums.Season;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

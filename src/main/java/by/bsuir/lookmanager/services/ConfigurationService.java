@@ -7,5 +7,5 @@ import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import java.util.List;
 
 public interface ConfigurationService {
-    ApplicationResponseDto<ConfigurationResponseDto> getConfiguration();
+    ApplicationResponseDto<ConfigurationResponseDto> getConfiguration(String lang);
 }

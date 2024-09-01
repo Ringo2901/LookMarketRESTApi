@@ -6,7 +6,7 @@ import by.bsuir.lookmanager.entities.product.information.ProductColor;
 import by.bsuir.lookmanager.entities.product.information.ProductMaterial;
 import by.bsuir.lookmanager.entities.product.information.ProductSize;
 import by.bsuir.lookmanager.entities.product.information.ProductTag;
-import by.bsuir.lookmanager.enums.Season;
+import by.bsuir.lookmanager.entities.product.information.Season;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -20,18 +20,18 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ProductDetailsResponseMapper {
     @Mappings({
-            @Mapping(source = "subCategory.name", target = "subCategoryName"),
-            @Mapping(source = "subCategory.category.name", target = "categoryName"),
+            @Mapping(source = "subCategory.nameEn", target = "subCategoryName"),
+            @Mapping(source = "subCategory.category.nameEn", target = "categoryName"),
             @Mapping(source = "productInformation.description", target = "description"),
-            @Mapping(source = "productInformation.gender", target = "gender"),
+            /*@Mapping(source = "productInformation.gender", target = "gender"),
             @Mapping(source = "productInformation.season", target = "season", qualifiedByName = "mapSeason"),
             @Mapping(source = "productInformation.condition", target = "condition"),
-            @Mapping(source = "productInformation.ageType", target = "ageType"),
+            @Mapping(source = "productInformation.ageType", target = "ageType"),*/
             @Mapping(source = "productInformation.productBrand.brandName", target = "brandName"),
             @Mapping(source = "productInformation.sizes", target = "sizes"),
-            @Mapping(source = "productInformation.colors", target = "colors"),
+            /*@Mapping(source = "productInformation.colors", target = "colors"),
             @Mapping(source = "productInformation.materials", target = "materials"),
-            @Mapping(source = "productInformation.tags", target = "tags"),
+            @Mapping(source = "productInformation.tags", target = "tags"),*/
             @Mapping(source = "productInformation.price", target = "price"),
             @Mapping(source = "catalog.user.login", target = "login"),
             @Mapping(source = "catalog.user.id", target = "userId"),
@@ -46,10 +46,10 @@ public interface ProductDetailsResponseMapper {
     })
     ProductDetailsResponseDto productEntityToResponseDto (ProductEntity product);
 
-    @Named("mapSeason")
+   /* @Named("mapSeason")
     default String mapSeason(Season season) {
         return season == Season.DEMI_SEASON ? "DEMI-SEASON" : season.name();
-    }
+    }*/
     default String formatTimestamp(Timestamp timestamp) {
         if (timestamp == null) {
             return null;
@@ -62,7 +62,7 @@ public interface ProductDetailsResponseMapper {
                 .map(ProductSize::getSize)
                 .collect(Collectors.toList());
     }
-    default List<String> mapProductColors(List<ProductColor> productColors) {
+    /*default List<String> mapProductColors(List<ProductColor> productColors) {
         return productColors.stream()
                 .map(ProductColor::getName)
                 .collect(Collectors.toList());
@@ -76,5 +76,5 @@ public interface ProductDetailsResponseMapper {
         return productTags.stream()
                 .map(ProductTag::getTagName)
                 .collect(Collectors.toList());
-    }
+    }*/
 }

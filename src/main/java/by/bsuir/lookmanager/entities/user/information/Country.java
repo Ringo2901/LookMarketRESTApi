@@ -14,6 +14,8 @@ public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "name")
-    private String name;
+    @Column(name = "name_en")
+    private String nameEn;
+    @Column(name = "name_ru")
+    private String nameRu;
 }

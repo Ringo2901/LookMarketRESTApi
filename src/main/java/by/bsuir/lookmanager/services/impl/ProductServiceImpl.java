@@ -16,10 +16,10 @@ import by.bsuir.lookmanager.dto.product.media.mapper.ImageDataToDtoMapper;
 import by.bsuir.lookmanager.entities.product.ProductEntity;
 import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
-import by.bsuir.lookmanager.enums.AgeType;
-import by.bsuir.lookmanager.enums.Condition;
-import by.bsuir.lookmanager.enums.ProductGender;
-import by.bsuir.lookmanager.enums.Season;
+import by.bsuir.lookmanager.entities.product.information.AgeType;
+import by.bsuir.lookmanager.entities.product.information.Condition;
+import by.bsuir.lookmanager.entities.product.information.ProductGender;
+import by.bsuir.lookmanager.entities.product.information.Season;
 import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.ProductService;
@@ -244,22 +244,22 @@ public class ProductServiceImpl implements ProductService {
         if (requestDto.getGender().isEmpty()){
             productInformation.setGender(null);
         } else {
-            productInformation.setGender(ProductGender.valueOf(requestDto.getGender()));
+           // productInformation.setGender(ProductGender.valueOf(requestDto.getGender()));
         }
         if (requestDto.getSeason().isEmpty()){
             productInformation.setSeason(null);
         } else {
-            productInformation.setSeason(requestDto.getSeason().equals("DEMI-SEASON") ? Season.DEMI_SEASON : Season.valueOf(requestDto.getSeason()));
+           // productInformation.setSeason(requestDto.getSeason().equals("DEMI-SEASON") ? Season.DEMI_SEASON : Season.valueOf(requestDto.getSeason()));
         }
         if (requestDto.getCondition().isEmpty()){
             productInformation.setCondition(null);
         } else {
-            productInformation.setCondition(Condition.valueOf(requestDto.getCondition()));
+          //  productInformation.setCondition(Condition.valueOf(requestDto.getCondition()));
         }
         if (requestDto.getAgeType().isEmpty()){
             productInformation.setAgeType(null);
         } else {
-            productInformation.setAgeType(AgeType.valueOf(requestDto.getAgeType()));
+           // productInformation.setAgeType(requestDto.getAgeType());
         }
         productInformation.setProductBrand(brandRepository.getReferenceById(requestDto.getBrandId()));
         productInformation.setColors(colorRepository.findAllById(requestDto.getColorsId()));

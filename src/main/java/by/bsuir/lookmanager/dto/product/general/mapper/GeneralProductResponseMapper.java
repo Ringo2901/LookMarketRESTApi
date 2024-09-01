@@ -15,8 +15,8 @@ import java.util.Base64;
 
 @Mapper(componentModel = "spring")
 public interface GeneralProductResponseMapper {
-    @Mapping(source = "subCategory.name", target = "subCategoryName")
-    @Mapping(source = "subCategory.category.name", target = "categoryName")
+    @Mapping(source = "subCategory.nameEn", target = "subCategoryName")
+    @Mapping(source = "subCategory.category.nameEn", target = "categoryName")
     @Mapping(source = "catalog.user.login", target = "login")
     @Mapping(source = "catalog.user.id", target = "userId")
     @Mapping(source = "productInformation.price", target = "price")

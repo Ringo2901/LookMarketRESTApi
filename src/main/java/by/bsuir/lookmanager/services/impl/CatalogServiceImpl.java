@@ -116,7 +116,7 @@ public class CatalogServiceImpl implements CatalogService {
         ApplicationResponseDto<CatalogResponseDto> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Find catalog to delete with catalog id = " + catalogId);
         Catalog catalogToUpdate = catalogRepository.findById(catalogId).orElseThrow(() -> new NotFoundException("Catalog with catalog id = " + catalogId + " not found when updateCatalog execute!"));
-        catalogToUpdate.setName(requestDto.getName());
+        catalogToUpdate.setNameEn(requestDto.getName());
         LOGGER.info("Update catalog with catalog id = " + catalogId + " with new name = " + requestDto.getName());
         Catalog catalog = catalogRepository.save(catalogToUpdate);
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
@@ -183,7 +183,7 @@ public class CatalogServiceImpl implements CatalogService {
             LOGGER.info("Find personal catalog by user id = " + userId);
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(personalCatalog.getId());
-            newCatalog.setName(personalCatalog.getName());
+            newCatalog.setName(personalCatalog.getNameEn());
             LOGGER.info("Personal catalog for user id = " + userId + " personal catalog without products = " + newCatalog);
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogIdOrderByCreatedTimeDesc(personalCatalog.getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {
@@ -235,7 +235,7 @@ public class CatalogServiceImpl implements CatalogService {
             LOGGER.info("Find first 2 favourites by user id = " + userId);
             CatalogWithItemsDto newCatalog = new CatalogWithItemsDto();
             newCatalog.setId(catalogs.get(i).getId());
-            newCatalog.setName(catalogs.get(i).getName());
+            newCatalog.setName(catalogs.get(i).getNameEn());
             LOGGER.info("Catalog for user id = " + userId + " catalog without products = " + newCatalog);
             List<GeneralProductResponseDto> generalProducts = productListMapper.toGeneralProductResponseDtoList(productRepository.findFirst2ByCatalogIdOrderByCreatedTimeDesc(catalogs.get(i).getId()));
             for (GeneralProductResponseDto generalProductResponseDto : generalProducts) {

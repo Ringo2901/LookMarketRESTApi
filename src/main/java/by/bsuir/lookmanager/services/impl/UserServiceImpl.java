@@ -8,18 +8,16 @@ import by.bsuir.lookmanager.dto.user.mapper.UserRegisterMapper;
 import by.bsuir.lookmanager.entities.user.UserEntity;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
 import by.bsuir.lookmanager.entities.user.information.UserProfile;
-import by.bsuir.lookmanager.enums.UserGender;
+import by.bsuir.lookmanager.entities.user.information.UserGender;
 import by.bsuir.lookmanager.exceptions.BadParameterValueException;
 import by.bsuir.lookmanager.exceptions.NotFoundException;
 import by.bsuir.lookmanager.services.UserService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.moesif.api.APIHelper;
 import com.moesif.api.models.UserBuilder;
 import com.moesif.api.models.UserModel;
 import com.moesif.servlet.MoesifFilter;
 import io.github.cdimascio.dotenv.Dotenv;
-import jakarta.persistence.Column;
 import jakarta.servlet.Filter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,7 +95,7 @@ public class UserServiceImpl implements UserService {
         userProfileRepository.save(user.getUserProfile());
         UserEntity savedUser = userRepository.save(user);
         Catalog personalCatalog = new Catalog();
-        personalCatalog.setName("Personal catalog");
+        personalCatalog.setNameEn("Personal catalog");
         personalCatalog.setUser(savedUser);
         catalogRepository.save(personalCatalog);
         userRegisterResponseDto.setCode(201);
@@ -204,7 +202,7 @@ public class UserServiceImpl implements UserService {
         if (requestDto.getGender().isEmpty()) {
             userProfile.setGender(null);
         } else {
-            userProfile.setGender(UserGender.valueOf(requestDto.getGender()));
+            //userProfile.setGender(UserGender.valueOf(requestDto.getGender()));
         }
         userProfile.setPostalCode(requestDto.getPostalCode());
         if (requestDto.getImageData() != null && !requestDto.getImageData().isEmpty()) {
@@ -283,7 +281,7 @@ public class UserServiceImpl implements UserService {
             userProfileRepository.save(profile);
             userToSave = userRepository.save(userToSave);
             Catalog personalCatalog = new Catalog();
-            personalCatalog.setName("Personal catalog");
+            personalCatalog.setNameEn("Personal catalog");
             personalCatalog.setUser(userToSave);
             LOGGER.info("Save user with email = " + dto.getEmail());
             catalogRepository.save(personalCatalog);

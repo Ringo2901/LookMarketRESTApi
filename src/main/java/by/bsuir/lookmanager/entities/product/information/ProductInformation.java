@@ -1,16 +1,10 @@
 package by.bsuir.lookmanager.entities.product.information;
 
-import by.bsuir.lookmanager.entities.product.ProductEntity;
-import by.bsuir.lookmanager.enums.AgeType;
-import by.bsuir.lookmanager.enums.Condition;
-import by.bsuir.lookmanager.enums.ProductGender;
-import by.bsuir.lookmanager.enums.Season;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.Type;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.List;
@@ -26,9 +20,8 @@ public class ProductInformation {
     private Long id;
     @Column(name = "price")
     private Double price;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "gender", columnDefinition = "product_type")
-    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "gender_id")
     private ProductGender gender;
     @Column(name = "description")
     private String description;
@@ -38,37 +31,34 @@ public class ProductInformation {
     private Double longitude;
     @Column(name = "view_number")
     private Integer viewNumber;
-    @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(name = "season", columnDefinition = "season")
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "season_id")
     private Season season;
-    @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(name = "condition", columnDefinition = "product_condition")
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "condition_id")
     private Condition condition;
-    @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(name = "age_type", columnDefinition = "age_type")
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "age_id")
     private AgeType ageType;
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "brand_id")
     private ProductBrand productBrand;
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinTable(name = "product_size",
-    joinColumns = @JoinColumn(name = "product_id"),
-    inverseJoinColumns = @JoinColumn(name = "size_id"))
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "size_id"))
     private List<ProductSize> sizes;
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinTable(name = "product_color",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "color_id"))
     private List<ProductColor> colors;
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinTable(name = "product_material",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "material_id"))
     private List<ProductMaterial> materials;
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinTable(name = "product_tag",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))

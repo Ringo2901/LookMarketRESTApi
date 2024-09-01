@@ -1,10 +1,9 @@
 package by.bsuir.lookmanager.entities.product;
 
-import by.bsuir.lookmanager.dto.product.general.GeneralProductResponseDto;
 import by.bsuir.lookmanager.entities.product.information.*;
 import by.bsuir.lookmanager.entities.product.promotion.Promotion;
 import by.bsuir.lookmanager.entities.user.information.Catalog;
-import by.bsuir.lookmanager.enums.ProductStatus;
+import by.bsuir.lookmanager.entities.product.information.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Map;
 
@@ -31,9 +29,8 @@ public class ProductEntity {
     private Timestamp createdTime;
     @Column(name = "update_time")
     private Timestamp updateTime;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "statud_id")
     private ProductStatus status;
     @OneToOne
     @JoinColumn(name = "product_information_id")
@@ -59,13 +56,13 @@ public class ProductEntity {
 
         if (subCategory != null) {
             for (int i = 0; i < importanceCoefficients.get("subCategory"); i++) {
-                textBuilder.append(subCategory.getName().toLowerCase()).append(" ");
+                textBuilder.append(subCategory.getNameEn().toLowerCase()).append(" ");
             }
         }
 
         if (productInformation.getGender() != null) {
             for (int i = 0; i < importanceCoefficients.get("gender"); i++) {
-                textBuilder.append(productInformation.getGender().toString().toLowerCase()).append(" ");
+                textBuilder.append(productInformation.getGender().getNameEn().toLowerCase()).append(" ");
             }
         }
 
@@ -77,19 +74,19 @@ public class ProductEntity {
 
         if (productInformation.getSeason() != null) {
             for (int i = 0; i < importanceCoefficients.get("season"); i++) {
-                textBuilder.append(productInformation.getSeason().toString().toLowerCase()).append(" ");
+                textBuilder.append(productInformation.getSeason().getNameEn().toLowerCase()).append(" ");
             }
         }
 
         if (productInformation.getCondition() != null) {
             for (int i = 0; i < importanceCoefficients.get("condition"); i++) {
-                textBuilder.append(productInformation.getCondition().toString().toLowerCase()).append(" ");
+                textBuilder.append(productInformation.getCondition().getNameEn().toLowerCase()).append(" ");
             }
         }
 
         if (productInformation.getAgeType() != null) {
             for (int i = 0; i < importanceCoefficients.get("ageType"); i++) {
-                textBuilder.append(productInformation.getAgeType().toString().toLowerCase()).append(" ");
+                textBuilder.append(productInformation.getAgeType().getNameEn().toLowerCase()).append(" ");
             }
         }
 
@@ -110,7 +107,7 @@ public class ProductEntity {
         if (productInformation.getColors() != null) {
             for (int i = 0; i < importanceCoefficients.get("color"); i++) {
                 for (ProductColor size : productInformation.getColors()) {
-                    textBuilder.append(size.getName().toLowerCase()).append(" ");
+                    textBuilder.append(size.getNameEn().toLowerCase()).append(" ");
                 }
             }
         }
@@ -118,7 +115,7 @@ public class ProductEntity {
         if (productInformation.getMaterials() != null) {
             for (int i = 0; i < importanceCoefficients.get("material"); i++) {
                 for (ProductMaterial size : productInformation.getMaterials()) {
-                    textBuilder.append(size.getMaterialName().toLowerCase()).append(" ");
+                    textBuilder.append(size.getNameEn().toLowerCase()).append(" ");
                 }
             }
         }
@@ -126,7 +123,7 @@ public class ProductEntity {
         if (productInformation.getTags() != null) {
             for (int i = 0; i < importanceCoefficients.get("tag"); i++) {
                 for (ProductTag size : productInformation.getTags()) {
-                    textBuilder.append(size.getTagName().toLowerCase()).append(" ");
+                    textBuilder.append(size.getNameEn().toLowerCase()).append(" ");
                 }
             }
         }

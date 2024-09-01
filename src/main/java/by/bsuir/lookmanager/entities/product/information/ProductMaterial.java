@@ -16,6 +16,8 @@ public class ProductMaterial {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "material_name")
-    private String materialName;
+    @Column(name = "material_name_en")
+    private String nameEn;
+    @Column(name = "material_name_ru")
+    private String nameRu;
 }
