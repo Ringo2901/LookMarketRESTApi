@@ -23,10 +23,10 @@ public class ProductDetailsResponseDto {
     private ProductStatus status;
 
     private String description;
-    private ProductGender gender;
+    private String gender;
     private String season;
-    private Condition condition;
-    private AgeType ageType;
+    private String condition;
+    private String ageType;
     private String brandName;
 
     private Double latitude;

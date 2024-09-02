@@ -15,43 +15,14 @@ import org.mapstruct.Named;
 public interface ProductDetailsRequestMapper {
     @Mappings({
             @Mapping(target = "createdTime", ignore = true),
-            /*@Mapping(source = "entity.gender", target = "productInformation.gender"),//, qualifiedByName = "mapGender"),
-            @Mapping(source = "entity.season", target = "productInformation.season"),//, qualifiedByName = "mapSeason"),
-            @Mapping(source = "entity.condition", target = "productInformation.condition"),//, qualifiedByName = "mapCondition"),
-            @Mapping(source = "entity.ageType", target = "productInformation.ageType"),//, qualifiedByName = "mapAgeType"),*/
+            @Mapping(target = "productInformation.gender", ignore = true),
+            @Mapping(target = "productInformation.season", ignore = true),
+            @Mapping(target = "productInformation.condition", ignore = true),
+            @Mapping(target = "productInformation.ageType", ignore = true),
             @Mapping(source = "entity.description", target = "productInformation.description"),
             @Mapping(source = "entity.price", target = "productInformation.price"),
             @Mapping(source = "entity.latitude", target = "productInformation.latitude"),
             @Mapping(source = "entity.longitude", target = "productInformation.longitude")
     })
     ProductEntity productRequestDtoToEntity(ProductDetailsRequestDto entity);
-
-//    @Named("mapSeason")
-//    default Season mapSeason(String season) {
-//        if (season.isEmpty()){
-//            return null;
-//        }
-//        return "DEMI-SEASON".equals(season) ? Season.DEMI_SEASON : Season.valueOf(season);
-//    }
-//    @Named("mapGender")
-//    default ProductGender mapGender(String gender) {
-//        if (gender.isEmpty()){
-//            return null;
-//        }
-//        return ProductGender.valueOf(gender);
-//    }
-//    @Named("mapCondition")
-//    default Condition mapCondition(String condition) {
-//        if (condition.isEmpty()){
-//            return null;
-//        }
-//        return Condition.valueOf(condition);
-//    }
-//    @Named("mapAgeType")
-//    default AgeType mapAgeType(String ageType) {
-//        if (ageType.isEmpty()){
-//            return null;
-//        }
-//        return AgeType.valueOf(ageType);
-//    }
 }

@@ -20,9 +20,7 @@ public class ProductInformation {
     private Long id;
     @Column(name = "price")
     private Double price;
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "gender_id")
-    private ProductGender gender;
+
     @Column(name = "description")
     private String description;
     @Column(name = "latitude")
@@ -31,6 +29,9 @@ public class ProductInformation {
     private Double longitude;
     @Column(name = "view_number")
     private Integer viewNumber;
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "gender_id")
+    private ProductGender gender;
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "season_id")
     private Season season;

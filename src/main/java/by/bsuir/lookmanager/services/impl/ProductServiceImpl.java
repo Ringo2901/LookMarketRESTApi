@@ -4,6 +4,7 @@ import by.bsuir.lookmanager.dao.*;
 import by.bsuir.lookmanager.dao.specification.ProductSpecification;
 import by.bsuir.lookmanager.dto.ApplicationResponseDto;
 import by.bsuir.lookmanager.dto.ListResponseDto;
+import by.bsuir.lookmanager.dto.configuration.EnumDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsRequestDto;
 import by.bsuir.lookmanager.dto.product.details.ProductDetailsResponseDto;
 import by.bsuir.lookmanager.dto.product.details.ProductInformationRequestDto;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = "recommendedProducts")
@@ -83,11 +85,21 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ImageDataToDtoMapper imageDataToDtoMapper;
     @Autowired
+    private AgeTypeRepository ageTypeRepository;
+    @Autowired
+    private ConditionRepository conditionRepository;
+    @Autowired
+    private ProductGenderRepository productGenderRepository;
+    @Autowired
+    private ProductStatusRepository productStatusRepository;
+    @Autowired
+    private SeasonRepository seasonRepository;
+    @Autowired
     private FavouritesRepository favouritesRepository;
     private static final Logger LOGGER = LogManager.getLogger(ProductServiceImpl.class);
 
     @Override
-    public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long userId, Long id) throws NotFoundException {
+    public ApplicationResponseDto<ProductDetailsResponseDto> getProductInformationById(Long userId, Long id, String lang) throws NotFoundException {
         ApplicationResponseDto<ProductDetailsResponseDto> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Find product by id = " + id);
         ProductEntity product = productRepository.findById(id).orElse(null);
@@ -107,6 +119,23 @@ public class ProductServiceImpl implements ProductService {
             responseDto.setStatus("OK");
             responseDto.setMessage("Product found!");
             ProductDetailsResponseDto productResponseDto = productDetailsResponseMapper.productEntityToResponseDto(product);
+            productResponseDto.setAgeType(lang.equals("en")?product.getProductInformation().getAgeType().getNameEn():product.getProductInformation().getAgeType().getNameRu());
+            productResponseDto.setCondition(lang.equals("en")?product.getProductInformation().getCondition().getNameEn():product.getProductInformation().getCondition().getNameRu());
+            productResponseDto.setGender(lang.equals("en")?product.getProductInformation().getGender().getNameEn():product.getProductInformation().getGender().getNameRu());
+            productResponseDto.setSeason(lang.equals("en")?product.getProductInformation().getSeason().getNameEn():product.getProductInformation().getSeason().getNameRu());
+
+            productResponseDto.setMaterials(materialRepository.findAll().stream()
+                    .map(material -> "ru".equals(lang) ? material.getNameRu() : material.getNameEn())
+                    .collect(Collectors.toList()));
+
+            productResponseDto.setTags(tagRepository.findAll().stream()
+                    .map(tag -> "ru".equals(lang) ? tag.getNameRu() : tag.getNameEn())
+                    .collect(Collectors.toList()));
+
+            productResponseDto.setColors(colorRepository.findAll().stream()
+                    .map(color -> "ru".equals(lang) ? color.getNameRu() : color.getNameEn())
+                    .collect(Collectors.toList()));
+
             List<ImageData> images = imageDataRepository.findByProductId(product.getId());
             LOGGER.info("Fill product images for product with id = " + id);
             List<String> urls = new ArrayList<>();
@@ -159,23 +188,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> getProductsWithSorting(Long userId, String query, Integer pageSize, Integer pageNumber, String sortBy, String sortOrder,
-                                                                                          List<String> size, List<String> color, List<String> brand, List<String> filtSeason, List<String> filtGender,
-                                                                                          List<String> filtAgeType, List<String> tags, List<String> materials, List<String> subcategory, List<String> category,
+                                                                                          List<Integer> size, List<Integer> color, List<Integer> brand, List<Integer> filtSeason, List<Integer> filtGender,
+                                                                                          List<Integer> filtAgeType, List<Integer> tags, List<Integer> materials, List<Integer> subcategory, List<Integer> category,
                                                                                           Double minPrice, Double maxPrice) throws SQLException {
         LOGGER.info("Get products with sorting, filtering and pagination");
         String decodedQuery = "";
         if (query != null) {
             decodedQuery = UriUtils.decode(query, "UTF-8");
         }
-        List<Integer> sizes = new ArrayList<>();
-        if (size!=null) {
-            for (String name : size) {
-                sizes.add(Integer.parseInt(name));
-            }
-        } else {
-            sizes=null;
-        }
-        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(userId, decodedQuery, pageSize, pageNumber, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+        List<GeneralProductResponseDto> products = productNativeRepository.getProducts(userId, decodedQuery, pageSize, pageNumber, sortBy, sortOrder, size != null ? size.toArray(new Integer[size.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
 
         LOGGER.info("Set favourites");
         for (GeneralProductResponseDto product : products) {
@@ -183,7 +204,7 @@ public class ProductServiceImpl implements ProductService {
         }
         ApplicationResponseDto<ListResponseDto<GeneralProductResponseDto>> responseDto = new ApplicationResponseDto<>();
         ListResponseDto<GeneralProductResponseDto> listResponseDto = new ListResponseDto<>();
-        Long totalItems = productNativeRepository.getProductCount(userId, decodedQuery, sortBy, sortOrder, sizes != null ? sizes.toArray(new Integer[sizes.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
+        Long totalItems = productNativeRepository.getProductCount(userId, decodedQuery, sortBy, sortOrder, size != null ? size.toArray(new Integer[size.size()]) : null, color != null ? color.toArray(new String[color.size()]) : null, brand != null ? brand.toArray(new String[brand.size()]) : null, filtSeason != null ? filtSeason.toArray(new String[filtSeason.size()]) : null, filtGender != null ? filtGender.toArray(new String[0]) : null, filtAgeType != null ? filtAgeType.toArray(new String[0]) : null, tags != null ? tags.toArray(new String[0]) : null, materials != null ? materials.toArray(new String[0]) : null, subcategory != null ? subcategory.toArray(new String[0]) : null, category != null ? category.toArray(new String[0]) : null, minPrice, maxPrice);
         listResponseDto.setItems(products);
         listResponseDto.setTotalItems(totalItems);
         responseDto.setStatus("Product found!");
@@ -241,25 +262,25 @@ public class ProductServiceImpl implements ProductService {
         ProductInformation productInformation = entityToUpdate.getProductInformation();
         productInformation.setDescription(requestDto.getDescription());
         productInformation.setPrice(requestDto.getPrice());
-        if (requestDto.getGender().isEmpty()){
+        if (requestDto.getGenderId()==null){
             productInformation.setGender(null);
         } else {
-           // productInformation.setGender(ProductGender.valueOf(requestDto.getGender()));
+            productInformation.setGender(productGenderRepository.getReferenceById(Long.valueOf(requestDto.getGenderId())));
         }
-        if (requestDto.getSeason().isEmpty()){
+        if (requestDto.getSeasonId()==null){
             productInformation.setSeason(null);
         } else {
-           // productInformation.setSeason(requestDto.getSeason().equals("DEMI-SEASON") ? Season.DEMI_SEASON : Season.valueOf(requestDto.getSeason()));
+            productInformation.setSeason(seasonRepository.getReferenceById(Long.valueOf(requestDto.getSeasonId())));
         }
-        if (requestDto.getCondition().isEmpty()){
+        if (requestDto.getConditionId()==null){
             productInformation.setCondition(null);
         } else {
-          //  productInformation.setCondition(Condition.valueOf(requestDto.getCondition()));
+            productInformation.setCondition(conditionRepository.getReferenceById(Long.valueOf(requestDto.getConditionId())));
         }
-        if (requestDto.getAgeType().isEmpty()){
+        if (requestDto.getAgeTypeId()==null){
             productInformation.setAgeType(null);
         } else {
-           // productInformation.setAgeType(requestDto.getAgeType());
+            productInformation.setAgeType(ageTypeRepository.getReferenceById(Long.valueOf(requestDto.getAgeTypeId())));
         }
         productInformation.setProductBrand(brandRepository.getReferenceById(requestDto.getBrandId()));
         productInformation.setColors(colorRepository.findAllById(requestDto.getColorsId()));

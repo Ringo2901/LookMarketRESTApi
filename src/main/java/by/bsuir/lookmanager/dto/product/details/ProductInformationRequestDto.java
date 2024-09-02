@@ -15,10 +15,10 @@ public class ProductInformationRequestDto {
     private Double price;
 
     private String description;
-    private String gender;
-    private String season;
-    private String condition;
-    private String ageType;
+    private Integer genderId;
+    private Integer seasonId;
+    private Integer conditionId;
+    private Integer ageTypeId;
     private Long brandId;
 
     private List<Long> sizesId;

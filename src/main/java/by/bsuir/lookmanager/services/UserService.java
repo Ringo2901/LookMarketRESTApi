@@ -9,9 +9,9 @@ public interface UserService {
 
     ApplicationResponseDto<Long> userLogin(UserLoginRequestDto userLoginRequestDto);
 
-    ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id);
+    ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id, String lang);
 
-    ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto);
+    ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto, String lang);
 
     ApplicationResponseDto<?> deleteUserById(Long id);
 

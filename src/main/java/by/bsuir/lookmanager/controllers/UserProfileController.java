@@ -27,12 +27,13 @@ public class UserProfileController {
     private JwtValidator jwtValidator;
     private static final Logger LOGGER = LogManager.getLogger(UserProfileController.class);
     @GetMapping()
-    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String token) {
+    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                         @RequestParam(required = false, defaultValue = "en") String lang) {
         if (token == null){
             throw new NotFoundException("User not found!");
         }
         LOGGER.info("Start getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
-        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(0L, jwtValidator.validateTokenAndGetUserId(token));
+        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(0L, jwtValidator.validateTokenAndGetUserId(token), lang);
         LOGGER.info("Finish getting current user with id = " + jwtValidator.validateTokenAndGetUserId(token));
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
@@ -49,16 +50,20 @@ public class UserProfileController {
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getUserById(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long id) {
+    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> getUserById(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
+                                                                                      @RequestParam(required = false, defaultValue = "en") String lang,
+                                                                                      @PathVariable Long id) {
         LOGGER.info("Start getting user with id = " + id);
-        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), id);
+        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.findUserById(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), id, lang);
         LOGGER.info("Finish getting user with id = " + id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
     @PostMapping()
-    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> updateUserProfileById(@RequestHeader("Authorization") String token, @RequestBody UserProfileRequestDto requestDto) {
+    public ResponseEntity<ApplicationResponseDto<UserProfileResponseDto>> updateUserProfileById(@RequestHeader("Authorization") String token,
+                                                                                                @RequestParam(required = false, defaultValue = "en") String lang,
+                                                                                                @RequestBody UserProfileRequestDto requestDto) {
         LOGGER.info("Start updating user with id = " + jwtValidator.validateTokenAndGetUserId(token));
-        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.saveUserProfileById(jwtValidator.validateTokenAndGetUserId(token), requestDto);
+        ApplicationResponseDto<UserProfileResponseDto> responseDto = userService.saveUserProfileById(jwtValidator.validateTokenAndGetUserId(token), requestDto, lang);
         LOGGER.info("Finish updating user response = " + responseDto);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }

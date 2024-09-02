@@ -55,6 +55,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
     @Autowired
+    private UserGenderRepository userGenderRepository;
+    @Autowired
     private Filter moesifFilter;
     private final Cloudinary cloudinary;
     private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
@@ -155,13 +157,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id) throws NotFoundException {
+    public ApplicationResponseDto<UserProfileResponseDto> findUserById(Long userId, Long id, String lang) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Find user by id = " + userId);
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found when findUserById execute"));
         LOGGER.info("Find catalogs by user id = " + userId);
         List<Catalog> catalogs = catalogRepository.findByUserId(user.getId());
         UserProfileResponseDto userProfileResponseDto = userProfileMapper.userEntityToUserProfileResponseDto(user);
+        userProfileResponseDto.setGender(lang.equals("eu")?user.getUserProfile().getGender().getNameEn():user.getUserProfile().getGender().getNameRu());
         List<Long> catalogIdsList = new ArrayList<>();
         for (Catalog catalog : catalogs) {
             catalogIdsList.add(catalog.getId());
@@ -179,7 +182,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto) throws NotFoundException {
+    public ApplicationResponseDto<UserProfileResponseDto> saveUserProfileById(Long id, UserProfileRequestDto requestDto, String lang) throws NotFoundException {
         ApplicationResponseDto<UserProfileResponseDto> responseDto = new ApplicationResponseDto<>();
         LOGGER.info("Find user by id = " + id);
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id = " + id + " when saveUserProfileById execute"));
@@ -199,11 +202,7 @@ public class UserServiceImpl implements UserService {
         }
         userProfile.setAddress(requestDto.getAddress());
         userProfile.setPhoneNumber(requestDto.getPhoneNumber());
-        if (requestDto.getGender().isEmpty()) {
-            userProfile.setGender(null);
-        } else {
-            //userProfile.setGender(UserGender.valueOf(requestDto.getGender()));
-        }
+        userProfile.setGender(userGenderRepository.getReferenceById(requestDto.getGenderId().longValue()));
         userProfile.setPostalCode(requestDto.getPostalCode());
         if (requestDto.getImageData() != null && !requestDto.getImageData().isEmpty()) {
             String carg = requestDto.getImageData();

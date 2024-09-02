@@ -29,9 +29,11 @@ public class ProductController {
     private static final Logger LOGGER = LogManager.getLogger(ProductController.class);
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> getProductById(@RequestHeader(value = "Authorization", required = false) Optional<String> token, @PathVariable Long id) {
+    public ResponseEntity<ApplicationResponseDto<ProductDetailsResponseDto>> getProductById(@RequestHeader(value = "Authorization", required = false) Optional<String> token,
+                                                                                            @RequestParam(required = false, defaultValue = "en") String lang,
+                                                                                            @PathVariable Long id) {
         LOGGER.info("Start getting product info by product id = " + id);
-        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.getProductInformationById(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), id);
+        ApplicationResponseDto<ProductDetailsResponseDto> responseDto = productService.getProductInformationById(jwtValidator.validateTokenAndGetUserId(token.orElse(null)), id, lang);
         LOGGER.info("Finish getting product info by product id = " + id);
         return ResponseEntity.status(responseDto.getCode()).body(responseDto);
     }
@@ -66,16 +68,16 @@ public class ProductController {
                                                                                                           @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
                                                                                                           @RequestParam(required = false, defaultValue = "createdTime") String sortBy,
                                                                                                           @RequestParam(required = false, defaultValue = "desc") String sortOrder,
-                                                                                                          @RequestParam(required = false) List<String> sizes,
-                                                                                                          @RequestParam(required = false) List<String> colors,
-                                                                                                          @RequestParam(required = false) List<String> brand,
-                                                                                                          @RequestParam(required = false) List<String> seasons,
-                                                                                                          @RequestParam(required = false) List<String> genders,
-                                                                                                          @RequestParam(required = false) List<String> ageTypes,
-                                                                                                          @RequestParam(required = false) List<String> tags,
-                                                                                                          @RequestParam(required = false) List<String> materials,
-                                                                                                          @RequestParam(required = false) List<String> subcategory,
-                                                                                                          @RequestParam(required = false) List<String> category,
+                                                                                                          @RequestParam(required = false) List<Integer> sizes,
+                                                                                                          @RequestParam(required = false) List<Integer> colors,
+                                                                                                          @RequestParam(required = false) List<Integer> brand,
+                                                                                                          @RequestParam(required = false) List<Integer> seasons,
+                                                                                                          @RequestParam(required = false) List<Integer> genders,
+                                                                                                          @RequestParam(required = false) List<Integer> ageTypes,
+                                                                                                          @RequestParam(required = false) List<Integer> tags,
+                                                                                                          @RequestParam(required = false) List<Integer> materials,
+                                                                                                          @RequestParam(required = false) List<Integer> subcategory,
+                                                                                                          @RequestParam(required = false) List<Integer> category,
                                                                                                           @RequestParam(required = false, defaultValue = "0") Double minPrice,
                                                                                                           @RequestParam(required = false, defaultValue = "1000") Double maxPrice) throws SQLException {
         LOGGER.info("Start getting products with sorting and filtering");
